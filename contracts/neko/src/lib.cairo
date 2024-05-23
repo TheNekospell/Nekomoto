@@ -1,5 +1,5 @@
 #[starknet::contract]
-mod MyERC20Token {
+mod Neko {
     use openzeppelin::token::erc20::erc20::ERC20Component::InternalTrait;
     use openzeppelin::token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use starknet::{ContractAddress, get_caller_address};
@@ -33,7 +33,7 @@ mod MyERC20Token {
         fixed_supply: u256,
         recipient: ContractAddress
     ) {
-        self.erc20.initializer("aaa", "bbb");
+        self.erc20.initializer("NekoCoin", "NKO");
         self.erc20._mint(recipient, fixed_supply);
     }
 
