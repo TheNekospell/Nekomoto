@@ -2,6 +2,7 @@ mod interface;
 
 #[starknet::contract]
 mod Nekomoto {
+    use core::traits::TryInto;
     use core::array::ArrayTrait;
     use core::integer;
     use nekomoto::interface::ERC20BurnTraitDispatcherTrait;
@@ -11,7 +12,7 @@ mod Nekomoto {
     use core::traits::Into;
     use openzeppelin::token::erc721::erc721::ERC721Component::InternalTrait;
     use openzeppelin::introspection::src5::SRC5Component;
-    use openzeppelin::token::erc721::{ERC721Component, ERC721HooksEmptyImpl};
+    use openzeppelin::token::erc721::ERC721Component;
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
 
     component!(path: ERC721Component, storage: erc721, event: ERC721Event);
@@ -775,5 +776,42 @@ mod Nekomoto {
         }
 
         (rarity, element, name)
+    }
+
+    impl ERC721HooksImpl<TContractState> of ERC721Component::ERC721HooksTrait<TContractState> {
+        fn before_update(
+            ref self: ERC721Component::ComponentState<TContractState>,
+            to: ContractAddress,
+            token_id: u256,
+            auth: ContractAddress
+        ) {
+            let mut state = nekomoto::Nekomoto::unsafe_new_contract_state();
+            let seed = state.seed.read(token_id);
+            let with_buff = state.with_buff.read(token_id);
+            let rarity = generate_rarity(seed, with_buff);
+            let owner = state.owner.read();
+            let from = self.ERC721_owners.read(token_id);
+            if from == owner {
+                if rarity == 4 || rarity == 5 {
+                    substract_lucky(ref state, to);
+                }
+                let fade = generate_fade(@state, rarity.try_into().unwrap(), seed, token_id);
+                assert(fade == 0, 'Still have fade');
+                state.fade_consume.write(token_id, state.fade_consume.read(token_id) + fade);
+            } else if to == owner {
+                if rarity == 4 || rarity == 5 {
+                    add_lucky(ref state, from);
+                }
+                state.stake_time.write(token_id, get_block_timestamp().into());
+                state.stake_from.write(token_id, from);
+            }
+        }
+
+        fn after_update(
+            ref self: ERC721Component::ComponentState<TContractState>,
+            to: ContractAddress,
+            token_id: u256,
+            auth: ContractAddress
+        ) {}
     }
 }
