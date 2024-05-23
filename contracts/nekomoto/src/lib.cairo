@@ -1,13 +1,13 @@
 mod interface;
 
 #[starknet::contract]
-mod Box {
+mod Nekomoto {
     use core::array::ArrayTrait;
     use core::integer;
-    use box::interface::ERC20BurnTraitDispatcherTrait;
-    use box::interface::ERC721BurnTraitDispatcherTrait;
-    use box::interface::ERC721BurnTraitDispatcher;
-    use box::interface::ERC20BurnTraitDispatcher;
+    use nekomoto::interface::ERC20BurnTraitDispatcherTrait;
+    use nekomoto::interface::ERC721BurnTraitDispatcherTrait;
+    use nekomoto::interface::ERC721BurnTraitDispatcher;
+    use nekomoto::interface::ERC20BurnTraitDispatcher;
     use core::traits::Into;
     use openzeppelin::token::erc721::erc721::ERC721Component::InternalTrait;
     use openzeppelin::introspection::src5::SRC5Component;
@@ -116,9 +116,9 @@ mod Box {
         prism: ContractAddress,
         temporal_shard: ContractAddress
     ) {
-        let name = "NFT";
-        let symbol = "NFT";
-        let base_uri = "https://api.example.com/v1/";
+        let name = "Nekomoto";
+        let symbol = "Nekomoto";
+        let base_uri = "TBD";
 
         self.token_id.write(1);
         self.erc721.initializer(name, symbol, base_uri);
@@ -131,25 +131,34 @@ mod Box {
     }
 
     #[external(v0)]
-    fn summon(ref self: ContractState, recipient: ContractAddress) {
+    fn summon(ref self: ContractState, recipient: ContractAddress, count: u256) {
         let token_id = self.token_id.read();
         let sender = get_caller_address();
         assert(sender == self.owner.read(), 'Only the owner can mint');
 
-        let block_time = starknet::get_block_timestamp();
-        let b_u256_time: u256 = block_time.into();
-        let input = array![b_u256_time, token_id];
-        let seed = keccak::keccak_u256s_be_inputs(input.span());
+        let mut i = 0;
+        loop {
+            if i == count {
+                break;
+            }
 
-        self.erc721._mint(recipient, token_id);
-        self.token_id.write(token_id + 1);
-        self.seed.write(token_id, seed);
-        self.with_buff.write(token_id, if lucky(@self, sender) {
-            1
-        } else {
-            0
-        });
-        self.emit(Summon { to: recipient, token_id });
+            let block_time = starknet::get_block_timestamp();
+            let b_u256_time: u256 = block_time.into();
+            let input = array![b_u256_time, token_id];
+            let seed = keccak::keccak_u256s_be_inputs(input.span());
+
+            self.erc721._mint(recipient, token_id);
+            self.token_id.write(token_id + 1);
+            self.seed.write(token_id, seed);
+            self.with_buff.write(token_id, if lucky(@self, sender) {
+                1
+            } else {
+                0
+            });
+            self.emit(Summon { to: recipient, token_id });
+
+            i = i + 1;
+        }
     }
 
     // BUFF
@@ -390,6 +399,7 @@ mod Box {
             level: level.into()
         }
     }
+
 
     fn random(input: u256, min: u256, max: u256) -> u256 {
         if max == min {
