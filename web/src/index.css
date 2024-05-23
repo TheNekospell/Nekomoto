@@ -1,0 +1,158 @@
+@font-face {
+  font-family: '04b03';
+  src: local('04b03'), url(./fonts/04B_03__.TTF) format('woff');
+}
+@font-face {
+  font-family: 'Frijole';
+  src: local('Frijole'), url(./fonts/Frijole-Regular.ttf) format('woff');
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+.main-bg {
+  background-repeat: no-repeat;
+  background-size: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.navbar {
+  display: flex;
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  height: 80px;
+  gap: 12px;
+  justify-content: space-between;
+}
+.navbar-main {
+  background: rgba(0, 0, 0, 0.24);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+.nav-img {
+  height: 48px;
+}
+.nav-title {
+  font-family: "Frijole", system-ui;
+  font-size: 18px;
+  background-image: linear-gradient(to bottom, #FFD43C 10.5%, #F66C08 100%);
+  -webkit-background-clip: text;
+  color: transparent;
+
+  text-shadow: 0px 4px 24px 0px rgba(0, 0, 0, 0.48), 0px 18px 0px 0px rgba(255, 255, 255, 1),0px -32px 0px 0px rgba(0, 0, 0, 0.64);
+
+}
+.middle-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  align-items: center;
+}
+.middle-middle {
+  width: 1024px;
+  height: 428px;
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  align-items: center;
+}
+.middle-title {
+  font-family: "Frijole", system-ui;
+  font-size: 128px;
+  font-weight: 400;
+  line-height: 128px;
+  letter-spacing: -12px;
+  background-image: linear-gradient(to bottom, #FFD43C 10.5%, #F66C08 100%);
+  -webkit-background-clip: text;
+  color: transparent;
+
+  text-shadow: 0px 4px 24px 0px rgba(0, 0, 0, 0.48), 0px 18px 0px 0px rgba(255, 255, 255, 1),0px -32px 0px 0px rgba(0, 0, 0, 0.64);
+
+
+}
+.middle-desc {
+  font-family: '04b03';
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 22px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.middle-button img {
+  height: 20px;
+  width: 20px;
+}
+.middle-button {
+  margin-top: 60px;
+  font-family: '04b03';
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 28px;
+  text-align: center;
+  color: rgba(0, 0, 0, 1);
+  background: linear-gradient(180deg, #FFD43C 0%, #F66C08 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  width: 159px;
+  padding: 12px 0;
+  border-radius: 8px;
+  border: 4px solid rgba(0, 0, 0, 0.24);
+  cursor: pointer;
+}
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nav-right {
+  display: flex;
+  align-items: center;
+  margin-right: 14px;
+}
+.nav-right img {
+  width: 20px;
+  cursor: pointer;
+}
+.navbar-mobile {
+  width: 360px;
+}
+.middle-main-mobile {
+  width: 360px;
+}
+.middle-middle-mobile {
+  width: 360px;
+}
+.title-img {
+  width: 360px;
+}
+.middle-desc-mobile {
+  font-size: 17px;
+  margin-top: 16px;
+}
+.title-max-img {
+  width: 805px;
+}
+.nav-top-title {
+  width: 130.5px;
+}
