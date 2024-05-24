@@ -6,6 +6,10 @@
   font-family: 'Frijole';
   src: local('Frijole'), url(./fonts/Frijole-Regular.ttf) format('woff');
 }
+@font-face {
+  font-family: 'Bigshort';
+  src: local('Bigshort'), url(./fonts/big-shot.ttf) format('woff');
+}
 
 body {
   margin: 0;
@@ -90,7 +94,7 @@ code {
 
 }
 .middle-desc {
-  font-family: '04b03';
+  font-family: 'Bigshort';
   color: rgba(255, 255, 255, 0.9);
   font-size: 22px;
   text-align: center;
@@ -147,12 +151,14 @@ code {
   width: 360px;
 }
 .middle-desc-mobile {
-  font-size: 17px;
+  font-size: 18px;
   margin-top: 16px;
+  width: auto;
 }
 .title-max-img {
-  width: 805px;
+  width: 826px;
 }
 .nav-top-title {
-  width: 130.5px;
+  width: 116px;
+  height: 36px;
 }
