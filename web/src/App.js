@@ -20,7 +20,7 @@ function App() {
             <div className="middle-middle middle-middle-mobile" >
                 <img className="title-img" src="title.png" alt=""/>
                 <div className="middle-desc middle-desc-mobile">
-                    Hidden in the ocean of SEI is an ancient and mysterious island called the "Civet Islands", which is the hometown of civets. The Civet Islands are made up of five main islands, each representing an elemental force: fire, water, wind, earth, and thunder. These islands surround the central mysterious island, which is said to contain endless power.
+                    A fully onchain card game combining RPG elements with collection, nurturing, and strategy mechanics.
                 </div>
                 <div className="middle-button">
                     <img src="play.png" alt=""/>
