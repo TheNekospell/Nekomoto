@@ -1,0 +1,20 @@
+.coner-top-left{
+    position: absolute;
+    left:-25px;
+    top:-10px;
+  }
+  .coner-bottom-left{
+    position: absolute;
+    left:-25px;
+    bottom:-10px;
+  }
+  .coner-top-right{
+    position: absolute;
+    right:-25px;
+    top:-10px;
+  }
+  .coner-bottom-right{
+    position: absolute;
+    right:-25px;
+    bottom:-10px;
+  }

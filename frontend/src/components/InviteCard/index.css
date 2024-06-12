@@ -1,0 +1,58 @@
+.invite-card {
+  padding: 32px 28px;
+  background: #1d3344;
+  position: relative;
+  height: 100%;
+}
+
+
+
+.card-mini-desc{
+  color: #90A6AF;
+   font-size: 11px;
+   font-family: BIG SHOT;
+   font-weight: 400;
+   word-wrap: break-word;
+   margin-top: 12px;
+}
+
+.invite-btn-wrapper{
+  position: absolute;
+  left:50%;
+  bottom:-18px;
+  transform: translateX(-50%);
+}
+
+.friend{
+
+}
+.friend-avatar{
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  background-color: #0A273C;
+  color: #01DCE4;
+  line-height: 1.5;
+  font-size: 24px;
+  text-align: center;
+  cursor: pointer;
+}
+.friend-text{
+color: #01DCE4;
+ font-size: 12px;
+ font-family: 04b03;
+ font-weight: 400;
+ word-wrap: break-word
+}
+.friend-text2{
+  color: #90A6AF;
+   font-size: 12px;
+   font-family: 04b03;
+   font-weight: 400;
+   word-wrap: break-word
+  }
+
+
+

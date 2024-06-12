@@ -1,0 +1,8 @@
+.card-item > img {
+  margin-bottom: 8px;
+  width: 100%;
+}
+.card-item {
+  width: 100%;
+  margin-bottom: 24px;
+}

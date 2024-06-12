@@ -1,0 +1,70 @@
+.nBtn {
+
+  text-align: center;
+  padding: 12px 36px;
+  color: black;
+  font-size: 14px;
+  font-family: BIG SHOT;
+  font-weight: 400;
+  text-transform: uppercase;
+  word-wrap: break-word;
+  cursor: pointer;
+  line-height: 1;
+  height: 36px;
+  display: inline-flex;
+align-self: center;
+}
+
+.yellowBtn.shortBtn{
+    background: url("../../assets/btn-yellow-short.png") no-repeat;
+    background-size: 100% 100%;
+}
+.yellowBtn.longBtn{
+    background: url("../../assets/btn-yellow-long.png") no-repeat;
+    background-size: 100% 100%;
+}
+
+.orangeBtn.shortBtn{
+    background: url("../../assets/btn-orange-short.png") no-repeat;
+    background-size: 100% 100%;
+}
+.orangeBtn.longBtn{
+    background: url("../../assets/btn-orange-long.png") no-repeat;
+    background-size: 100% 100%;
+}
+
+.yellowBtn.shortBtn{
+    background: url("../../assets/btn-yellow-short.png") no-repeat;
+    background-size: 100% 100%;
+}
+.yellowBtn.longBtn{
+    background: url("../../assets/btn-yellow-long.png") no-repeat;
+    background-size: 100% 100%;
+}
+
+.blueBtn.shortBtn{
+    background: url("../../assets/btn-blue-short.png") no-repeat;
+    background-size: 100% 100%;
+}
+.blueBtn.longBtn{
+    background: url("../../assets/btn-blue-long.png") no-repeat;
+    background-size: 100% 100%;
+}
+
+.stakeBtn {
+}
+
+.lvBtn {
+}
+
+.unStakeBtn {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.longBtn {
+}
+
+
+.disabledBtn{
+    opacity: 0.6;
+}

@@ -1,0 +1,43 @@
+.input-card {
+  padding: 32px 28px;
+  background: #1d3344;
+  position: relative;
+  height: 100%;
+}
+
+
+
+.input-card-text1 {
+  color: white;
+}
+
+.input-card-text2 {
+  color: #ffec9e;
+}
+
+.input-card-text3 {
+  color: #01DCE4;
+}
+
+.input-card-input {
+  color: #90a6af;
+  font-size: 14px;
+  font-family: BIG SHOT;
+  font-weight: 400;
+  word-wrap: break-word;
+  padding: 0 16px;
+  height: 48px;
+  background: #0E2736;
+  outline: none;
+  width: 100%;
+  border: none;
+}
+
+
+
+
+
+.padding-wrapper{
+  padding:24px;
+  background-color: #0E2736;
+}

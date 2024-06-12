@@ -1,0 +1,20 @@
+.info-card {
+  padding: 32px 28px;
+  background: #1d3344;
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.num-60 {
+  color: white;
+  font-size: 48px;
+  font-family: BIG SHOT;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+.info-item{
+  background-color: #0E2736;
+  padding: 20px;
+}

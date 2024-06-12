@@ -1,0 +1,23 @@
+.radioBtn {
+  text-align: center;
+  padding: 12px 16px;
+
+  cursor: pointer;
+  line-height: 1;
+  height: 36px;
+  display: inline-flex;
+
+  color: #90a6af;
+  font-size: 14px;
+  font-family: BIG SHOT;
+  font-weight: 400;
+  text-transform: uppercase;
+  word-wrap: break-word;
+  background-color: #112E3F;
+  margin-right: 12px;
+}
+
+.activeRadioBtn{
+  color: #03141B;
+  background-color: #E9D78E;
+}
