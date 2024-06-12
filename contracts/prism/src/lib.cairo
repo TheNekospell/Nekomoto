@@ -1,5 +1,5 @@
 #[starknet::contract]
-mod Prism {
+mod Prism{
     use openzeppelin::token::erc20::erc20::ERC20Component::InternalTrait;
     use openzeppelin::token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use starknet::{ContractAddress, get_caller_address};

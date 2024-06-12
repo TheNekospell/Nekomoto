@@ -1,5 +1,5 @@
 #[starknet::contract]
-mod Neko {
+mod NekoCoin{
     use openzeppelin::token::erc20::erc20::ERC20Component::InternalTrait;
     use openzeppelin::token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use starknet::{ContractAddress, get_caller_address};
@@ -27,11 +27,9 @@ mod Neko {
 
     #[constructor]
     fn constructor(
-        ref self: ContractState,
-        // name: ByteArray,
-        // symbol: ByteArray,
-        fixed_supply: u256,
-        recipient: ContractAddress
+        ref self: ContractState, // name: ByteArray,
+         // symbol: ByteArray,
+        fixed_supply: u256, recipient: ContractAddress
     ) {
         self.erc20.initializer("NekoCoin", "NKO");
         self.erc20._mint(recipient, fixed_supply);

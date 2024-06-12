@@ -13,10 +13,14 @@ mod Nekomoto {
     use openzeppelin::token::erc721::erc721::ERC721Component::InternalTrait;
     use openzeppelin::introspection::src5::SRC5Component;
     use openzeppelin::token::erc721::ERC721Component;
-    use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
+    use starknet::{ContractAddress, get_caller_address, get_block_timestamp, ClassHash};
+
+    use components::upgradeable::upgradeable::UpgradeableComponent;
+    use components::upgradeable::upgradeable::UpgradeableComponent::InternalTrait as upgradeableInternal;
 
     component!(path: ERC721Component, storage: erc721, event: ERC721Event);
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
+    component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
 
     #[abi(embed_v0)]
     impl ERC721MixinImpl = ERC721Component::ERC721MixinImpl<ContractState>;
@@ -24,12 +28,14 @@ mod Nekomoto {
 
     #[storage]
     struct Storage {
-        owner: ContractAddress,
+        host: ContractAddress,
         token_id: u256,
         #[substorage(v0)]
         erc721: ERC721Component::Storage,
         #[substorage(v0)]
         src5: SRC5Component::Storage,
+        #[substorage(v0)]
+        upgradeable: UpgradeableComponent::Storage,
         // BUFF
         neko: ContractAddress,
         prism: ContractAddress,
@@ -40,6 +46,9 @@ mod Nekomoto {
         // BOX
         seed: LegacyMap<u256, u256>,
         with_buff: LegacyMap<u256, u8>,
+        starter: LegacyMap<u256, u8>,
+        open_pack: LegacyMap<ContractAddress, u8>,
+        starter_pack_limit: u256,
         fade_increase: LegacyMap<u256, u256>,
         fade_consume: LegacyMap<u256, u256>,
         stake_time: LegacyMap<u256, u256>,
@@ -68,6 +77,8 @@ mod Nekomoto {
         ERC721Event: ERC721Component::Event,
         #[flat]
         SRC5Event: SRC5Component::Event,
+        #[flat]
+        UpgradeableEvent: UpgradeableComponent::Event,
         UpgradeAscend: UpgradeAscend,
         TimeFreeze: TimeFreeze,
         Upgrade: Upgrade,
@@ -124,18 +135,24 @@ mod Nekomoto {
         self.token_id.write(1);
         self.erc721.initializer(name, symbol, base_uri);
 
-        self.owner.write(get_caller_address());
+        self.host.write(get_caller_address());
 
         self.neko.write(neko);
         self.prism.write(prism);
         self.temporal_shard.write(temporal_shard);
     }
 
+    #[abi(embed_v0)]
+    fn replace_classhash(ref self: ContractState, new_class_hash: ClassHash) {
+        assert(get_caller_address() == self.host.read(), 'Only the host can mint');
+        self.upgradeable._upgrade(new_class_hash);
+    }
+
     #[external(v0)]
     fn summon(ref self: ContractState, recipient: ContractAddress, count: u256) {
         let token_id = self.token_id.read();
         let sender = get_caller_address();
-        assert(sender == self.owner.read(), 'Only the owner can mint');
+        assert(sender == self.host.read(), 'Only the host can mint');
 
         let mut i = 0;
         loop {
@@ -160,6 +177,24 @@ mod Nekomoto {
 
             i = i + 1;
         }
+    }
+
+    #[external(v0)]
+    fn add_limit(ref self: ContractState, input: u256) {
+        assert(self.host.read() == get_caller_address(), 'Only the host');
+        self.starter_pack_limit.write(self.starter_pack_limit.read() + input);
+    }
+
+    #[external(v0)]
+    fn stater_pack(ref self: ContractState) {
+        let sender = get_caller_address();
+        assert(self.open_pack.read(sender) == 0, 'Already opened');
+        assert(self.starter_pack_limit.read() > 0, 'No more starter pack');
+        self.open_pack.write(sender, 1);
+        self.starter_pack_limit.write(self.starter_pack_limit.read() - 1);
+        let token_id = self.token_id.read() + 1;
+        self.token_id.write(token_id);
+        self.emit(Summon { to: sender, token_id: token_id });
     }
 
     // BUFF
@@ -243,9 +278,9 @@ mod Nekomoto {
     }
 
     #[external(v0)]
-    fn upgradeAscend(ref self: ContractState) {
+    fn upgrade_acend(ref self: ContractState) {
         let ascend = self.ascend.read(get_caller_address());
-        let (neko_count, prism) = upgradeAscendConsume(ascend + 1);
+        let (neko_count, prism) = upgrade_ascend_consume(ascend + 1);
 
         assert(neko_count != 0, 'Exceed max level');
 
@@ -266,7 +301,7 @@ mod Nekomoto {
             );
     }
 
-    fn upgradeAscendConsume(target_level: u256) -> (u256, u256) {
+    fn upgrade_ascend_consume(target_level: u256) -> (u256, u256) {
         if (target_level == 1) {
             return (100000000000000000000, 9000000000000000000);
         } else if (target_level == 2) {
@@ -296,7 +331,7 @@ mod Nekomoto {
         ref self: ContractState, token_id: Span<u256>, amount: Span<u256>, burn: Span<u256>
     ) {
         let sender = get_caller_address();
-        assert(self.owner.read() == sender, 'Only the owner');
+        assert(self.host.read() == sender, 'Only the host');
 
         let mut j = 0;
         loop {
@@ -418,7 +453,7 @@ mod Nekomoto {
     }
 
     fn stake_consume(self: @ContractState, token_id: u256) -> u256 {
-        if self.erc721._owner_of(token_id) == self.owner.read() {
+        if self.erc721._owner_of(token_id) == self.host.read() {
             let end = time_freeze_end(self, self.stake_from.read(token_id));
             let block_time = get_block_timestamp().into();
             if end != 0 && block_time > end {
@@ -789,16 +824,16 @@ mod Nekomoto {
             let seed = state.seed.read(token_id);
             let with_buff = state.with_buff.read(token_id);
             let rarity = generate_rarity(seed, with_buff);
-            let owner = state.owner.read();
+            let host = state.host.read();
             let from = self.ERC721_owners.read(token_id);
-            if from == owner {
+            if from == host {
                 if rarity == 4 || rarity == 5 {
                     substract_lucky(ref state, to);
                 }
                 let fade = generate_fade(@state, rarity.try_into().unwrap(), seed, token_id);
                 assert(fade == 0, 'Still have fade');
                 state.fade_consume.write(token_id, state.fade_consume.read(token_id) + fade);
-            } else if to == owner {
+            } else if to == host {
                 if rarity == 4 || rarity == 5 {
                     add_lucky(ref state, from);
                 }

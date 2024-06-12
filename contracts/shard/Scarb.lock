@@ -2,13 +2,19 @@
 version = 1
 
 [[package]]
-name = "erc721"
+name = "components"
 version = "0.1.0"
-dependencies = [
- "openzeppelin",
-]
+source = "git+https://github.com/orangeryang/cairo-component.git#a1512653fd3e942297ecce5587e87168499ecbb3"
 
 [[package]]
 name = "openzeppelin"
 version = "0.13.0"
 source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.13.0#978b4e75209da355667d8954d2450e32bd71fe49"
+
+[[package]]
+name = "temporalshard"
+version = "0.1.0"
+dependencies = [
+ "components",
+ "openzeppelin",
+]

@@ -8,5 +8,6 @@ edition = "2023_11"
 [dependencies]
 starknet = "2.6.3"
 openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.13.0" }
+components = { git = "https://github.com/orangeryang/cairo-component.git" }
 
 [[target.starknet-contract]]
