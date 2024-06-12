@@ -9,9 +9,9 @@
   min-height: 100vh;
 }
 .app-content {
-  max-width: 1280px;
+  /* max-width: 1280px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 16px; */
 }
 
 .yellow-border {
@@ -196,6 +196,21 @@
   margin-bottom: 8px;
 }
 
+.black-bg5{
+  padding:14px 24px;
+  position: relative;
+  margin-bottom: 8px;
+  background: #0E2736 url('./assets/icon6.png') 24px 14px no-repeat;
+  background-size: 24px 24px;
+}
+.black-bg4{
+  padding:14px 24px;
+  position: relative;
+  margin-bottom: 8px;
+  background: #0E2736 url('./assets/icon5.png') 24px 14px no-repeat;
+  background-size: 24px 24px;
+}
+
 .adept-bg{
   background-color: #0E2736;
   padding:16px 24px;
@@ -204,5 +219,13 @@
 }
 
 
+.ant-select-selector{
+  background-color: #E9D78E !important;
+  border: none !important;
+  border-radius: none !important;
+}
 
+.ant-dropdown-menu{
+  background-color: #0E2736 !important;
+}
 

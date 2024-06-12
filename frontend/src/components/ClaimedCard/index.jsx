@@ -8,7 +8,7 @@ import icon3 from "@assets/icon3.png";
 import { Col, Row, Flex } from "antd";
 import { useAppStore } from "@stores/index";
 
-export default function ClaimedCard() {
+export default function ClaimedCard({type}) {
   const { device } = useAppStore(); 
   return (
     <div className="input-card">
@@ -73,12 +73,12 @@ export default function ClaimedCard() {
         </Col> */}
       </Row>
       <Row align="center" justify="space-between" style={{marginTop:'24px'}}>
-        <Col xs={24} sm={5} style={{alignSelf:'center', margin:'16px 0'}}>
+        <Col xs={24} sm={type ==='short' ? 24 : 5} style={{alignSelf:'center', margin:'16px 0'}}>
           <img src={icon1} width={40} alt="" />
           <img src={icon2} width={40} alt="" style={{margin:'0 16px'}}  />
           <img src={icon3} width={40} alt="" />
         </Col>
-        <Col xs={24} sm={19}>
+        <Col xs={24} sm={type ==='short' ? 24 : 19}>
           <Row align="center" className="padding-wrapper">
             <Col xs={24} sm={6}>
               <GemItem color="purple" title="Prism" descLeft="x1245" />

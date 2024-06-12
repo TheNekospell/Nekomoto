@@ -13,7 +13,7 @@ export default function NekoTable({ title }) {
       <div className="card-title" style={{ marginBottom: "16px" }}>
         Treasury Revenue
       </div>
-      <Table columns={TableColumns} dataSource={TableData} scroll={{ x: 1200 }} pagination={false} />
+      <Table rowKey='id' columns={TableColumns} dataSource={TableData} scroll={{ x: 1200 }} pagination={false} />
 
       {/* <Row justify="center" className="table-header">
         {TableHeader.map((title, index) => (

@@ -24,16 +24,17 @@ export default function InviteCard({
       <BoxBorder />
 
       <Row justify="center" gutter>
-        <Col xs={24} sm={10} className="text-center">
+        <Col xs={24} sm={24} lg={10} className="text-center">
           <Row className="black-bg" align="center">
-            <Col xs={8} sm={8} className="text-center">
+            <Col xs={8} sm={8}  lg={8} className="text-center">
               <div style={{ padding: "11px 10px" }}>
                 <img src={box} width={56} />
               </div>
             </Col>
             <Col
               xs={16}
-              sm={16}
+              sm={16} 
+              lg={16}
               className="text-center"
               style={{ alignSelf: "center" }}
             >
@@ -48,21 +49,23 @@ export default function InviteCard({
 
         <Col
           xs={24}
-          sm={2}
+          sm={24} 
+          lg={2}
           className="text-center"
           style={{ alignSelf: "center", margin: "8px 0" }}
         >
           <img src={isMobile ? arrowDown : arrowRight} width={32} />
         </Col>
 
-        <Col xs={24} sm={10} className="text-center">
+        <Col xs={24} sm={24}  lg={10} className="text-center">
           <Row className="black-bg" align="center">
-            <Col xs={8} sm={8} className="text-center">
+            <Col xs={8} sm={8}  lg={8} className="text-center">
               <img src={masterBox} width={76} className="margin-right-16" />
             </Col>
             <Col
               xs={16}
-              sm={16}
+              sm={16} 
+              lg={16}
               className="text-center"
               style={{ alignSelf: "center" }}
             >
@@ -92,31 +95,31 @@ export default function InviteCard({
           </div>
         </Row>
         <Row justify={'center'} gutter='8'>
-            <Col xs={4} sm={3} className="friend">
+            <Col xs={4} sm={4}  lg={3} className="friend">
               <div className="friend-avatar text-center">
                 <img src={avatar} width="100%" alt="" />
               </div>
               <div className="friend-text">0x12...34</div>
             </Col>
-            <Col xs={4} sm={3} className="friend">
+            <Col xs={4} sm={4}  lg={3} className="friend">
               <div className="friend-avatar text-center">
                 +
               </div>
               <div className="friend-text2">Waiting</div>
             </Col>
-            <Col xs={4} sm={3} className="friend">
+            <Col xs={4} sm={4}  lg={3} className="friend">
               <div className="friend-avatar text-center">
                 +
               </div>
               <div className="friend-text2">Waiting</div>
             </Col>
-            <Col xs={4} sm={3} className="friend">
+            <Col xs={4} sm={4}  lg={3} className="friend">
               <div className="friend-avatar text-center">
                 +
               </div>
               <div className="friend-text2">Waiting</div>
             </Col>
-            <Col xs={4} sm={3} className="friend">
+            <Col xs={4} sm={4}  lg={3} className="friend">
               <div className="friend-avatar text-center">
                 +
               </div>

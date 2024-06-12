@@ -14,7 +14,7 @@ const gemMap = {
 export default function GemItem({ color, title, descLeft, descRight }) {
   return (
     <Flex className="gem-item">
-      <img src={gemMap[color]} width={48} alt="" />
+      <img src={gemMap[color]} width={48} alt="" style={{alignSelf:'self-start'}} />
       <div style={{marginLeft:'16px'}}>
         <div className="gem-title">{title}</div>
         <div>

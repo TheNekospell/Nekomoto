@@ -15,7 +15,7 @@ export default function Home() {
         <div className="home-text">
         A fully onchain card game combining RPG elements with <br /> collection, nurturing, and strategy mechanics.
         </div>
-        <div className="home-btn" onClick={()=>navigate('/wallet')}>
+        <div className="home-btn" onClick={()=>navigate('/assets')}>
            <img width={12} src={play} alt="" style={{marginRight:'16px'}} /> Paly
         </div>
       </div>

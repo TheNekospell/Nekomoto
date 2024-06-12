@@ -62,18 +62,25 @@ export default function Detail() {
       </Flex>
 
       <Row gutter={{ md: 0, lg: 16 }}>
-        <Col xs={24}  sm={24}  lg={6} className="margin-top-16">
-          <BoxCard
-            onButtonClick={() => setIsModalOpen1(true)}
-            title="Adept’s Chest"
-            buttonText="Open"
-            desc="Stake at least one Level 13 Neko NFT to obtain an Adept's Chest."
-          />
+        <Col xs={24}  sm={24}  lg={12} className="margin-top-16">
+          <InviteCard />
         </Col>
-        <Col xs={24}  sm={24}  lg={18} className="margin-top-16">
-          <ClaimedCard type="long" />
+        <Col xs={24}  sm={24}  lg={12} className="margin-top-16">
+          <ClaimedCard type="short" />
         </Col>
       </Row>
+
+
+      {/* <Row gutter={{ xs: 0, sm: 16 }}>
+        <Col xs={24} sm={12}>
+          <InviteCard />
+        </Col>
+        <Col xs={24} sm={12}>
+          <ClaimedCard type="short" />
+        </Col>
+      </Row> */}
+
+
       <Row gutter={{ md: 0, lg: 16 }}>
         <Col xs={24}  sm={24}  lg={6} className="margin-top-16">
           <BoxCard
