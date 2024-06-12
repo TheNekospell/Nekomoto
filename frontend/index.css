@@ -1,0 +1,6 @@
+@font-face {
+    font-family: big shot;
+    font-style: normal;
+    font-weight: 400;
+    src: local('BIG SHOT'),url(./public/big-shot.woff) format('woff')
+}
