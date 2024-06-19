@@ -4,7 +4,6 @@ pub(crate) mod NekoCoin {
     use openzeppelin::token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use starknet::{ContractAddress, get_caller_address};
 
-
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
 
     // ERC20 Mixin
@@ -26,11 +25,7 @@ pub(crate) mod NekoCoin {
     }
 
     #[constructor]
-    fn constructor(
-        ref self: ContractState, // name: ByteArray,
-         // symbol: ByteArray,
-        fixed_supply: u256, recipient: ContractAddress
-    ) {
+    fn constructor(ref self: ContractState, fixed_supply: u256, recipient: ContractAddress) {
         self.erc20.initializer("NekoCoin", "NKO");
         self.erc20.mint(recipient, fixed_supply);
     }

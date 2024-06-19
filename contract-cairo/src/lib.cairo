@@ -9,6 +9,6 @@ pub mod interface {
     pub mod interface;
 }
 
-pub mod tests {
-    pub mod test;
+mod tests {
+    mod test;
 }
