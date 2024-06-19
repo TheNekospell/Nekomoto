@@ -118,8 +118,8 @@ contract Box is Buff, ERC721Burnable {
     ) public override {
         require(tokenId <= _tokenId);
         _level[tokenId] = 0;
-        _fadeConsume[tokenId] = 0;
-        _fadeIncrease[tokenId] = 0;
+        // _fadeConsume[tokenId] = 0;
+        // _fadeIncrease[tokenId] = 0;
         _stakeTime[tokenId] = 0;
 
         if (to == address(0)) {
@@ -262,7 +262,7 @@ contract Box is Buff, ERC721Burnable {
         );
         Info memory info = _getDetail(rarity, seed, level, isStarter);
 
-        info.Fade = _generateFade(rarity, seed, tokenId, origin, isStarter);
+        info.Fade = _generateFade(rarity, seed, tokenId, isStarter);
 
         uint256 Mana = 0;
         if (info.Fade != 0) {
@@ -345,7 +345,7 @@ contract Box is Buff, ERC721Burnable {
         uint8 rarity,
         uint256 seed,
         uint256 tokenId,
-        bool origin,
+        // bool origin,
         bool isStarter
     ) internal view returns (uint256 Fade) {
         if (isStarter) {
@@ -363,9 +363,9 @@ contract Box is Buff, ERC721Burnable {
         } else if (rarity == 5) {
             Fade = _random(seed, 1350_00, 1600_00);
         }
-        if (origin) {
-            return Fade;
-        }
+        // if (origin) {
+        //     return Fade;
+        // }
         Fade = Fade + _fadeIncrease[tokenId] - _fadeConsume[tokenId];
         uint256 stakeConsume = _stakeConsume(tokenId);
         if (Fade > stakeConsume) {

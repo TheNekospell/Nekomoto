@@ -1,5 +1,5 @@
 #[starknet::contract]
-mod TemporalShard {
+pub(crate) mod TemporalShard {
     use openzeppelin::token::erc721::erc721::ERC721Component::InternalTrait;
     use openzeppelin::introspection::src5::SRC5Component;
     use openzeppelin::token::erc721::{ERC721Component, ERC721HooksEmptyImpl};
@@ -52,7 +52,7 @@ mod TemporalShard {
                 break;
             }
 
-            self.erc721._mint(recipient, self.token_id.read());
+            self.erc721.mint(recipient, self.token_id.read());
             self.token_id.write(self.token_id.read() + 1);
 
             i = i + 1;
@@ -61,12 +61,12 @@ mod TemporalShard {
 
     #[external(v0)]
     fn burn(ref self: ContractState, token_id: u256) {
-        self.erc721._burn(token_id);
+        self.erc721.burn(token_id);
     }
 
     #[external(v0)]
     fn burnFrom(ref self: ContractState, account: ContractAddress, token_id: u256) {
         self.erc721._check_authorized(account, get_caller_address(), token_id);
-        self.erc721._burn(token_id);
+        self.erc721.burn(token_id);
     }
 }
