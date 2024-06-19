@@ -21,11 +21,55 @@ mod test {
         0xfa15f33d9a964602972ee0635ba5e641646f0944d7dc279360e7ec943dce6a;
     const ACCOUNT_TEST_CLASS_HASH: felt252 =
         0xd5ad229820cc3391b5d3888c6ce1e08f010ce0d5be429e8030dfc603c60dc8;
+    const amount: u256 = 100_000_000_000_000_000_000;
 
-    fn deploy_nekomoto() {}
-    fn deploy_nekocoin() {}
-    fn deploy_prism() {}
-    fn deploy_shard() {}
+    #[test]
+    fn test() {
+        let host = deploy_account(0);
+        let bob = deploy_account(1);
+        let alice = deploy_account(2);
+
+        let nekocoin_address = deploy_nekocoin(host.contract_address.into());
+        let prism_address = deploy_prism(host.contract_address.into());
+        let temporal_shard_address = deploy_shard(host.contract_address.into());
+        let nekomoto_address = deploy_nekomoto(
+            nekocoin_address.into(),
+            prism_address.into(),
+            temporal_shard_address.into(),
+            host.contract_address.into()
+        );
+    }
+
+    fn deploy_nekomoto(
+        nekocoin: felt252, prism: felt252, temporal_shard: felt252, host: felt252
+    ) -> ContractAddress {
+        let mut calldata = array![];
+        calldata.append_serde(nekocoin);
+        calldata.append_serde(prism);
+        calldata.append_serde(temporal_shard);
+        calldata.append_serde(host);
+        deploy(nekomoto::contracts::nekomoto::Nekomoto::TEST_CLASS_HASH, calldata)
+    }
+
+    fn deploy_nekocoin(recipient: felt252) -> ContractAddress {
+        let mut calldata = array![];
+        calldata.append_serde(amount);
+        calldata.append_serde(recipient);
+
+        deploy(nekomoto::contracts::neko_coin::NekoCoin::TEST_CLASS_HASH, calldata)
+    }
+
+    fn deploy_prism(host: felt252) -> ContractAddress {
+        let mut calldata = array![];
+        calldata.append_serde(host);
+        deploy(nekomoto::contracts::prism::Prism::TEST_CLASS_HASH, calldata)
+    }
+
+    fn deploy_shard(host: felt252) -> ContractAddress {
+        let mut calldata = array![];
+        calldata.append_serde(host);
+        deploy(nekomoto::contracts::temporal_shard::TemporalShard::TEST_CLASS_HASH, calldata)
+    }
 
     fn deploy_account(salt: felt252) -> AccountABIDispatcher {
         set_version(1);

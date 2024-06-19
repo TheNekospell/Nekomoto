@@ -132,7 +132,8 @@ pub(crate) mod Nekomoto {
         ref self: ContractState,
         neko: ContractAddress,
         prism: ContractAddress,
-        temporal_shard: ContractAddress
+        temporal_shard: ContractAddress,
+        host: ContractAddress
     ) {
         let name = "Nekomoto";
         let symbol = "Nekomoto";
@@ -141,7 +142,7 @@ pub(crate) mod Nekomoto {
         self.token_id.write(1);
         self.erc721.initializer(name, symbol, base_uri);
 
-        self.host.write(get_caller_address());
+        self.host.write(host);
 
         self.neko.write(neko);
         self.prism.write(prism);

@@ -14,7 +14,7 @@ pub(crate) mod Prism {
     struct Storage {
         #[substorage(v0)]
         erc20: ERC20Component::Storage,
-        owner: ContractAddress
+        host: ContractAddress
     }
 
     #[event]
@@ -25,9 +25,9 @@ pub(crate) mod Prism {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, fixed_supply: u256) {
+    fn constructor(ref self: ContractState, host: ContractAddress) {
         self.erc20.initializer("Prism", "Prism");
-        self.owner.write(get_caller_address());
+        self.host.write(host);
     }
 
     #[external(v0)]

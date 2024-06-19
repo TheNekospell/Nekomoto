@@ -14,7 +14,7 @@ pub(crate) mod TemporalShard {
 
     #[storage]
     struct Storage {
-        owner: ContractAddress,
+        host: ContractAddress,
         token_id: u256,
         #[substorage(v0)]
         erc721: ERC721Component::Storage,
@@ -32,20 +32,20 @@ pub(crate) mod TemporalShard {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState) {
+    fn constructor(ref self: ContractState, host: ContractAddress) {
         let name = "TemporalShard";
         let symbol = "TemporalShard";
         let base_uri = "TBD";
 
         self.token_id.write(1);
-        self.owner.write(get_caller_address());
+        self.host.write(host);
 
         self.erc721.initializer(name, symbol, base_uri);
     }
 
     #[external(v0)]
     fn mint(ref self: ContractState, recipient: ContractAddress, count: u256) {
-        assert(get_caller_address() == self.owner.read(), 'Only the owner can mint');
+        assert(get_caller_address() == self.host.read(), 'Only the host can mint');
         let mut i = 0;
         loop {
             if i == count {
