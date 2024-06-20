@@ -1,5 +1,5 @@
 #[starknet::contract]
-pub(crate) mod TemporalShard {
+pub mod TemporalShard {
     use openzeppelin::token::erc721::erc721::ERC721Component::InternalTrait;
     use openzeppelin::introspection::src5::SRC5Component;
     use openzeppelin::token::erc721::{ERC721Component, ERC721HooksEmptyImpl};

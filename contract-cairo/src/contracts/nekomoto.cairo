@@ -1,5 +1,5 @@
 #[starknet::contract]
-pub(crate) mod Nekomoto {
+pub mod Nekomoto {
     use nekomoto::interface::interface::{
         ERC20BurnTraitDispatcher, ERC20BurnTraitDispatcherTrait, ERC721BurnTraitDispatcher,
         ERC721BurnTraitDispatcherTrait
@@ -9,7 +9,13 @@ pub(crate) mod Nekomoto {
     use core::integer;
     use core::traits::Into;
     use core::num::traits::Zero;
-    use openzeppelin::token::erc721::erc721::ERC721Component::InternalTrait;
+    use openzeppelin::{
+        utils::serde::SerializedAppend,
+        token::{
+            erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait},
+            erc721::interface::{IERC721Dispatcher, IERC721DispatcherTrait},
+        },
+    };
     use openzeppelin::introspection::src5::SRC5Component;
     use openzeppelin::token::erc721::ERC721Component;
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp, ClassHash};
@@ -128,7 +134,7 @@ pub(crate) mod Nekomoto {
     }
 
     #[constructor]
-    pub(crate) fn constructor(
+    fn constructor(
         ref self: ContractState,
         neko: ContractAddress,
         prism: ContractAddress,
@@ -139,7 +145,6 @@ pub(crate) mod Nekomoto {
         let symbol = "Nekomoto";
         let base_uri = "TBD";
 
-        self.token_id.write(1);
         self.erc721.initializer(name, symbol, base_uri);
 
         self.host.write(host);
@@ -147,19 +152,27 @@ pub(crate) mod Nekomoto {
         self.neko.write(neko);
         self.prism.write(prism);
         self.temporal_shard.write(temporal_shard);
+
+        self.starter_pack_limit.write(20000);
     }
 
-    #[abi(embed_v0)]
-    pub(crate) fn replace_classhash(ref self: ContractState, new_class_hash: ClassHash) {
+    #[external(v0)]
+    fn replace_classhash(ref self: ContractState, new_class_hash: ClassHash) {
         assert(get_caller_address() == self.host.read(), 'Only the host');
         self.upgradeable._upgrade(new_class_hash);
     }
 
-    #[abi(embed_v0)]
-    pub(crate) fn summon(ref self: ContractState, recipient: ContractAddress, count: u256) {
-        let token_id = self.token_id.read() + 1;
+    #[external(v0)]
+    fn summon(ref self: ContractState, recipient: ContractAddress, count: u256, ref random: u256) {
+        let mut token_id = self.token_id.read();
         let sender = get_caller_address();
-        assert(sender == self.host.read(), 'Only the host can mint');
+        assert(sender == self.host.read(), 'Only the host can summon');
+
+        let amount = count * 25000000000000000000000;
+        let nekocoin = self.neko.read();
+        IERC20Dispatcher { contract_address: nekocoin }
+            .transfer_from(sender, self.host.read(), amount * 75 / 100);
+        ERC20BurnTraitDispatcher { contract_address: nekocoin }.burnFrom(sender, amount * 25 / 100);
 
         let block_time = starknet::get_block_timestamp();
         let mut i = 0;
@@ -168,7 +181,9 @@ pub(crate) mod Nekomoto {
                 break;
             }
 
-            let input = array![block_time.into() + i, token_id];
+            token_id = token_id + 1;
+            let input = array![block_time.into() + i, token_id, random];
+            random = random + 1;
             let seed = keccak::keccak_u256s_be_inputs(input.span());
 
             let is_lucky = lucky(@self, sender);
@@ -190,8 +205,8 @@ pub(crate) mod Nekomoto {
         }
     }
 
-    #[abi(embed_v0)]
-    pub(crate) fn stake(ref self: ContractState, token_id: Array<u256>) {
+    #[external(v0)]
+    fn stake(ref self: ContractState, token_id: Array<u256>) {
         let len = token_id.len();
         let from = get_caller_address();
         let token_count = self.token_id.read();
@@ -222,8 +237,8 @@ pub(crate) mod Nekomoto {
         }
     }
 
-    #[abi(embed_v0)]
-    pub(crate) fn withdraw(ref self: ContractState, token_id: Array<u256>) {
+    #[external(v0)]
+    fn withdraw(ref self: ContractState, token_id: Array<u256>) {
         let len = token_id.len();
         let token_count = self.token_id.read();
         let host = self.host.read();
@@ -257,20 +272,21 @@ pub(crate) mod Nekomoto {
         }
     }
 
-    #[abi(embed_v0)]
-    pub(crate) fn add_limit(ref self: ContractState, input: u256) {
+    #[external(v0)]
+    fn add_limit(ref self: ContractState, input: u256) {
         assert(self.host.read() == get_caller_address(), 'Only the host');
         self.starter_pack_limit.write(self.starter_pack_limit.read() + input);
     }
 
-    #[abi(embed_v0)]
-    pub(crate) fn stater_pack(ref self: ContractState) {
+    #[external(v0)]
+    fn starter_pack(ref self: ContractState) {
         let sender = get_caller_address();
         assert(self.open_pack.read(sender) == 0, 'Already opened');
         assert(self.starter_pack_limit.read() > 0, 'No more starter pack');
         self.open_pack.write(sender, 1);
         self.starter_pack_limit.write(self.starter_pack_limit.read() - 1);
         let token_id = self.token_id.read() + 1;
+        self.erc721.mint(sender, token_id);
         self.token_id.write(token_id);
         self.emit(Summon { to: sender, token_id: token_id });
     }
@@ -278,27 +294,27 @@ pub(crate) mod Nekomoto {
     // BUFF
 
     #[abi(embed_v0)]
-    pub(crate) fn burn(ref self: ContractState, token_id: u256) {
+    fn burn(ref self: ContractState, token_id: u256) {
         self.erc721.burn(token_id);
     }
 
     #[abi(embed_v0)]
-    pub(crate) fn lucky(self: @ContractState, input: ContractAddress) -> bool {
+    fn lucky(self: @ContractState, input: ContractAddress) -> bool {
         self.lucky.read(input) >= 1
     }
 
-    pub(crate) fn add_lucky(ref self: ContractState, input: ContractAddress) {
+    fn add_lucky(ref self: ContractState, input: ContractAddress) {
         let lucky = self.lucky.read(input);
         self.lucky.write(input, lucky + 1);
     }
 
-    pub(crate) fn substract_lucky(ref self: ContractState, input: ContractAddress) {
+    fn substract_lucky(ref self: ContractState, input: ContractAddress) {
         let lucky = self.lucky.read(input);
         self.lucky.write(input, lucky - 1);
     }
 
     #[abi(embed_v0)]
-    pub(crate) fn time_freeze(self: @ContractState, input: ContractAddress) -> bool {
+    fn time_freeze(self: @ContractState, input: ContractAddress) -> bool {
         let time_freeze_start = self.time_freeze.read(input);
         if time_freeze_start == 0 {
             return false;
@@ -311,8 +327,8 @@ pub(crate) mod Nekomoto {
         false
     }
 
-    #[abi(embed_v0)]
-    pub(crate) fn start_time_freeze(ref self: ContractState, token_id: u256) {
+    #[external(v0)]
+    fn start_time_freeze(ref self: ContractState, token_id: u256) {
         let block_time = get_block_timestamp();
         let sender = get_caller_address();
         assert(time_freeze_end(@self, sender) < block_time.into(), 'Already frozen');
@@ -321,7 +337,7 @@ pub(crate) mod Nekomoto {
         self.emit(TimeFreeze { sender: sender, token_id, time: block_time.into() });
     }
 
-    pub(crate) fn time_freeze_end(self: @ContractState, input: ContractAddress) -> u256 {
+    fn time_freeze_end(self: @ContractState, input: ContractAddress) -> u256 {
         let time_freeze = self.time_freeze.read(input);
         if time_freeze == 0 {
             return 0;
@@ -330,7 +346,7 @@ pub(crate) mod Nekomoto {
     }
 
     #[abi(embed_v0)]
-    pub(crate) fn ascend(self: @ContractState, input: ContractAddress) -> (u256, u256) {
+    fn ascend(self: @ContractState, input: ContractAddress) -> (u256, u256) {
         let level = self.ascend.read(input);
         let mut bonus = 0;
         if level == 1 {
@@ -355,16 +371,19 @@ pub(crate) mod Nekomoto {
         (level, bonus)
     }
 
-    #[abi(embed_v0)]
-    pub(crate) fn upgrade_acend(ref self: ContractState) {
+    #[external(v0)]
+    fn upgrade_acend(ref self: ContractState) {
         let ascend = self.ascend.read(get_caller_address());
         let (neko_count, prism) = upgrade_ascend_consume(ascend + 1);
 
         assert(neko_count != 0, 'Exceed max level');
+        let sender = get_caller_address();
 
-        ERC20BurnTraitDispatcher { contract_address: self.neko.read() }.burn(neko_count);
+        ERC20BurnTraitDispatcher { contract_address: self.neko.read() }
+            .burnFrom(sender, neko_count);
         if prism > 0 {
-            ERC20BurnTraitDispatcher { contract_address: self.prism.read() }.burn(prism);
+            ERC20BurnTraitDispatcher { contract_address: self.prism.read() }
+                .burnFrom(sender, prism);
         }
 
         self.ascend.write(get_caller_address(), ascend + 1);
@@ -379,7 +398,7 @@ pub(crate) mod Nekomoto {
             );
     }
 
-    pub(crate) fn upgrade_ascend_consume(target_level: u256) -> (u256, u256) {
+    fn upgrade_ascend_consume(target_level: u256) -> (u256, u256) {
         if (target_level == 1) {
             return (100000000000000000000, 9000000000000000000);
         } else if (target_level == 2) {
@@ -404,8 +423,8 @@ pub(crate) mod Nekomoto {
 
     // BOX
 
-    #[abi(embed_v0)]
-    pub(crate) fn increase_fade(
+    #[external(v0)]
+    fn increase_fade(
         ref self: ContractState, token_id: Span<u256>, amount: Span<u256>, burn: Span<u256>
     ) {
         let sender = get_caller_address();
@@ -424,7 +443,7 @@ pub(crate) mod Nekomoto {
         }
     }
 
-    pub(crate) fn upgrade_level_consume(target_level: u8) -> (u256, u256) {
+    fn upgrade_level_consume(target_level: u8) -> (u256, u256) {
         if (target_level == 1) {
             return (100000000000000000000, 0);
         } else if (target_level == 2) {
@@ -453,17 +472,20 @@ pub(crate) mod Nekomoto {
         (0, 0)
     }
 
-    #[abi(embed_v0)]
-    pub(crate) fn upgrade(ref self: ContractState, token_id: u256) {
+    #[external(v0)]
+    fn upgrade(ref self: ContractState, token_id: u256) {
         assert(self.token_id.read() > token_id, 'Invalid token_id');
 
+        let sender = get_caller_address();
         let target_level = self.level.read(token_id) + 1;
         let (neko_count, prism) = upgrade_level_consume(target_level);
 
         assert(neko_count != 0, 'Exceed max level');
-        ERC20BurnTraitDispatcher { contract_address: self.neko.read() }.burn(neko_count);
+        ERC20BurnTraitDispatcher { contract_address: self.neko.read() }
+            .burnFrom(sender, neko_count);
         if prism > 0 {
-            ERC20BurnTraitDispatcher { contract_address: self.prism.read() }.burn(prism);
+            ERC20BurnTraitDispatcher { contract_address: self.prism.read() }
+                .burnFrom(sender, prism);
         }
 
         self.level.write(token_id, target_level);
@@ -480,7 +502,7 @@ pub(crate) mod Nekomoto {
     }
 
     #[abi(embed_v0)]
-    pub(crate) fn generate(self: @ContractState, token_id: u256, origin: bool) -> Info {
+    fn generate(self: @ContractState, token_id: u256, origin: bool) -> Info {
         assert(self.token_id.read() > token_id, 'Invalid token_id');
 
         let seed = self.seed.read(token_id);
@@ -519,7 +541,7 @@ pub(crate) mod Nekomoto {
     }
 
 
-    pub(crate) fn random(input: u256, min: u256, max: u256) -> u256 {
+    fn random(input: u256, min: u256, max: u256) -> u256 {
         if max == min {
             return min;
         }
@@ -534,7 +556,7 @@ pub(crate) mod Nekomoto {
         min + result
     }
 
-    pub(crate) fn stake_consume(self: @ContractState, token_id: u256) -> u256 {
+    fn stake_consume(self: @ContractState, token_id: u256) -> u256 {
         if self.erc721._owner_of(token_id) == self.host.read() {
             let end = time_freeze_end(self, self.stake_from.read(token_id));
             let block_time = get_block_timestamp().into();
@@ -547,7 +569,7 @@ pub(crate) mod Nekomoto {
         0
     }
 
-    pub(crate) fn generate_fade(
+    fn generate_fade(
         self: @ContractState, rarity: u8, seed: u256, token_id: u256, is_starter: bool
     ) -> u256 {
         let mut fade = 0;
@@ -575,7 +597,7 @@ pub(crate) mod Nekomoto {
         }
     }
 
-    pub(crate) fn generate_SPI(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
+    fn generate_SPI(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
         let mut SPI = 0;
         if is_starter {
             SPI = 500;
@@ -622,7 +644,7 @@ pub(crate) mod Nekomoto {
         return SPI;
     }
 
-    pub(crate) fn generate_ATK(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
+    fn generate_ATK(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
         let mut ATK = 0;
         if is_starter {
             ATK = 300;
@@ -669,7 +691,7 @@ pub(crate) mod Nekomoto {
         return ATK;
     }
 
-    pub(crate) fn generate_DEF(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
+    fn generate_DEF(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
         let mut DEF = 0;
         if is_starter {
             DEF = 300;
@@ -716,7 +738,7 @@ pub(crate) mod Nekomoto {
         return DEF;
     }
 
-    pub(crate) fn generate_SPD(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
+    fn generate_SPD(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
         let mut SPD = 0;
         if is_starter {
             SPD = 100;
@@ -757,7 +779,7 @@ pub(crate) mod Nekomoto {
         return SPD;
     }
 
-    pub(crate) fn generate_rarity(seed: u256, with_buff: u8, is_starter: bool) -> u256 {
+    fn generate_rarity(seed: u256, with_buff: u8, is_starter: bool) -> u256 {
         if is_starter {
             return 0;
         }
@@ -793,9 +815,7 @@ pub(crate) mod Nekomoto {
         return rarity;
     }
 
-    pub(crate) fn generate_basic_info(
-        seed: u256, with_buff: u8, is_starter: bool
-    ) -> (u8, u8, felt252) {
+    fn generate_basic_info(seed: u256, with_buff: u8, is_starter: bool) -> (u8, u8, felt252) {
         if is_starter {
             return (1, 1, 'Mikan');
         }
@@ -925,11 +945,14 @@ pub(crate) mod Nekomoto {
             auth: ContractAddress
         ) {
             let mut state = nekomoto::contracts::nekomoto::Nekomoto::unsafe_new_contract_state();
-            assert(token_id <= state.token_id.read(), 'Not mint yet');
-            state.level.write(token_id, 0);
-            // state.fade_consume.write(token_id,0);
-            // state.fade_increase.write(token_id,0);
-            state.stake_time.write(token_id, 0);
+            let host = state.host.read();
+            if self.ERC721_owners.read(token_id) != host && to != host {
+                state.level.write(token_id, 0);
+                // state.fade_consume.write(token_id,0);
+                // state.fade_increase.write(token_id,0);
+                state.stake_time.write(token_id, 0);
+                state.emit(Reset { token_id });
+            }
         }
 
         fn after_update(
@@ -937,9 +960,6 @@ pub(crate) mod Nekomoto {
             to: ContractAddress,
             token_id: u256,
             auth: ContractAddress
-        ) {
-            let mut state = nekomoto::contracts::nekomoto::Nekomoto::unsafe_new_contract_state();
-            state.emit(Reset { token_id });
-        }
+        ) {}
     }
 }

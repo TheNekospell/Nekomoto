@@ -1,11 +1,21 @@
 #[cfg(test)]
 mod test {
+    use core::array::ArrayTrait;
     use core::result::ResultTrait;
     use core::option::OptionTrait;
     use core::traits::TryInto;
+    use core::num::traits::Zero;
+    use super::super::account::Account;
+    use nekomoto::interface::interface::{
+        ERC721BurnTraitDispatcher, ERC721BurnTraitDispatcherTrait, ERC20BurnTraitDispatcher,
+        ERC20BurnTraitDispatcherTrait
+    };
     use openzeppelin::{
         utils::serde::SerializedAppend,
-        token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait},
+        token::{
+            erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait},
+            erc721::interface::{IERC721Dispatcher, IERC721DispatcherTrait},
+        },
         account::interface::{AccountABIDispatcherTrait, AccountABIDispatcher}, tests::utils,
     };
     use starknet::{
@@ -17,17 +27,16 @@ mod test {
         account::Call,
     };
 
-    const ERC20_TEST_CLASS_HASH: felt252 =
-        0xfa15f33d9a964602972ee0635ba5e641646f0944d7dc279360e7ec943dce6a;
-    const ACCOUNT_TEST_CLASS_HASH: felt252 =
-        0xd5ad229820cc3391b5d3888c6ce1e08f010ce0d5be429e8030dfc603c60dc8;
-    const amount: u256 = 100_000_000_000_000_000_000;
+    const amount: u256 = 2_000_000_000_000_000_000_000_000_000;
 
     #[test]
     fn test() {
         let host = deploy_account(0);
         let bob = deploy_account(1);
         let alice = deploy_account(2);
+        println!("deploy host:{:?}", host.contract_address);
+        println!("deploy bob:{:?}", bob.contract_address);
+        println!("deploy alice:{:?}", alice.contract_address);
 
         let nekocoin_address = deploy_nekocoin(host.contract_address.into());
         let prism_address = deploy_prism(host.contract_address.into());
@@ -38,6 +47,225 @@ mod test {
             temporal_shard_address.into(),
             host.contract_address.into()
         );
+        println!("deploy nekocoin at: {:?}", nekocoin_address);
+        println!("deploy prism at: {:?}", prism_address);
+        println!("deploy shard at: {:?}", temporal_shard_address);
+        println!("deploy nekomoto at: {:?}", nekomoto_address);
+
+        spread_assets(
+            host, bob.contract_address, nekocoin_address, prism_address, temporal_shard_address
+        );
+        spread_assets(
+            host, alice.contract_address, nekocoin_address, prism_address, temporal_shard_address
+        );
+
+        assert_eq!(
+            IERC20Dispatcher { contract_address: nekocoin_address }
+                .balance_of(bob.contract_address),
+            (amount / 10)
+        );
+        assert_eq!(
+            IERC20Dispatcher { contract_address: prism_address }.balance_of(bob.contract_address),
+            (amount / 10)
+        );
+        assert_eq!(
+            IERC721Dispatcher { contract_address: temporal_shard_address }
+                .balance_of(bob.contract_address),
+            (100)
+        );
+
+        approve_assets(
+            bob, nekomoto_address, nekocoin_address, prism_address, temporal_shard_address
+        );
+        approve_assets(
+            alice, nekomoto_address, nekocoin_address, prism_address, temporal_shard_address
+        );
+
+        assert_eq!(
+            IERC20Dispatcher { contract_address: nekocoin_address }
+                .allowance(bob.contract_address, nekomoto_address),
+            (amount / 10)
+        );
+        assert_eq!(
+            IERC20Dispatcher { contract_address: prism_address }
+                .allowance(bob.contract_address, nekomoto_address),
+            (amount / 10)
+        );
+        assert_eq!(
+            IERC721Dispatcher { contract_address: temporal_shard_address }
+                .is_approved_for_all(bob.contract_address, nekomoto_address),
+            (true)
+        );
+
+        // starter pack
+        bob
+            .__execute__(
+                array![
+                    Call {
+                        to: nekomoto_address,
+                        selector: selector!("starter_pack"),
+                        calldata: array![].span()
+                    }
+                ]
+            );
+        assert!(
+            IERC721Dispatcher { contract_address: nekomoto_address }
+                .balance_of(bob.contract_address) == 1
+        );
+        println!(
+            "starter pack open : {:?}",
+            IERC721Dispatcher { contract_address: nekomoto_address }
+                .balance_of(bob.contract_address)
+        );
+
+        // summon
+        let mut calldata = array![];
+        calldata.append_serde(bob.contract_address);
+        calldata.append_serde(20_u256);
+        calldata.append_serde(666666_u256);
+        host
+            .__execute__(
+                array![
+                    Call {
+                        to: nekomoto_address,
+                        selector: selector!("summon"),
+                        calldata: calldata.span()
+                    }
+                ]
+            );
+
+        assert!(
+            IERC721Dispatcher { contract_address: nekomoto_address }
+                .balance_of(bob.contract_address) >= 1
+        );
+        println!(
+            "starter pack and summon : {:?}",
+            IERC721Dispatcher { contract_address: nekomoto_address }
+                .balance_of(bob.contract_address)
+        );
+
+        // upgrade nekomoto
+        let mut calldata = array![];
+        calldata.append_serde(2_u256);
+        let mut i = 13;
+        loop {
+            if i == 0 {
+                break;
+            }
+
+            let mut multicall = array![];
+            multicall
+                .append(
+                    Call {
+                        to: nekomoto_address,
+                        selector: selector!("upgrade"),
+                        calldata: calldata.span()
+                    }
+                );
+            bob.__execute__(multicall);
+            println!("upgrade level: {}", 14 - i);
+
+            i = i - 1;
+        };
+    }
+
+    // let arr = ArrayTrait::<T>::new();
+    // <T, +Drop<T>, +SerializedAppend<T>>
+    fn invoke<T, +Drop<T>, +SerializedAppend<T>>(
+        account: AccountABIDispatcher,
+        contract: ContractAddress,
+        selector: felt252,
+        ref rawdata: Array<T>
+    ) {
+        let mut calldata = array![];
+        loop {
+            match rawdata.pop_front() {
+                Option::Some(v) => calldata.append_serde(v),
+                Option::None => { break; }
+            }
+        }
+    }
+
+    fn approve_assets(
+        account: AccountABIDispatcher,
+        reciever: ContractAddress,
+        nekocoin_address: ContractAddress,
+        prism_address: ContractAddress,
+        temporal_shard_address: ContractAddress
+    ) {
+        let mut multicall = array![];
+        let amount_to_use = amount / 10;
+
+        // neko coin
+        let mut calldata = array![];
+        calldata.append_serde(reciever);
+        calldata.append_serde(amount_to_use);
+        let call = Call {
+            to: nekocoin_address, selector: selector!("approve"), calldata: calldata.span()
+        };
+        multicall.append(call);
+
+        // prism
+        let mut calldata = array![];
+        calldata.append_serde(reciever);
+        calldata.append_serde(amount_to_use);
+        let call = Call {
+            to: prism_address, selector: selector!("approve"), calldata: calldata.span()
+        };
+        multicall.append(call);
+
+        // shard
+        let mut calldata = array![];
+        calldata.append_serde(reciever);
+        calldata.append_serde(true);
+        let call = Call {
+            to: temporal_shard_address,
+            selector: selector!("set_approval_for_all"),
+            calldata: calldata.span()
+        };
+        multicall.append(call);
+
+        account.__execute__(multicall);
+    }
+
+    fn spread_assets(
+        host: AccountABIDispatcher,
+        reciever: ContractAddress,
+        nekocoin_address: ContractAddress,
+        prism_address: ContractAddress,
+        temporal_shard_address: ContractAddress
+    ) {
+        let mut multicall = array![];
+        let amount_to_use = amount / 10;
+
+        // neko coin
+        let mut calldata = array![];
+        calldata.append_serde(reciever);
+        calldata.append_serde(amount_to_use);
+        let call = Call {
+            to: nekocoin_address, selector: selector!("transfer"), calldata: calldata.span()
+        };
+        multicall.append(call);
+
+        // prism
+        let mut calldata = array![];
+        calldata.append_serde(reciever);
+        calldata.append_serde(amount_to_use);
+        let call = Call {
+            to: prism_address, selector: selector!("mint"), calldata: calldata.span()
+        };
+        multicall.append(call);
+
+        // shard
+        let mut calldata = array![];
+        calldata.append_serde(reciever);
+        calldata.append_serde(100_u256);
+        let call = Call {
+            to: temporal_shard_address, selector: selector!("mint"), calldata: calldata.span()
+        };
+        multicall.append(call);
+
+        host.__execute__(multicall);
     }
 
     fn deploy_nekomoto(
@@ -85,26 +313,27 @@ mod test {
         set_transaction_hash(0x601d3d2e265c10ff645e1554c435e72ce6721f0ba5fc96f0c650bfc6231191a);
         calldata.append(0x26da8d11938b76025862be14fdb8b28438827f73e75e86f7bfa38b196951fa7);
 
-        let address = deploy_with_salt(ACCOUNT_TEST_CLASS_HASH, calldata, salt);
+        let address = deploy_with_salt(Account::TEST_CLASS_HASH, calldata, salt);
         AccountABIDispatcher { contract_address: address }
     }
 
     fn deploy_with_salt(
         classhash: felt252, calldata: Array<felt252>, salt: felt252
     ) -> ContractAddress {
-        let (address, _) = starknet::syscalls::deploy_syscall(
+        let result = starknet::syscalls::deploy_syscall(
             classhash.try_into().unwrap(), salt, calldata.span(), false
-        )
-            .expect('deploy failed');
+        );
+        if result.is_err() {
+            let err = result.unwrap_err();
+            println!("deploy error: {:?}", err);
+            return Zero::zero();
+        }
+        let (address, _) = result.unwrap();
         address
     }
 
     fn deploy(classhash: felt252, calldata: Array<felt252>) -> ContractAddress {
-        let (address, _) = starknet::syscalls::deploy_syscall(
-            classhash.try_into().unwrap(), 0, calldata.span(), false
-        )
-            .expect('deploy failed');
-        address
+        deploy_with_salt(classhash, calldata, 0)
     }
 }
 

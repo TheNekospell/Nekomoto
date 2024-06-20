@@ -11,4 +11,5 @@ pub mod interface {
 
 mod tests {
     mod test;
+    mod account;
 }
