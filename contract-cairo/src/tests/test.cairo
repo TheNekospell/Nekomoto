@@ -1,14 +1,18 @@
+// set_caller_address does not work sometimes
+
 #[cfg(test)]
 mod test {
+    use core::serde::Serde;
     use core::array::ArrayTrait;
     use core::result::ResultTrait;
     use core::option::OptionTrait;
     use core::traits::TryInto;
     use core::num::traits::Zero;
+
     use super::super::account::Account;
     use nekomoto::interface::interface::{
         ERC721BurnTraitDispatcher, ERC721BurnTraitDispatcherTrait, ERC20BurnTraitDispatcher,
-        ERC20BurnTraitDispatcherTrait
+        ERC20BurnTraitDispatcherTrait, NekomotoTraitDispatcher, NekomotoTraitDispatcherTrait, Info
     };
     use openzeppelin::{
         utils::serde::SerializedAppend,
@@ -20,9 +24,10 @@ mod test {
     };
     use starknet::{
         ContractAddress, ClassHash, contract_address_const, get_contract_address,
+        get_block_timestamp,
         testing::{
             set_contract_address, set_caller_address, set_signature, set_transaction_hash,
-            set_version
+            set_version, set_block_timestamp, set_block_number
         },
         account::Call,
     };
@@ -119,21 +124,20 @@ mod test {
         );
 
         // summon
-        let mut calldata = array![];
-        calldata.append_serde(bob.contract_address);
-        calldata.append_serde(20_u256);
-        calldata.append_serde(666666_u256);
         host
             .__execute__(
                 array![
                     Call {
                         to: nekomoto_address,
                         selector: selector!("summon"),
-                        calldata: calldata.span()
+                        calldata: array![]
+                            .join(bob.contract_address)
+                            .join(20_u256)
+                            .join(666666_u256)
+                            .span()
                     }
                 ]
             );
-
         assert!(
             IERC721Dispatcher { contract_address: nekomoto_address }
                 .balance_of(bob.contract_address) >= 1
@@ -144,16 +148,43 @@ mod test {
                 .balance_of(bob.contract_address)
         );
 
+        set_block_timestamp(1_000_000_000_000);
+        bob
+            .__execute__(
+                array![
+                    Call {
+                        to: nekomoto_address,
+                        selector: selector!("stake"),
+                        calldata: array![]
+                            .join(
+                                array![
+                                    1_u256,
+                                    2_u256,
+                                    3_u256,
+                                    4_u256,
+                                    5_u256,
+                                    6_u256,
+                                    7_u256,
+                                    8_u256,
+                                    9_u256,
+                                    10_u256
+                                ]
+                            )
+                            .span()
+                    }
+                ]
+            );
+
         // upgrade nekomoto
+        let mut multicall = array![];
         let mut calldata = array![];
         calldata.append_serde(2_u256);
-        let mut i = 13;
+        let mut i = 12;
         loop {
             if i == 0 {
                 break;
             }
 
-            let mut multicall = array![];
             multicall
                 .append(
                     Call {
@@ -162,11 +193,182 @@ mod test {
                         calldata: calldata.span()
                     }
                 );
-            bob.__execute__(multicall);
-            println!("upgrade level: {}", 14 - i);
+            // println!("upgrade level to: {}", 14 - i);
 
             i = i - 1;
         };
+        bob.__execute__(multicall);
+
+        // hard to deserialize
+        // bob
+        //     .__execute__(
+        //         array![
+        //             Call {
+        //                 to: nekomoto_address,
+        //                 selector: selector!("generate"),
+        //                 calldata: calldata.join(2_u256).join(false).span()
+        //             }
+        //         ]
+        //     );
+        let result = NekomotoTraitDispatcher { contract_address: nekomoto_address }
+            .generate(2_u256, false);
+        // result.print();
+        PTrait::<Info>::print(result);
+        assert_eq!(result.level, 13);
+
+        assert_eq!(
+            NekomotoTraitDispatcher { contract_address: nekomoto_address }
+                .lucky(bob.contract_address),
+            true
+        );
+
+        set_block_timestamp(1_000_000_003_600);
+        assert_eq!(
+            NekomotoTraitDispatcher { contract_address: nekomoto_address }
+                .generate(2_u256, false)
+                .fade,
+            result.fade - 100
+        );
+
+        bob
+            .__execute__(
+                array![
+                    Call {
+                        to: nekomoto_address,
+                        selector: selector!("withdraw"),
+                        calldata: array![]
+                            .join(
+                                array![
+                                    1_u256,
+                                    2_u256,
+                                    3_u256,
+                                    4_u256,
+                                    5_u256,
+                                    6_u256,
+                                    7_u256,
+                                    8_u256,
+                                    9_u256,
+                                    10_u256
+                                ]
+                            )
+                            .span()
+                    }
+                ]
+            );
+
+        assert_eq!(
+            NekomotoTraitDispatcher { contract_address: nekomoto_address }
+                .lucky(bob.contract_address),
+            false
+        );
+
+        // buff part
+
+        println!("block timestamp:{}", get_block_timestamp());
+
+        assert_eq!(
+            NekomotoTraitDispatcher { contract_address: nekomoto_address }
+                .time_freeze_end(bob.contract_address),
+            0
+        );
+
+        bob
+            .__execute__(
+                array![
+                    Call {
+                        to: nekomoto_address,
+                        selector: selector!("start_time_freeze"),
+                        calldata: array![].join(1_u256).span()
+                    }
+                ]
+            );
+        assert_eq!(
+            NekomotoTraitDispatcher { contract_address: nekomoto_address }
+                .time_freeze(bob.contract_address),
+            true
+        );
+
+        bob
+            .__execute__(
+                {
+                    let mut i = 9;
+                    let mut multicall = array![];
+                    loop {
+                        if i == 0 {
+                            break;
+                        }
+                        multicall
+                            .append(
+                                Call {
+                                    to: nekomoto_address,
+                                    selector: selector!("upgrade_acend"),
+                                    calldata: array![].span()
+                                }
+                            );
+                        i = i - 1;
+                    };
+                    multicall
+                }
+            );
+        assert_eq!(
+            NekomotoTraitDispatcher { contract_address: nekomoto_address }
+                .ascend(bob.contract_address),
+            (9, 51)
+        );
+
+        // transfer
+        bob
+            .__execute__(
+                array![
+                    Call {
+                        to: nekomoto_address,
+                        selector: selector!("transfer_from"),
+                        calldata: array![]
+                            .join(bob.contract_address)
+                            .join(alice.contract_address)
+                            .join(2_u256)
+                            .span()
+                    }
+                ]
+            );
+
+        assert_eq!(
+            IERC721Dispatcher { contract_address: nekomoto_address }.owner_of(2_u256),
+            alice.contract_address
+        );
+
+        assert_eq!(
+            NekomotoTraitDispatcher { contract_address: nekomoto_address }
+                .generate(2_u256, false)
+                .level,
+            1
+        );
+    }
+
+    // for fun
+    #[generate_trait]
+    impl JoinTraitImpl<T, +Serde<T>, +Drop<T>> of JoinTrait<T> {
+        fn join(mut self: Array<felt252>, value: T) -> Array<felt252> {
+            value.serialize(ref self);
+            self
+        }
+    }
+
+    #[generate_trait]
+    impl PImpl<T> of PTrait<T> {
+        fn print(self: Info) -> Info {
+            println!("rarity:{}", self.rarity);
+            println!("element:{}", self.element);
+            println!("name:{}", self.name);
+            println!("SPI:{}", self.SPI);
+            println!("ATK:{}", self.ATK);
+            println!("DEF:{}", self.DEF);
+            println!("SPD:{}", self.SPD);
+            println!("fade:{}", self.fade);
+            println!("mana:{}", self.mana);
+            println!("level:{}", self.level);
+            self
+        }
     }
 
     // let arr = ArrayTrait::<T>::new();
@@ -193,39 +395,31 @@ mod test {
         prism_address: ContractAddress,
         temporal_shard_address: ContractAddress
     ) {
-        let mut multicall = array![];
         let amount_to_use = amount / 10;
 
-        // neko coin
-        let mut calldata = array![];
-        calldata.append_serde(reciever);
-        calldata.append_serde(amount_to_use);
-        let call = Call {
-            to: nekocoin_address, selector: selector!("approve"), calldata: calldata.span()
-        };
-        multicall.append(call);
-
-        // prism
-        let mut calldata = array![];
-        calldata.append_serde(reciever);
-        calldata.append_serde(amount_to_use);
-        let call = Call {
-            to: prism_address, selector: selector!("approve"), calldata: calldata.span()
-        };
-        multicall.append(call);
-
-        // shard
-        let mut calldata = array![];
-        calldata.append_serde(reciever);
-        calldata.append_serde(true);
-        let call = Call {
-            to: temporal_shard_address,
-            selector: selector!("set_approval_for_all"),
-            calldata: calldata.span()
-        };
-        multicall.append(call);
-
-        account.__execute__(multicall);
+        account
+            .__execute__(
+                array![
+                    // neko coin
+                    Call {
+                        to: nekocoin_address,
+                        selector: selector!("approve"),
+                        calldata: array![].join(reciever).join(amount_to_use).span()
+                    },
+                    // prism
+                    Call {
+                        to: prism_address,
+                        selector: selector!("approve"),
+                        calldata: array![].join(reciever).join(amount_to_use).span()
+                    },
+                    // shard
+                    Call {
+                        to: temporal_shard_address,
+                        selector: selector!("set_approval_for_all"),
+                        calldata: array![].join(reciever).join(true).span()
+                    },
+                ]
+            );
     }
 
     fn spread_assets(

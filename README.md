@@ -1,6 +1,6 @@
 #
 
-## Contracts
+## Contracts Solidity
 
 ```bash
 cd contract-solidity
@@ -8,6 +8,15 @@ npm i
 npx hardhat compile
 npx hardhat run scripts/deploy.ts --network xxx
 npx hardhat verify 0xaaaa --network xxx
+```
+
+## Contract Cairo
+
+```bash
+cd contract-cairo
+scarb --release build
+# scarb build
+scarb test
 ```
 
 ## Server
