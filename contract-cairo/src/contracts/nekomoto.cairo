@@ -531,8 +531,8 @@ pub mod Nekomoto {
         let output: u256 = keccak::keccak_u256s_be_inputs(array![input].span());
 
         let result = (u256 {
-            low: integer::u128_byte_reverse(output.high), // just comment here to
-            high: integer::u128_byte_reverse(output.low) // avoid stupid format
+            low: integer::u128_byte_reverse(output.high),
+            high: integer::u128_byte_reverse(output.low)
         }) % ((max - min).into());
 
         min + result
@@ -540,13 +540,27 @@ pub mod Nekomoto {
 
     fn stake_consume(self: @ContractState, token_id: u256) -> u256 {
         if self.erc721._owner_of(token_id) == self.host.read() {
-            let end = self.time_freeze_end(self.stake_from.read(token_id));
-            let block_time = get_block_timestamp().into();
-            if end != 0 && block_time > end {
-                return (block_time - end) / 36;
-            } else if end == 0 {
-                return (block_time - self.stake_time.read(token_id)) / 36;
-            }
+            let stake_time_start = self.stake_time.read(token_id);
+            let stake_time_end = get_block_timestamp().into();
+
+            let freeze_start = self.time_freeze.read(self.stake_from.read(token_id));
+            let freeze_end = freeze_start + 259200;
+
+            let actual_freeze = if stake_time_start < freeze_end {
+                (if stake_time_end < freeze_end {
+                    stake_time_end
+                } else {
+                    freeze_end
+                })
+                    - (if stake_time_start < freeze_start {
+                        freeze_start
+                    } else {
+                        stake_time_start
+                    })
+            } else {
+                0
+            };
+            return (stake_time_end - stake_time_start - actual_freeze) / 36;
         }
         0
     }

@@ -34,8 +34,15 @@ mod test {
 
     const amount: u256 = 2_000_000_000_000_000_000_000_000_000;
 
-    #[test]
-    fn test() {
+    fn init() -> (
+        AccountABIDispatcher,
+        AccountABIDispatcher,
+        AccountABIDispatcher,
+        ContractAddress,
+        ContractAddress,
+        ContractAddress,
+        ContractAddress
+    ) {
         let host = deploy_account(0);
         let bob = deploy_account(1);
         let alice = deploy_account(2);
@@ -56,6 +63,29 @@ mod test {
         println!("deploy prism at: {:?}", prism_address);
         println!("deploy shard at: {:?}", temporal_shard_address);
         println!("deploy nekomoto at: {:?}", nekomoto_address);
+        (
+            host,
+            bob,
+            alice,
+            nekocoin_address,
+            prism_address,
+            temporal_shard_address,
+            nekomoto_address
+        )
+    }
+
+    #[test]
+    fn test_main_process() {
+        let (
+            host,
+            bob,
+            alice,
+            nekocoin_address,
+            prism_address,
+            temporal_shard_address,
+            nekomoto_address
+        ) =
+            init();
 
         spread_assets(
             host, bob.contract_address, nekocoin_address, prism_address, temporal_shard_address
@@ -342,6 +372,51 @@ mod test {
                 .generate(2_u256, false)
                 .level,
             1
+        );
+
+        // time freeze and fade consume
+        set_block_timestamp(2_000_000_000_000);
+
+        alice
+            .__execute__(
+                array![
+                    Call {
+                        to: nekomoto_address,
+                        selector: selector!("stake"),
+                        calldata: array![].join(array![2_u256]).span()
+                    }
+                ]
+            );
+
+        let result = NekomotoTraitDispatcher { contract_address: nekomoto_address }
+            .generate(2_u256, false);
+        PTrait::<Info>::print(result);
+
+        set_block_timestamp(2_000_000_003_600);
+
+        alice
+            .__execute__(
+                array![
+                    Call {
+                        to: nekomoto_address,
+                        selector: selector!("start_time_freeze"),
+                        calldata: array![].join(101_u256).span()
+                    }
+                ]
+            );
+        assert_eq!(
+            NekomotoTraitDispatcher { contract_address: nekomoto_address }
+                .time_freeze(alice.contract_address),
+            true
+        );
+
+        set_block_timestamp(2_000_000_007_200);
+
+        assert_eq!(
+            NekomotoTraitDispatcher { contract_address: nekomoto_address }
+                .generate(2_u256, false)
+                .fade,
+            result.fade - 100
         );
     }
 
