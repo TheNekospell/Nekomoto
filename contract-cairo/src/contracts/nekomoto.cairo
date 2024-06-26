@@ -18,10 +18,9 @@ pub mod Nekomoto {
     };
     use openzeppelin::introspection::src5::SRC5Component;
     use openzeppelin::token::erc721::ERC721Component;
+    use openzeppelin::upgrades::upgradeable::UpgradeableComponent;
+    use openzeppelin::upgrades::upgradeable::UpgradeableComponent::InternalTrait as upgradeableInternal;
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp, ClassHash};
-
-    use components::upgradeable::upgradeable::UpgradeableComponent;
-    use components::upgradeable::upgradeable::UpgradeableComponent::InternalTrait as upgradeableInternal;
 
     component!(path: ERC721Component, storage: erc721, event: ERC721Event);
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
@@ -47,7 +46,7 @@ pub mod Nekomoto {
         temporal_shard: ContractAddress,
         lucky: LegacyMap<ContractAddress, u8>,
         time_freeze: LegacyMap<ContractAddress, u256>,
-        ascend: LegacyMap<ContractAddress, u256>,
+        ascend: LegacyMap<ContractAddress, u8>,
         // BOX
         seed: LegacyMap<u256, u256>,
         with_buff: LegacyMap<u256, u8>,
@@ -82,9 +81,9 @@ pub mod Nekomoto {
     struct UpgradeAscend {
         #[key]
         sender: ContractAddress,
-        new_level: u256,
-        neko_count: u256,
-        prism: u256
+        new_level: u8,
+        neko_coin_count: u256,
+        prism_count: u256
     }
 
     #[derive(Drop, starknet::Event)]
@@ -102,8 +101,8 @@ pub mod Nekomoto {
         #[key]
         token_id: u256,
         new_level: u256,
-        neko_count: u256,
-        prism: u256
+        neko_coin_count: u256,
+        prism_count: u256
     }
 
     #[derive(Drop, starknet::Event)]
@@ -147,7 +146,7 @@ pub mod Nekomoto {
     impl NekomotoTraitImpl of NekomotoTrait<ContractState> {
         fn replace_classhash(ref self: ContractState, new_class_hash: ClassHash) {
             assert(get_caller_address() == self.host.read(), 'Only the host');
-            self.upgradeable._upgrade(new_class_hash);
+            self.upgradeable.upgrade(new_class_hash);
         }
 
 
@@ -319,7 +318,7 @@ pub mod Nekomoto {
             time_freeze + 259200
         }
 
-        fn ascend(self: @ContractState, input: ContractAddress) -> (u256, u256) {
+        fn ascend(self: @ContractState, input: ContractAddress) -> (u8, u8) {
             let level = self.ascend.read(input);
             let mut bonus = 0;
             if level == 1 {
@@ -346,13 +345,13 @@ pub mod Nekomoto {
 
         fn upgrade_acend(ref self: ContractState) {
             let ascend = self.ascend.read(get_caller_address());
-            let (neko_count, prism) = upgrade_ascend_consume(ascend + 1);
+            let (neko_coin_count, prism) = upgrade_ascend_consume(ascend + 1);
 
-            assert(neko_count != 0, 'Exceed max level');
+            assert(neko_coin_count != 0, 'Exceed max level');
             let sender = get_caller_address();
 
             ERC20BurnTraitDispatcher { contract_address: self.neko.read() }
-                .burnFrom(sender, neko_count);
+                .burnFrom(sender, neko_coin_count);
             if prism > 0 {
                 ERC20BurnTraitDispatcher { contract_address: self.prism.read() }
                     .burnFrom(sender, prism);
@@ -364,8 +363,8 @@ pub mod Nekomoto {
                     UpgradeAscend {
                         sender: get_caller_address(),
                         new_level: ascend + 1,
-                        neko_count: neko_count,
-                        prism: prism
+                        neko_coin_count: neko_coin_count,
+                        prism_count: prism
                     }
                 );
         }
@@ -397,11 +396,11 @@ pub mod Nekomoto {
 
             let sender = get_caller_address();
             let target_level = self.level.read(token_id) + 1;
-            let (neko_count, prism) = upgrade_level_consume(target_level);
+            let (neko_coin_count, prism) = upgrade_level_consume(target_level);
 
-            assert(neko_count != 0, 'Exceed max level');
+            assert(neko_coin_count != 0, 'Exceed max level');
             ERC20BurnTraitDispatcher { contract_address: self.neko.read() }
-                .burnFrom(sender, neko_count);
+                .burnFrom(sender, neko_coin_count);
             if prism > 0 {
                 ERC20BurnTraitDispatcher { contract_address: self.prism.read() }
                     .burnFrom(sender, prism);
@@ -414,8 +413,8 @@ pub mod Nekomoto {
                         sender: get_caller_address(),
                         token_id: token_id,
                         new_level: target_level.into(),
-                        neko_count: neko_count,
-                        prism: prism
+                        neko_coin_count: neko_coin_count,
+                        prism_count: prism
                     }
                 )
         }
@@ -471,7 +470,7 @@ pub mod Nekomoto {
         self.lucky.write(input, lucky - 1);
     }
 
-    fn upgrade_ascend_consume(target_level: u256) -> (u256, u256) {
+    fn upgrade_ascend_consume(target_level: u8) -> (u256, u256) {
         if (target_level == 1) {
             return (100000000000000000000, 9000000000000000000);
         } else if (target_level == 2) {

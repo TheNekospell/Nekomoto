@@ -14,14 +14,27 @@ import (
 
 var DB *gorm.DB
 
-func init() {
+func InitDatabase() {
 	var err error
 	DB, err = gorm.Open(mysql.Open(env.GetEnvValue("DSN")), &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true})
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("Connected to database")
+	initTables()
+}
 
+func InitDatabaseSn() {
+	var err error
+	DB, err = gorm.Open(mysql.Open(env.GetEnvValue("DSN_SN")), &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Connected to database")
+	initTables()
+}
+
+func initTables() {
 	list := []interface{}{
 		&ServerAddress{},
 		&ServerClaimRecord{},
@@ -49,7 +62,7 @@ func init() {
 		&EventTimeFreeze{},
 		&EventAscendUpgrade{},
 	}
-	err = DB.AutoMigrate(list...)
+	err := DB.AutoMigrate(list...)
 	if err != nil {
 		panic(err)
 	}
@@ -215,7 +228,7 @@ type Model struct {
 
 type ServerAddress struct {
 	Model
-	Address    string `gorm:"uniqueIndex type:char(42) not null"`
+	Address    string `gorm:"uniqueIndex type:char(66) not null"`
 	InviteCode string `gorm:"not null index"`
 	IsStarter  bool   `gorm:"not null default:true"`
 }
@@ -327,7 +340,7 @@ type ServerRewardPool struct {
 type ServerWhiteListOfBountyWave struct {
 	Model
 	Uid     uint64 `gorm:"not null index"`
-	Address string `gorm:"uniqueIndex type:char(42) not null"`
+	Address string `gorm:"uniqueIndex type:char(66) not null"`
 }
 
 type ServerBountyWaveConfig struct {
@@ -366,8 +379,8 @@ type Hash struct {
 type EventNekoCoinTransfer struct {
 	Model
 	Hash
-	From                 string          `gorm:"not null type:char(42)"`
-	To                   string          `gorm:"not null type:char(42)"`
+	From                 string          `gorm:"not null type:char(66)"`
+	To                   string          `gorm:"not null type:char(66)"`
 	Amount               decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
 	TransferOrMintOrBurn uint8           `gorm:"not null default:0 index"`
 }
@@ -375,8 +388,8 @@ type EventNekoCoinTransfer struct {
 type EventPrismTransfer struct {
 	Model
 	Hash
-	From                 string          `gorm:"not null type:char(42)"`
-	To                   string          `gorm:"not null type:char(42)"`
+	From                 string          `gorm:"not null type:char(66)"`
+	To                   string          `gorm:"not null type:char(66)"`
 	Amount               decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
 	TransferOrMintOrBurn uint8           `gorm:"not null default:0 index"`
 }
@@ -384,8 +397,8 @@ type EventPrismTransfer struct {
 type EventNekoSpiritTransfer struct {
 	Model
 	Hash
-	From                 string `gorm:"not null type:char(42)"`
-	To                   string `gorm:"not null type:char(42)"`
+	From                 string `gorm:"not null type:char(66)"`
+	To                   string `gorm:"not null type:char(66)"`
 	TokenId              uint64 `gorm:"not null"`
 	TransferOrMintOrBurn uint8  `gorm:"not null default:0 index"`
 }
@@ -393,8 +406,8 @@ type EventNekoSpiritTransfer struct {
 type EventTemporalShardTransfer struct {
 	Model
 	Hash
-	From                 string `gorm:"not null type:char(42)"`
-	To                   string `gorm:"not null type:char(42)"`
+	From                 string `gorm:"not null type:char(66)"`
+	To                   string `gorm:"not null type:char(66)"`
 	TokenId              uint64 `gorm:"not null"`
 	TransferOrMintOrBurn uint8  `gorm:"not null default:0 index"`
 }
@@ -402,7 +415,7 @@ type EventTemporalShardTransfer struct {
 type EventNekoSpiritUpgrade struct {
 	Model
 	Hash
-	From          string          `gorm:"not null type:char(42) index"`
+	From          string          `gorm:"not null type:char(66) index"`
 	TokenId       uint64          `gorm:"not null index"`
 	NewLevel      uint64          `gorm:"not null"`
 	NekoCoinCount decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
@@ -412,7 +425,7 @@ type EventNekoSpiritUpgrade struct {
 type EventTimeFreeze struct {
 	Model
 	Hash
-	From      string    `gorm:"not null type:char(42)"`
+	From      string    `gorm:"not null type:char(66)"`
 	TokenId   uint64    `gorm:"not null"`
 	StartTime time.Time `gorm:"not null"`
 }
@@ -420,7 +433,7 @@ type EventTimeFreeze struct {
 type EventAscendUpgrade struct {
 	Model
 	Hash
-	From          string          `gorm:"not null type:char(42) index"`
+	From          string          `gorm:"not null type:char(66) index"`
 	NewLevel      uint64          `gorm:"not null"`
 	NekoCoinCount decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
 	PrismaCount   decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`

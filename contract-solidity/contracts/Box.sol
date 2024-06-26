@@ -88,7 +88,7 @@ contract Box is Buff, ERC721Burnable {
                 rarity,
                 seed,
                 tokenId[i],
-                false,
+                // false,
                 isStarter
             );
             require(Fade == 0);

@@ -23,7 +23,7 @@ pub struct Info {
     pub SPD: u256,
     pub fade: u256,
     pub mana: u256,
-    pub level: u256
+    pub level: u8
 }
 
 #[starknet::interface]
@@ -39,7 +39,7 @@ pub trait NekomotoTrait<ContractState> {
     fn time_freeze(self: @ContractState, input: ContractAddress) -> bool;
     fn start_time_freeze(ref self: ContractState, token_id: u256);
     fn time_freeze_end(self: @ContractState, input: ContractAddress) -> u256;
-    fn ascend(self: @ContractState, input: ContractAddress) -> (u256, u256);
+    fn ascend(self: @ContractState, input: ContractAddress) -> (u8, u8);
     fn upgrade_acend(ref self: ContractState);
     fn increase_fade(
         ref self: ContractState, token_id: Span<u256>, amount: Span<u256>, burn: Span<u256>

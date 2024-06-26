@@ -75,6 +75,18 @@ mod test {
     }
 
     #[test]
+    #[ignore]
+    fn temp() {
+        let mut temp: felt252 = true.into();
+        println!("true:{}", temp);
+        temp = false.into();
+        println!("false:{}", temp);
+
+        let felt: felt252 = 'felt';
+        println!("felt:{}", felt);
+    }
+
+    #[test]
     fn test_main_process() {
         let (
             host,
