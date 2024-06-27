@@ -14,8 +14,8 @@ pub trait ERC721BurnTrait<ContractState> {
 
 #[derive(Copy, Drop, Serde)]
 pub struct Info {
-    pub rarity: u8,
-    pub element: u8,
+    pub rarity: felt252,
+    pub element: felt252,
     pub name: felt252,
     pub SPI: u256,
     pub ATK: u256,

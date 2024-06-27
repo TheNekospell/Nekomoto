@@ -443,9 +443,11 @@ pub mod Nekomoto {
                 mana = ((4 * SPI + 3 * ATK + 2 * DEF + 1 * SPD) * 65) / 1000;
             }
 
+            let (rarity_string, element_string) = get_rarity_and_element(rarity, element);
+
             Info {
-                rarity: rarity,
-                element: element,
+                rarity: rarity_string,
+                element: element_string,
                 name: name,
                 SPI: SPI,
                 ATK: ATK,
@@ -459,6 +461,29 @@ pub mod Nekomoto {
     }
 
     // internal impl
+
+    fn get_rarity_and_element(rarity: u8, element: u8) -> (felt252, felt252) {
+        (
+            match rarity {
+                0 => '',
+                1 => 'Common',
+                2 => 'Uncommon',
+                3 => 'Rare',
+                4 => 'Epic',
+                5 => 'Legendary',
+                _ => '',
+            },
+            match rarity {
+                0 => '',
+                1 => 'Fire',
+                2 => 'Water',
+                3 => 'Wind',
+                4 => 'Earth',
+                5 => 'Thunder',
+                _ => '',
+            }
+        )
+    }
 
     fn add_lucky(ref self: ContractState, input: ContractAddress) {
         let lucky = self.lucky.read(input);

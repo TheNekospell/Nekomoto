@@ -2,7 +2,10 @@ package chain_sn
 
 import (
 	"backend/internal/env"
+	"encoding/hex"
+	"fmt"
 	"math/big"
+	"strings"
 
 	"github.com/NethermindEth/juno/core/felt"
 	"github.com/NethermindEth/starknet.go/account"
@@ -59,5 +62,21 @@ func init() {
 	if err != nil {
 		panic(err.Error())
 	}
+
+}
+
+func FeltToString(hexOrigin string) string {
+
+	hexOrigin = strings.TrimPrefix(hexOrigin, "0x")
+
+	hexBytes, err := hex.DecodeString(hexOrigin)
+	if err != nil {
+		fmt.Println("err in felt to string:", err.Error())
+		return ""
+	}
+
+	str := string(hexBytes)
+	fmt.Println("str: ", str)
+	return str
 
 }

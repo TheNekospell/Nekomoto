@@ -1,7 +1,5 @@
 
-read -s -p "deploy private key:" PRIVATE_KEY
-echo ""
-read -p "host address:" HOST
+source ./scripts/.shell_config
 
 read -p "neko_coin hash:" CLASS_HASH_COIN
 ADDRESS_COIN=$(starkli deploy --watch $CLASS_HASH_COIN u256:2000000000000000000000000000 $HOST --account ./starkli/account --private-key $PRIVATE_KEY | tail -n 1)

@@ -2,12 +2,11 @@ package service
 
 import (
 	"backend/internal/database"
-	invoke "backend/internal/invoker"
+	// invoke "backend/internal/invoker"
 	"backend/internal/model"
 	"strconv"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/shopspring/decimal"
 )
 
@@ -60,7 +59,7 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 
 	// invoke chain to send rewards, 10% as tax
 
-	invoke.SendNekoCoin(common.HexToAddress(addressDetail.Address), totalReward.Mul(decimal.New(9, -1)).Mul(decimal.New(10, 18)).BigInt())
+	// invoke.SendNekoCoin(common.HexToAddress(addressDetail.Address), totalReward.Mul(decimal.New(9, -1)).Mul(decimal.New(10, 18)).BigInt())
 
 	// clear cache
 

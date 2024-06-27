@@ -7,4 +7,6 @@ read ADDRESS
 # read PRIVATE_KEY
 
 starkli account fetch $ADDRESS --output ./starkli/account
-# starkli signer keystore from-key 
+# starkli account fetch $ADDRESS --output ./starkli/account_test
+
+# starkli signer keystore from-key

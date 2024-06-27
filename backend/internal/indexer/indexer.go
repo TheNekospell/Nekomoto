@@ -144,7 +144,7 @@ func (e *EventHandlerNekoSpirit) Handle(eventLog types.Log) {
 		if err != nil {
 			return
 		}
-		err = database.SaveEventNekoSpiritTransfer(event)
+		// err = database.SaveEventNekoSpiritTransfer(event)
 		if err != nil {
 			return
 		}
@@ -156,7 +156,7 @@ func (e *EventHandlerNekoSpirit) Handle(eventLog types.Log) {
 		if err != nil {
 			return
 		}
-		err = database.SaveEventNekoSpiritUpgrade(event)
+		// err = database.SaveEventNekoSpiritUpgrade(event)
 		if err != nil {
 			return
 		}
@@ -168,7 +168,7 @@ func (e *EventHandlerNekoSpirit) Handle(eventLog types.Log) {
 		if err != nil {
 			return
 		}
-		err = database.SaveEventNekoSpiritUpgradeAscend(event)
+		// err = database.SaveEventNekoSpiritUpgradeAscend(event)
 		if err != nil {
 			return
 		}
@@ -204,13 +204,13 @@ func (e *EventHandlerShard) Handle(eventLog types.Log) {
 			return
 		}
 
-		err = database.SaveEventShardTransfer(event)
+		// err = database.SaveEventShardTransfer(event)
 		if err != nil {
 			return
 		}
 
 		if event.From == chain.EmptyAddress || event.To == chain.EmptyAddress {
-			service.UpdateShardFromChain(event)
+			// service.UpdateShardFromChain(event)
 		}
 
 	}

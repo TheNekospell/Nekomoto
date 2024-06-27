@@ -3,3 +3,4 @@ target
 Scarb.lock
 
 starkli/*
+.shell_config

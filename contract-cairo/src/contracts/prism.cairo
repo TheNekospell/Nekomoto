@@ -32,6 +32,7 @@ pub mod Prism {
 
     #[external(v0)]
     fn mint(ref self: ContractState, recipient: ContractAddress, amount: u256) {
+        assert(get_caller_address() == self.host.read(), 'Only the host can mint');
         self.erc20.mint(recipient, amount);
     }
 

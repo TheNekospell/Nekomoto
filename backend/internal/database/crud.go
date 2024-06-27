@@ -1,7 +1,7 @@
 package database
 
 import (
-	"backend/internal/chain"
+	// "backend/internal/chain"
 	"fmt"
 	"strconv"
 	"time"
@@ -66,53 +66,53 @@ func UpdateBuffRecord(record *ServerBuffRecord) error {
 	return nil
 }
 
-func SaveEventNekoSpiritTransfer(event *chain.SpiritTransfer) error {
-	toSave := EventNekoSpiritTransfer{
-		Hash: Hash{
-			TransactionHash: event.Raw.TxHash.Hex(),
-			BlockNumber:     event.Raw.BlockNumber,
-			BlockHash:       event.Raw.BlockHash.Hex()},
-		From:    event.From.Hex(),
-		To:      event.To.Hex(),
-		TokenId: event.TokenId.Uint64(),
-	}
+// func SaveEventNekoSpiritTransfer(event *chain.SpiritTransfer) error {
+// 	toSave := EventNekoSpiritTransfer{
+// 		Hash: Hash{
+// 			TransactionHash: event.Raw.TxHash.Hex(),
+// 			BlockNumber:     event.Raw.BlockNumber,
+// 			BlockHash:       event.Raw.BlockHash.Hex()},
+// 		From:    event.From.Hex(),
+// 		To:      event.To.Hex(),
+// 		TokenId: event.TokenId.Uint64(),
+// 	}
 
-	if toSave.From == chain.EmptyAddressInHex {
-		toSave.TransferOrMintOrBurn = 1
-	} else if toSave.To == chain.EmptyAddressInHex {
-		toSave.TransferOrMintOrBurn = 2
-	}
-	return DB.Create(&toSave).Error
-}
+// 	if toSave.From == chain.EmptyAddressInHex {
+// 		toSave.TransferOrMintOrBurn = 1
+// 	} else if toSave.To == chain.EmptyAddressInHex {
+// 		toSave.TransferOrMintOrBurn = 2
+// 	}
+// 	return DB.Create(&toSave).Error
+// }
 
-func SaveEventNekoSpiritUpgrade(event *chain.SpiritUpgrade) error {
-	toSave := EventNekoSpiritUpgrade{
-		Hash: Hash{
-			TransactionHash: event.Raw.TxHash.Hex(),
-			BlockNumber:     event.Raw.BlockNumber,
-			BlockHash:       event.Raw.BlockHash.Hex()},
-		From:          event.Sender.Hex(),
-		TokenId:       event.TokenId.Uint64(),
-		NewLevel:      event.NewLevel.Uint64(),
-		NekoCoinCount: decimal.NewFromBigInt(event.NekoCount, -18),
-		PrismaCount:   decimal.NewFromBigInt(event.PrismCount, -18),
-	}
-	return DB.Create(&toSave).Error
-}
+// func SaveEventNekoSpiritUpgrade(event *chain.SpiritUpgrade) error {
+// 	toSave := EventNekoSpiritUpgrade{
+// 		Hash: Hash{
+// 			TransactionHash: event.Raw.TxHash.Hex(),
+// 			BlockNumber:     event.Raw.BlockNumber,
+// 			BlockHash:       event.Raw.BlockHash.Hex()},
+// 		From:          event.Sender.Hex(),
+// 		TokenId:       event.TokenId.Uint64(),
+// 		NewLevel:      event.NewLevel.Uint64(),
+// 		NekoCoinCount: decimal.NewFromBigInt(event.NekoCount, -18),
+// 		PrismaCount:   decimal.NewFromBigInt(event.PrismCount, -18),
+// 	}
+// 	return DB.Create(&toSave).Error
+// }
 
-func SaveEventNekoSpiritUpgradeAscend(event *chain.SpiritUpgradeAscend) error {
-	toSave := EventAscendUpgrade{
-		Hash: Hash{
-			TransactionHash: event.Raw.TxHash.Hex(),
-			BlockNumber:     event.Raw.BlockNumber,
-			BlockHash:       event.Raw.BlockHash.Hex()},
-		From:          event.Sender.Hex(),
-		NewLevel:      event.NewLevel.Uint64(),
-		NekoCoinCount: decimal.NewFromBigInt(event.NekoCount, -18),
-		PrismaCount:   decimal.NewFromBigInt(event.Prism, -18),
-	}
-	return DB.Create(&toSave).Error
-}
+// func SaveEventNekoSpiritUpgradeAscend(event *chain.SpiritUpgradeAscend) error {
+// 	toSave := EventAscendUpgrade{
+// 		Hash: Hash{
+// 			TransactionHash: event.Raw.TxHash.Hex(),
+// 			BlockNumber:     event.Raw.BlockNumber,
+// 			BlockHash:       event.Raw.BlockHash.Hex()},
+// 		From:          event.Sender.Hex(),
+// 		NewLevel:      event.NewLevel.Uint64(),
+// 		NekoCoinCount: decimal.NewFromBigInt(event.NekoCount, -18),
+// 		PrismaCount:   decimal.NewFromBigInt(event.Prism, -18),
+// 	}
+// 	return DB.Create(&toSave).Error
+// }
 
 func CreateAddress(address *ServerAddress) (uint64, error) {
 	if err := DB.Create(&address).Error; err != nil {
@@ -121,23 +121,23 @@ func CreateAddress(address *ServerAddress) (uint64, error) {
 	return address.ID, nil
 }
 
-func SaveEventShardTransfer(event *chain.ShardTransfer) error {
-	toSave := EventTemporalShardTransfer{
-		Hash: Hash{
-			TransactionHash: event.Raw.TxHash.Hex(),
-			BlockNumber:     event.Raw.BlockNumber,
-			BlockHash:       event.Raw.BlockHash.Hex()},
-		From:    event.From.Hex(),
-		To:      event.To.Hex(),
-		TokenId: event.TokenId.Uint64(),
-	}
-	if toSave.From == chain.EmptyAddressInHex {
-		toSave.TransferOrMintOrBurn = 1
-	} else if toSave.To == chain.EmptyAddressInHex {
-		toSave.TransferOrMintOrBurn = 2
-	}
-	return DB.Create(&toSave).Error
-}
+// func SaveEventShardTransfer(event *chain.ShardTransfer) error {
+// 	toSave := EventTemporalShardTransfer{
+// 		Hash: Hash{
+// 			TransactionHash: event.Raw.TxHash.Hex(),
+// 			BlockNumber:     event.Raw.BlockNumber,
+// 			BlockHash:       event.Raw.BlockHash.Hex()},
+// 		From:    event.From.Hex(),
+// 		To:      event.To.Hex(),
+// 		TokenId: event.TokenId.Uint64(),
+// 	}
+// 	if toSave.From == chain.EmptyAddressInHex {
+// 		toSave.TransferOrMintOrBurn = 1
+// 	} else if toSave.To == chain.EmptyAddressInHex {
+// 		toSave.TransferOrMintOrBurn = 2
+// 	}
+// 	return DB.Create(&toSave).Error
+// }
 
 func CreateShardRecord(record ServerTemporalShardRecord, address string) error {
 	Cache.Delete(CacheTagUid + strconv.FormatUint(GetAddressDetailByAddress(address).Uid, 10))

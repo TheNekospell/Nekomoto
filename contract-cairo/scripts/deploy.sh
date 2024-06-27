@@ -1,14 +1,12 @@
 
-read -s -p "deploy private key:" PRIVATE_KEY
-echo ""
-read -p "host address:" HOST
+source ./scripts/.shell_config
 
 echo "test and build..."
 scarb test && scarb --release build
 
 CLASS_HASH_COIN=$(starkli declare --watch ./target/release/nekomoto_Nekocoin.contract_class.json --account ./starkli/account --private-key $PRIVATE_KEY | tail -n 1)
 
-ADDRESS_COIN=$(starkli deploy --watch $CLASS_HASH_COIN $HOST --account ./starkli/account --private-key $PRIVATE_KEY | tail -n 1)
+ADDRESS_COIN=$(starkli deploy --watch $CLASS_HASH_COIN u256:2000000000000000000000000000 $HOST --account ./starkli/account --private-key $PRIVATE_KEY | tail -n 1)
 
 CLASS_HASH_PRISM=$(starkli declare --watch ./target/release/nekomoto_Prism.contract_class.json --account ./starkli/account --private-key $PRIVATE_KEY | tail -n 1)
 
