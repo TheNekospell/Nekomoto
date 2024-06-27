@@ -3,7 +3,9 @@ package invoker_sn
 import (
 	"backend/internal/chain_sn"
 	"backend/internal/database"
+	"backend/internal/env"
 	"math/big"
+	"time"
 
 	"context"
 	"fmt"
@@ -20,14 +22,13 @@ var (
 
 func init() {
 
-	ReadNekoSpiritInfo(1, false)
+	SendCoinAndNFT(env.GetEnvValue("TEST_ADDRESS_SN"), big.NewInt(100), big.NewInt(100), big.NewInt(10))
 
 }
 
 func ReadNekoSpiritInfo(tokenId uint64, origin bool) (database.ServerNekoSpiritInfo, error) {
 
 	var tag *felt.Felt
-	var err error
 	if origin {
 		tag, _ = utils.HexToFelt("0x1")
 	} else {
@@ -43,7 +44,7 @@ func ReadNekoSpiritInfo(tokenId uint64, origin bool) (database.ServerNekoSpiritI
 	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTag)
 	if errRpc != nil {
 		fmt.Println(errRpc.Error())
-		return database.ServerNekoSpiritInfo{}, err
+		return database.ServerNekoSpiritInfo{}, errRpc
 	}
 	fmt.Println("res:", response)
 	// fmt.Println("text: ", response[0].Text(16))
@@ -69,8 +70,197 @@ func ReadNekoSpiritInfo(tokenId uint64, origin bool) (database.ServerNekoSpiritI
 
 }
 
-func ReadOwnerOfNekoSpirit(tokenId uint64) string {
+func ReadOwnerOfNekoSpirit(tokenId uint64) (string, error) {
 
-	
+	call := rpc.FunctionCall{
+		ContractAddress:    chain_sn.NekomotoContractAddress,
+		EntryPointSelector: utils.GetSelectorFromNameFelt("owner_of"),
+		Calldata:           []*felt.Felt{utils.BigIntToFelt(big.NewInt(int64(tokenId))), utils.BigIntToFelt(big.NewInt(0))},
+	}
 
+	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTag)
+	if errRpc != nil {
+		fmt.Println(errRpc.Error())
+		return "", errRpc
+	}
+
+	fmt.Println("response: ", response)
+
+	return response[0].String(), nil
+
+}
+
+func SendCoinAndNFT(to string, nekocoinAmount *big.Int, prismAmount *big.Int, nftAmount *big.Int) error {
+
+	toFelt, err := utils.HexToFelt(to)
+	if err != nil {
+		fmt.Println("address err: ", err.Error())
+		return err
+	}
+
+	if nekocoinAmount.Cmp(big.NewInt(0)) > 0 {
+		nonce, errRpc := chain_sn.Account.Nonce(context.Background(), rpcTag, chain_sn.Account.AccountAddress)
+		if errRpc != nil {
+			fmt.Println("nonce err: ", errRpc.Error())
+			return errRpc
+		}
+
+		invoke := rpc.InvokeTxnV1{
+			MaxFee:        chain_sn.MaxFee,
+			Version:       rpc.TransactionV1,
+			Nonce:         nonce,
+			Type:          rpc.TransactionType_Invoke,
+			SenderAddress: chain_sn.Account.AccountAddress,
+		}
+		call := rpc.FunctionCall{
+			ContractAddress:    chain_sn.NekomotoContractAddress,
+			EntryPointSelector: utils.GetSelectorFromNameFelt("transfer"),
+			Calldata:           []*felt.Felt{toFelt, utils.BigIntToFelt(nekocoinAmount)},
+		}
+
+		invoke.Calldata, err = chain_sn.Account.FmtCalldata([]rpc.FunctionCall{call})
+		if err != nil {
+			fmt.Println("calldata err: ", err.Error())
+			return err
+		}
+
+		if err = chain_sn.Account.SignInvokeTransaction(context.Background(), &invoke); err != nil {
+			fmt.Println("sign err: ", err.Error())
+			return err
+		}
+		fmt.Println("invoke: ", invoke.Signature)
+
+		response, errRpc := chain_sn.Account.AddInvokeTransaction(context.Background(), invoke)
+		if errRpc != nil {
+			fmt.Println("invoke err: ", errRpc.Error())
+			return errRpc
+		}
+		fmt.Println("response: ", response)
+	}
+	if prismAmount.Cmp(big.NewInt(0)) > 0 {
+		nonce, errRpc := chain_sn.Account.Nonce(context.Background(), rpcTag, chain_sn.Account.AccountAddress)
+		if errRpc != nil {
+			fmt.Println("nonce err: ", errRpc.Error())
+			return errRpc
+		}
+
+		invoke := rpc.InvokeTxnV1{
+			MaxFee:        chain_sn.MaxFee,
+			Version:       rpc.TransactionV1,
+			Nonce:         nonce,
+			Type:          rpc.TransactionType_Invoke,
+			SenderAddress: chain_sn.Account.AccountAddress,
+		}
+		call := rpc.FunctionCall{
+			ContractAddress:    chain_sn.PrismContractAddress,
+			EntryPointSelector: utils.GetSelectorFromNameFelt("mint"),
+			Calldata:           []*felt.Felt{toFelt, utils.BigIntToFelt(prismAmount)},
+		}
+
+		invoke.Calldata, err = chain_sn.Account.FmtCalldata([]rpc.FunctionCall{call})
+		if err != nil {
+			fmt.Println("calldata err: ", err.Error())
+			return err
+		}
+
+		if err = chain_sn.Account.SignInvokeTransaction(context.Background(), &invoke); err != nil {
+			fmt.Println("sign err: ", err.Error())
+			return err
+		}
+		response, errRpc := chain_sn.Account.AddInvokeTransaction(context.Background(), invoke)
+		if errRpc != nil {
+			fmt.Println("invoke err: ", errRpc.Error())
+			return errRpc
+		}
+		fmt.Println("response: ", response)
+	}
+	if nftAmount.Cmp(big.NewInt(0)) > 0 {
+		nonce, errRpc := chain_sn.Account.Nonce(context.Background(), rpcTag, chain_sn.Account.AccountAddress)
+		if errRpc != nil {
+			fmt.Println("nonce err: ", errRpc.Error())
+			return errRpc
+		}
+
+		invoke := rpc.InvokeTxnV1{
+			MaxFee:        chain_sn.MaxFee,
+			Version:       rpc.TransactionV1,
+			Nonce:         nonce,
+			Type:          rpc.TransactionType_Invoke,
+			SenderAddress: chain_sn.Account.AccountAddress,
+		}
+		call := rpc.FunctionCall{
+			ContractAddress:    chain_sn.ShardContractAddress,
+			EntryPointSelector: utils.GetSelectorFromNameFelt("mint"),
+			Calldata:           []*felt.Felt{toFelt, utils.BigIntToFelt(nftAmount)},
+		}
+
+		invoke.Calldata, err = chain_sn.Account.FmtCalldata([]rpc.FunctionCall{call})
+		if err != nil {
+			fmt.Println("calldata err: ", err.Error())
+			return err
+		}
+
+		if err = chain_sn.Account.SignInvokeTransaction(context.Background(), &invoke); err != nil {
+			fmt.Println("sign err: ", err.Error())
+			return err
+		}
+		response, errRpc := chain_sn.Account.AddInvokeTransaction(context.Background(), invoke)
+		if errRpc != nil {
+			fmt.Println("invoke err: ", errRpc.Error())
+			return errRpc
+		}
+		fmt.Println("response: ", response)
+	}
+
+	return nil
+
+}
+
+func Summon(to string, count *big.Int) error {
+	randomInput := big.NewInt(int64(time.Now().Nanosecond()))
+	fmt.Println("[Invoker]build randomInput: ", randomInput)
+
+	toFelt, err := utils.HexToFelt(to)
+	if err != nil {
+		fmt.Println("address err: ", err.Error())
+		return err
+	}
+
+	nonce, errRpc := chain_sn.Account.Nonce(context.Background(), rpcTag, chain_sn.Account.AccountAddress)
+	if errRpc != nil {
+		fmt.Println("nonce err: ", errRpc.Error())
+		return errRpc
+	}
+
+	invoke := rpc.InvokeTxnV1{
+		MaxFee:        chain_sn.MaxFee,
+		Version:       rpc.TransactionV1,
+		Nonce:         nonce,
+		Type:          rpc.TransactionType_Invoke,
+		SenderAddress: chain_sn.Account.AccountAddress,
+	}
+	call := rpc.FunctionCall{
+		ContractAddress:    chain_sn.NekomotoContractAddress,
+		EntryPointSelector: utils.GetSelectorFromNameFelt("summon"),
+		Calldata:           []*felt.Felt{toFelt, utils.BigIntToFelt(count), utils.BigIntToFelt(big.NewInt(0)), utils.BigIntToFelt(randomInput), utils.BigIntToFelt(big.NewInt(0))},
+	}
+
+	invoke.Calldata, err = chain_sn.Account.FmtCalldata([]rpc.FunctionCall{call})
+	if err != nil {
+		fmt.Println("calldata err: ", err.Error())
+		return err
+	}
+
+	if err = chain_sn.Account.SignInvokeTransaction(context.Background(), &invoke); err != nil {
+		fmt.Println("sign err: ", err.Error())
+		return err
+	}
+	response, errRpc := chain_sn.Account.AddInvokeTransaction(context.Background(), invoke)
+	if errRpc != nil {
+		fmt.Println("invoke err: ", errRpc.Error())
+		return errRpc
+	}
+	fmt.Println("response: ", response)
+
+	return nil
 }

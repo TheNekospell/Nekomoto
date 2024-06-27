@@ -21,6 +21,8 @@ var (
 	NekoCoinContractAddress *felt.Felt
 	PrismContractAddress    *felt.Felt
 	ShardContractAddress    *felt.Felt
+
+	MaxFee *felt.Felt
 )
 
 func init() {
@@ -58,11 +60,15 @@ func init() {
 	ks := account.NewMemKeystore()
 	ks.Put(publicKey, privateKey)
 
-	Account, err = account.NewAccount(Client, address, publicKey, ks, 1)
+	Account, err = account.NewAccount(Client, address, publicKey, ks, 2)
 	if err != nil {
 		panic(err.Error())
 	}
 
+	MaxFee, err = utils.HexToFelt("0x9184e72a000")
+	if err != nil {
+		panic(err.Error())
+	}
 }
 
 func FeltToString(hexOrigin string) string {
