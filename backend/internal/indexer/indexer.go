@@ -3,7 +3,6 @@ package indexer
 import (
 	"backend/internal/chain"
 	"backend/internal/database"
-	"backend/internal/server/service"
 	"context"
 	"fmt"
 	"log"
@@ -136,47 +135,47 @@ func sendHistoryEvents(startBlock uint64, endBlock uint64, address []common.Addr
 type EventHandlerNekoSpirit struct{}
 
 func (e *EventHandlerNekoSpirit) Handle(eventLog types.Log) {
-	switch eventLog.Topics[0] {
+	// switch eventLog.Topics[0] {
 
-	case eventboxTransfer:
+	// case eventboxTransfer:
 
-		event, err := chain.ContractNekoSpirit.ParseTransfer(eventLog)
-		if err != nil {
-			return
-		}
-		// err = database.SaveEventNekoSpiritTransfer(event)
-		if err != nil {
-			return
-		}
-		service.UpdateNekoSpiritByTransfer(event.TokenId, event.To)
+	// 	// event, err := chain.ContractNekoSpirit.ParseTransfer(eventLog)
+	// 	// if err != nil {
+	// 	// 	return
+	// 	// }
+	// 	// err = database.SaveEventNekoSpiritTransfer(event)
+	// 	// if err != nil {
+	// 	// 	return
+	// 	// }
+	// 	// service.UpdateNekoSpiritByTransfer(event.TokenId, event.To)
 
-	case eventboxUpgrade:
+	// case eventboxUpgrade:
 
-		event, err := chain.ContractNekoSpirit.ParseUpgrade(eventLog)
-		if err != nil {
-			return
-		}
-		// err = database.SaveEventNekoSpiritUpgrade(event)
-		if err != nil {
-			return
-		}
-		service.UpdateNekoSpiritByUpgrade(event.TokenId)
+	// 	event, err := chain.ContractNekoSpirit.ParseUpgrade(eventLog)
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// 	// err = database.SaveEventNekoSpiritUpgrade(event)
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// 	service.UpdateNekoSpiritByUpgrade(event.TokenId)
 
-	case eventboxUpgradeAscend:
+	// case eventboxUpgradeAscend:
 
-		event, err := chain.ContractNekoSpirit.ParseUpgradeAscend(eventLog)
-		if err != nil {
-			return
-		}
-		// err = database.SaveEventNekoSpiritUpgradeAscend(event)
-		if err != nil {
-			return
-		}
-		service.UpdateAscendFromChain(event.Sender, event.NewLevel)
+	// 	event, err := chain.ContractNekoSpirit.ParseUpgradeAscend(eventLog)
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// 	// err = database.SaveEventNekoSpiritUpgradeAscend(event)
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// 	service.UpdateAscendFromChain(event.Sender, event.NewLevel)
 
-		// todo case
+	// 	// todo case
 
-	}
+	// }
 }
 
 type EventHandlerNeko struct{}

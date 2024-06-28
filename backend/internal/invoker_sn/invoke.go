@@ -3,7 +3,6 @@ package invoker_sn
 import (
 	"backend/internal/chain_sn"
 	"backend/internal/database"
-	"backend/internal/env"
 	"math/big"
 	"time"
 
@@ -19,12 +18,6 @@ import (
 var (
 	rpcTag rpc.BlockID = rpc.BlockID{Tag: "latest"}
 )
-
-func init() {
-
-	SendCoinAndNFT(env.GetEnvValue("TEST_ADDRESS_SN"), big.NewInt(100), big.NewInt(100), big.NewInt(10))
-
-}
 
 func ReadNekoSpiritInfo(tokenId uint64, origin bool) (database.ServerNekoSpiritInfo, error) {
 
@@ -46,7 +39,7 @@ func ReadNekoSpiritInfo(tokenId uint64, origin bool) (database.ServerNekoSpiritI
 		fmt.Println(errRpc.Error())
 		return database.ServerNekoSpiritInfo{}, errRpc
 	}
-	fmt.Println("res:", response)
+	// fmt.Println("res:", response)
 	// fmt.Println("text: ", response[0].Text(16))
 	// fmt.Println("string: ", response[0].String())
 	// fmt.Println("short string: ", response[0].ShortString())
@@ -60,11 +53,11 @@ func ReadNekoSpiritInfo(tokenId uint64, origin bool) (database.ServerNekoSpiritI
 		Rarity:  chain_sn.FeltToString(response[0].String()),
 		Element: chain_sn.FeltToString(response[1].String()),
 		Name:    chain_sn.FeltToString(response[2].String()),
-		SPI:     decimal.NewFromUint64(response[3].Uint64()),
-		ATK:     decimal.NewFromUint64(response[5].Uint64()),
-		DEF:     decimal.NewFromUint64(response[7].Uint64()),
-		SPD:     decimal.NewFromUint64(response[9].Uint64()),
-		Fade:    decimal.NewFromUint64(response[11].Uint64()),
+		SPI:     decimal.NewFromUint64(response[3].Uint64()).Div(decimal.NewFromUint64(100)),
+		ATK:     decimal.NewFromUint64(response[5].Uint64()).Div(decimal.NewFromUint64(100)),
+		DEF:     decimal.NewFromUint64(response[7].Uint64()).Div(decimal.NewFromUint64(100)),
+		SPD:     decimal.NewFromUint64(response[9].Uint64()).Div(decimal.NewFromUint64(100)),
+		Fade:    decimal.NewFromUint64(response[11].Uint64()).Div(decimal.NewFromUint64(100)),
 		Level:   response[15].Uint64(),
 	}, nil
 
@@ -113,9 +106,9 @@ func SendCoinAndNFT(to string, nekocoinAmount *big.Int, prismAmount *big.Int, nf
 			SenderAddress: chain_sn.Account.AccountAddress,
 		}
 		call := rpc.FunctionCall{
-			ContractAddress:    chain_sn.NekomotoContractAddress,
+			ContractAddress:    chain_sn.NekoCoinContractAddress,
 			EntryPointSelector: utils.GetSelectorFromNameFelt("transfer"),
-			Calldata:           []*felt.Felt{toFelt, utils.BigIntToFelt(nekocoinAmount)},
+			// Calldata:           []*felt.Felt{toFelt, utils.BigIntToFelt(nekocoinAmount), utils.BigIntToFelt(big.NewInt(0))},
 		}
 
 		invoke.Calldata, err = chain_sn.Account.FmtCalldata([]rpc.FunctionCall{call})
@@ -128,14 +121,14 @@ func SendCoinAndNFT(to string, nekocoinAmount *big.Int, prismAmount *big.Int, nf
 			fmt.Println("sign err: ", err.Error())
 			return err
 		}
-		fmt.Println("invoke: ", invoke.Signature)
+		// fmt.Println("invoke: ", invoke)
 
 		response, errRpc := chain_sn.Account.AddInvokeTransaction(context.Background(), invoke)
 		if errRpc != nil {
 			fmt.Println("invoke err: ", errRpc.Error())
 			return errRpc
 		}
-		fmt.Println("response: ", response)
+		fmt.Println("send neko coin response: ", response)
 	}
 	if prismAmount.Cmp(big.NewInt(0)) > 0 {
 		nonce, errRpc := chain_sn.Account.Nonce(context.Background(), rpcTag, chain_sn.Account.AccountAddress)
@@ -154,7 +147,7 @@ func SendCoinAndNFT(to string, nekocoinAmount *big.Int, prismAmount *big.Int, nf
 		call := rpc.FunctionCall{
 			ContractAddress:    chain_sn.PrismContractAddress,
 			EntryPointSelector: utils.GetSelectorFromNameFelt("mint"),
-			Calldata:           []*felt.Felt{toFelt, utils.BigIntToFelt(prismAmount)},
+			Calldata:           []*felt.Felt{toFelt, utils.BigIntToFelt(prismAmount), utils.BigIntToFelt(big.NewInt(0))},
 		}
 
 		invoke.Calldata, err = chain_sn.Account.FmtCalldata([]rpc.FunctionCall{call})
@@ -172,7 +165,7 @@ func SendCoinAndNFT(to string, nekocoinAmount *big.Int, prismAmount *big.Int, nf
 			fmt.Println("invoke err: ", errRpc.Error())
 			return errRpc
 		}
-		fmt.Println("response: ", response)
+		fmt.Println("send prism response: ", response)
 	}
 	if nftAmount.Cmp(big.NewInt(0)) > 0 {
 		nonce, errRpc := chain_sn.Account.Nonce(context.Background(), rpcTag, chain_sn.Account.AccountAddress)
@@ -191,7 +184,7 @@ func SendCoinAndNFT(to string, nekocoinAmount *big.Int, prismAmount *big.Int, nf
 		call := rpc.FunctionCall{
 			ContractAddress:    chain_sn.ShardContractAddress,
 			EntryPointSelector: utils.GetSelectorFromNameFelt("mint"),
-			Calldata:           []*felt.Felt{toFelt, utils.BigIntToFelt(nftAmount)},
+			Calldata:           []*felt.Felt{toFelt, utils.BigIntToFelt(nftAmount), utils.BigIntToFelt(big.NewInt(0))},
 		}
 
 		invoke.Calldata, err = chain_sn.Account.FmtCalldata([]rpc.FunctionCall{call})
@@ -209,7 +202,7 @@ func SendCoinAndNFT(to string, nekocoinAmount *big.Int, prismAmount *big.Int, nf
 			fmt.Println("invoke err: ", errRpc.Error())
 			return errRpc
 		}
-		fmt.Println("response: ", response)
+		fmt.Println("send nft response: ", response)
 	}
 
 	return nil
@@ -264,3 +257,4 @@ func Summon(to string, count *big.Int) error {
 
 	return nil
 }
+

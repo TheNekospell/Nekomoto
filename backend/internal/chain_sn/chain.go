@@ -23,6 +23,8 @@ var (
 	ShardContractAddress    *felt.Felt
 
 	MaxFee *felt.Felt
+	EmptyAddressStringShort = "0x0"
+	HostAddress = env.GetEnvValue("OWNER_ADDRESS_SN")
 )
 
 func init() {
@@ -56,7 +58,11 @@ func init() {
 	}
 
 	publicKey := env.GetEnvValue("PUBLIC_KEY_SN")
-	privateKey, _ := new(big.Int).SetString(env.GetEnvValue("PRIVATE_KEY_SN"), 0)
+	privateKey, ok := new(big.Int).SetString(env.GetEnvValue("PRIVATE_KEY_SN"), 0)
+	if !ok {
+		panic("invalid private key")
+	}
+
 	ks := account.NewMemKeystore()
 	ks.Put(publicKey, privateKey)
 
@@ -65,10 +71,7 @@ func init() {
 		panic(err.Error())
 	}
 
-	MaxFee, err = utils.HexToFelt("0x9184e72a000")
-	if err != nil {
-		panic(err.Error())
-	}
+	MaxFee = utils.Uint64ToFelt(10000000000000000)
 }
 
 func FeltToString(hexOrigin string) string {
@@ -82,7 +85,7 @@ func FeltToString(hexOrigin string) string {
 	}
 
 	str := string(hexBytes)
-	fmt.Println("str: ", str)
+	// fmt.Println("str: ", str)
 	return str
 
 }

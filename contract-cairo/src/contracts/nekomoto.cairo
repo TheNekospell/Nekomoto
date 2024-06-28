@@ -169,6 +169,7 @@ pub mod Nekomoto {
                 if i == count {
                     break;
                 }
+                i = i + 1;
 
                 token_id = token_id + 1;
                 let input = array![block_time.into() + i, token_id, random];
@@ -189,8 +190,6 @@ pub mod Nekomoto {
                     self.with_buff.write(token_id, 1);
                 }
                 self.emit(Summon { to: recipient, token_id });
-
-                i = i + 1;
             }
         }
 
@@ -391,7 +390,7 @@ pub mod Nekomoto {
         }
 
         fn upgrade(ref self: ContractState, token_id: u256) {
-            assert(self.token_id.read() > token_id, 'Invalid token_id');
+            assert(self.token_id.read() >= token_id, 'Invalid token_id');
             assert(self.erc721.ERC721_owners.read(token_id) == self.host.read(), 'Only staked');
 
             let sender = get_caller_address();
@@ -420,17 +419,18 @@ pub mod Nekomoto {
         }
 
         fn generate(self: @ContractState, token_id: u256, origin: bool) -> Info {
-            assert(self.token_id.read() > token_id, 'Invalid token_id');
+            assert(self.token_id.read() >= token_id, 'Invalid token_id');
 
             let seed = self.seed.read(token_id);
-            let with_buff = self.with_buff.read(token_id);
+            // let with_buff = self.with_buff.read(token_id);
             let is_starter = self.starter.read(token_id) == 1;
-            let mut level = self.level.read(token_id);
-            if origin {
-                level = 0;
-            }
+            let level = if origin {
+                0
+            } else {
+                self.level.read(token_id)
+            };
 
-            let (rarity, element, name) = generate_basic_info(seed, with_buff, is_starter);
+            let (rarity, element, name) = generate_basic_info(seed, is_starter);
             let SPI = generate_SPI(rarity, seed, level, is_starter);
             let ATK = generate_ATK(rarity, seed, level, is_starter);
             let DEF = generate_DEF(rarity, seed, level, is_starter);
@@ -835,7 +835,7 @@ pub mod Nekomoto {
         return rarity;
     }
 
-    fn generate_basic_info(seed: u256, with_buff: u8, is_starter: bool) -> (u8, u8, felt252) {
+    fn generate_basic_info(seed: u256, is_starter: bool) -> (u8, u8, felt252) {
         if is_starter {
             return (1, 1, 'Mikan');
         }
@@ -847,22 +847,18 @@ pub mod Nekomoto {
         let rarity_number = random(seed, 0, 10000);
         let element_number = random(seed, 0, 5);
 
-        let mut empty = 450;
+        // let mut empty = 450;
         let common = 5850;
         let uncommon = 8400;
         let rare = 9500;
         let epic = 9950;
         // let legendary = 10000;
 
-        if with_buff == 1 {
-            empty = 5;
-        }
+        // if with_buff == 1 {
+        //     empty = 5;
+        // }
 
-        if (rarity_number < empty) {
-            rarity = 0;
-            element = 0;
-            name = '';
-        } else if (rarity_number < common) {
+        if (rarity_number < common) {
             rarity = 1;
             if (element_number == 0) {
                 element = 1;

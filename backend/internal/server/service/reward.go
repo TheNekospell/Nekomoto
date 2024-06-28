@@ -2,6 +2,9 @@ package service
 
 import (
 	"backend/internal/database"
+	"backend/internal/invoker_sn"
+	"math/big"
+
 	// invoke "backend/internal/invoker"
 	"backend/internal/model"
 	"strconv"
@@ -59,7 +62,7 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 
 	// invoke chain to send rewards, 10% as tax
 
-	// invoke.SendNekoCoin(common.HexToAddress(addressDetail.Address), totalReward.Mul(decimal.New(9, -1)).Mul(decimal.New(10, 18)).BigInt())
+	invoker_sn.SendCoinAndNFT(addressDetail.Address, totalReward.Mul(decimal.New(9, -1)).Mul(decimal.New(10, 18)).BigInt(), big.NewInt(0), big.NewInt(0))
 
 	// clear cache
 

@@ -2,13 +2,13 @@ package main
 
 import (
 	"backend/internal/database"
-	_ "backend/internal/invoker_sn"
+	"backend/internal/indexer_sn"
 	"backend/internal/tick"
 )
 
 func main() {
 	database.InitDatabaseSn()
 	go tick.StartTicker()
-	// go indexer.StartIndexer()
+	indexer_sn.StartIndexer()
 	// server.StartServer()
 }

@@ -2,8 +2,10 @@ package service
 
 import (
 	"backend/internal/database"
+	"backend/internal/invoker_sn"
 	// "backend/internal/invoker"
 	"backend/internal/model"
+	"math/big"
 	"math/rand"
 	"time"
 
@@ -37,18 +39,18 @@ func OpenChest(req model.AddressAndSignature) (code model.ResponseCode, message 
 		}
 	}
 
-	// token1, err := big.NewInt(0).SetString(chest.Token1Amount.StringFixed(0), 10)
-	// if !err {
-	// 	return model.ServerInternalError, "server internal error"
-	// }
-	// token2, err := big.NewInt(0).SetString(chest.Token2Amount.StringFixed(0), 10)
-	// if !err {
-	// 	return model.ServerInternalError, "server internal error"
-	// }
-	// pow := new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)
-	// if err := invoke.SendChestReward(common.HexToAddress(req.Address), new(big.Int).Mul(token1, pow), new(big.Int).Mul(token2, pow), big.NewInt(int64(chest.NFTAmount))); err != nil {
-	// 	return model.ServerInternalError, "server internal error"
-	// }
+	token1, err := big.NewInt(0).SetString(chest.Token1Amount.StringFixed(0), 10)
+	if !err {
+		return model.ServerInternalError, "server internal error"
+	}
+	token2, err := big.NewInt(0).SetString(chest.Token2Amount.StringFixed(0), 10)
+	if !err {
+		return model.ServerInternalError, "server internal error"
+	}
+	pow := new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)
+	if err := invoker_sn.SendCoinAndNFT(req.Address, new(big.Int).Mul(token1, pow), new(big.Int).Mul(token2, pow), big.NewInt(int64(chest.NFTAmount))); err != nil {
+		return model.ServerInternalError, "server internal error"
+	}
 
 	database.UpdateChest(&chest)
 
@@ -77,20 +79,3 @@ func EmpowerChest(req model.TwoAddressAndSignature) (code model.ResponseCode, me
 
 	return model.Success, "Open success"
 }
-
-// func OpenStarterChest(req model.AddressAndSignature) (code model.ResponseCode, message string) {
-
-// 	config := database.QueryStarterChestConfig()
-// 	if config.Limit <= config.Opened {
-// 		return model.ServerInternalError, "Exceeded limit"
-// 	}
-
-// 	if err := invoke.SummonStarter(common.HexToAddress(req.Address)); err != nil {
-// 		fmt.Println("SummonStarter error: ", err)
-// 		return model.ServerInternalError, "Server internal error"
-// 	}
-// 	database.AddStarterChestOpened()
-// 	database.UpdateAddressStarter(req.Address)
-// 	return model.Success, "Open success"
-
-// }
