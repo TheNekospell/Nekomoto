@@ -208,9 +208,9 @@ pub mod Nekomoto {
                 let id = *token_id[i];
                 assert(id <= token_count, 'Not mint yet');
                 let seed = self.seed.read(id);
-                let with_buff = self.with_buff.read(id);
+                // let with_buff = self.with_buff.read(id);
                 let is_starter = self.starter.read(id) == 1;
-                let (rarity, _, _) = generate_basic_info(seed, with_buff, is_starter);
+                let (rarity, _, _) = generate_basic_info(seed, is_starter);
                 if rarity == 4 || rarity == 5 {
                     add_lucky(ref self, from);
                 }
@@ -238,9 +238,9 @@ pub mod Nekomoto {
                 let id = *token_id[i];
                 assert(id <= token_count, 'Not mint yet');
                 let seed = self.seed.read(id);
-                let with_buff = self.with_buff.read(id);
+                // let with_buff = self.with_buff.read(id);
                 let is_starter = self.starter.read(id) == 1;
-                let (rarity, _, _) = generate_basic_info(seed, with_buff, is_starter);
+                let (rarity, _, _) = generate_basic_info(seed,  is_starter);
                 let to = self.stake_from.read(id);
                 if rarity == 4 || rarity == 5 {
                     substract_lucky(ref self, to);

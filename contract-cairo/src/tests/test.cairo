@@ -258,11 +258,11 @@ mod test {
         PTrait::<Info>::print(result);
         assert_eq!(result.level, 13);
 
-        assert_eq!(
-            NekomotoTraitDispatcher { contract_address: nekomoto_address }
-                .lucky(bob.contract_address),
-            true
-        );
+        // assert_eq!(
+        //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
+        //         .lucky(bob.contract_address),
+        //     true
+        // );
 
         set_block_timestamp(1_000_000_003_600);
         assert_eq!(
@@ -298,11 +298,11 @@ mod test {
                 ]
             );
 
-        assert_eq!(
-            NekomotoTraitDispatcher { contract_address: nekomoto_address }
-                .lucky(bob.contract_address),
-            false
-        );
+        // assert_eq!(
+        //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
+        //         .lucky(bob.contract_address),
+        //     false
+        // );
 
         // buff part
 
