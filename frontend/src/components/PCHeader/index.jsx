@@ -15,132 +15,99 @@ import user from "@assets/user.png";
 import { Row, Col, Flex, Dropdown } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAppStore } from "@stores/index";
-export default function PCHeader() {
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const homePage = pathname === "/";
-  const assetsPage = pathname === "/assets";
-  const detailPage = pathname.includes("detail");
-  const isMobile = useAppStore().device === "mobile";
-  const items = [
-    {
-      key: "1",
-      label: (
-        <Flex align="center" justify="space-between" className="menu-text">
-          <img src={t5} width={24} style={{ marginRight: "6px" }} alt="" />
-          <span>MY ASSETS</span>
-        </Flex>
-      ),
-    },
-    {
-      key: "2",
-      label: (
-        <Flex align="center" justify="space-between" className="menu-text">
-          <Flex align="center">
-            <img src={blue} width={24} style={{ marginRight: "6px" }} alt="" />
-            <span>485</span>
-          </Flex>
-          <img src={t6} width={20} style={{ marginLeft: "24px" }} alt="" />
-        </Flex>
-      ),
-    },
-    {
-      key: "3",
-      label: (
-        <Flex align="center" justify="flex-start" style={{ width: "100%", textAlign:'left' }}>
-          <img src={user} width={16} height={20} alt="" />
-        </Flex>
-      ),
-    },
-  ];
+import Wallet from "@components/Wallet/wallet.jsx";
 
-  return (
-    <div className="pcHeader flex justify-between align-center">
-      <div
-        className="flex justify-between align-center"
-        style={{ cursor: "pointer" }}
-        onClick={() => navigate("/")}
-      >
-        <img src={logo} width={48} alt="" />
-        <img src={logoText} width={116} alt="" style={{ marginLeft: "12px" }} />
-      </div>
-      {homePage && (
-        <div>
-          <img src={x} width={48} alt="" />
-        </div>
-      )}
-      {isMobile ? (
-        <Dropdown menu={{ items }} placement="bottomRight">
-          <img src={t7} width={18} alt="" />
-        </Dropdown>
-      ) : (
-        !homePage && (
-          <>
-            <div>
-              <img src={t1} width={24} alt="" onClick={()=>navigate("/assets")} />
-              <img style={{ margin: "0 40px" }} src={t2} width={24} alt="" onClick={()=>navigate("/detail")}  />
-              <img
-                style={{ margin: "0 40px 0 0" }}
-                src={t3}
-                width={24}
-                alt=""
-                onClick={()=>navigate("/detail2")}
-              />
-              <img src={t4} width={24} alt="" />
-            </div>
-            {detailPage && (
-              <Row gutter={16}>
-                <Col className="header-btn2">
-                  <Flex align="center" justify="space-between">
-                    <img
-                      src={t5}
-                      width={24}
-                      style={{ marginRight: "6px" }}
-                      alt=""
-                    />
+export default function PCHeader() {
+    const navigate = useNavigate();
+    const {pathname} = useLocation();
+    const homePage = pathname === "/";
+    const assetsPage = pathname === "/assets";
+    const detailPage = pathname.includes("detail");
+    const isMobile = useAppStore().device === "mobile";
+    const items = [
+        {
+            key: "1",
+            label: (
+                <Flex align="center" justify="space-between" className="menu-text">
+                    <img src={t5} width={24} style={{marginRight: "6px"}} alt=""/>
                     <span>MY ASSETS</span>
-                  </Flex>
-                </Col>
-                <Col className="header-btn2" style={{ margin: "0 12px" }}>
-                  <Flex align="center" justify="space-between">
+                </Flex>
+            ),
+        },
+        {
+            key: "2",
+            label: (
+                <Flex align="center" justify="space-between" className="menu-text">
                     <Flex align="center">
-                      <img
-                        src={blue}
-                        width={24}
-                        style={{ marginRight: "6px" }}
-                        alt=""
-                      />
-                      <span>485</span>
+                        <img src={blue} width={24} style={{marginRight: "6px"}} alt=""/>
+                        <span>485</span>
                     </Flex>
-                    <img
-                      src={t6}
-                      width={20}
-                      style={{ marginLeft: "24px" }}
-                      alt=""
-                    />
-                  </Flex>
-                </Col>
-                <Col className="header-btn2">
-                  <Flex
-                    align="center"
-                    justify="center"
-                    style={{ width: "56px" }}
-                  >
-                    <img src={user} width={16} height={20} alt="" />
-                  </Flex>
-                </Col>
-              </Row>
-            )}
-            {assetsPage && (
-              <div>
-                <div className="header-btn" onClick={() => navigate("/detail")}>
-                  Connect Wallet
+                    <img src={t6} width={20} style={{marginLeft: "24px"}} alt=""/>
+                </Flex>
+            ),
+        },
+        {
+            key: "3",
+            label: (
+                <Flex align="center" justify="flex-start" style={{width: "100%", textAlign: 'left'}}>
+                    <img src={user} width={16} height={20} alt=""/>
+                </Flex>
+            ),
+        },
+    ];
+    
+    return (
+        <div className="pcHeader flex justify-between align-center">
+            <div
+                className="flex justify-between align-center"
+                style={{cursor: "pointer"}}
+                onClick={() => navigate("/")}
+            >
+                <img src={logo} width={48} alt=""/>
+                <img src={logoText} width={116} alt="" style={{marginLeft: "12px"}}/>
+            </div>
+            {homePage && (
+                <div>
+                    <a href={"https://x.com/TheNekomoto"} target="_blank">
+                        <img src={x} width={48} alt=""/></a>
                 </div>
-              </div>
             )}
-          </>
-        )
-      )}
-    </div>
-  );
+            {isMobile ? (
+                <Dropdown menu={{items}} placement="bottomRight">
+                    <img src={t7} width={18} alt=""/>
+                </Dropdown>
+            ) : (
+                !homePage && (
+                    <>
+                        <div style={{position: "absolute", left: "50%", transform: "translateX(-50%)"}}>
+                            <div>
+                                <a href={"https://x.com/TheNekomoto"} target="_blank">
+                                    <img src={t1} width={24} alt=""/>
+                                </a>
+                                <a href={""} target="_blank">
+                                    <img style={{margin: "0 40px"}} src={t2} width={24} alt=""/>
+                                </a>
+                                <a href={"https://discord.gg/zuxDPTbAWD"} target="_blank">
+                                    <img
+                                        style={{margin: "0 40px 0 0"}}
+                                        src={t3}
+                                        width={24}
+                                        alt=""
+                                    />
+                                </a>
+                                <a href={"https://the-nekospell.gitbook.io/the-nekomoto"} target="_blank">
+                                    <img src={t4} width={24} alt=""/>
+                                </a>
+                            </div>
+                        </div>
+                        {/*{detailPage && (<div></div>)}*/}
+                        {/*{assetsPage && (<div></div>)}*/}
+                        <div>
+                            <Wallet/>
+                        </div>
+                    </>
+                )
+            )}
+        </div>
+    );
 }

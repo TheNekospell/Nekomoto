@@ -1,26 +1,15 @@
 .pcHeader {
-  background: rgba(0, 0, 0, 0.24);
-  height: 80px;
-  padding: 0 24px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 999;
+    background: rgba(0, 0, 0, 0.24);
+    height: 80px;
+    padding: 0 24px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
 }
 
 .header-btn {
-  color: #01dce4;
-  font-size: 14px;
-  font-family: BIG SHOT;
-  font-weight: 400;
-  word-wrap: break-word;
-  cursor: pointer;
-  padding: 16px 20px;
-  background: rgba(1, 220, 228, 0.12);
-  text-align: center;
-}
-.header-btn2 {
     color: #01dce4;
     font-size: 14px;
     font-family: BIG SHOT;
@@ -28,10 +17,23 @@
     word-wrap: break-word;
     cursor: pointer;
     padding: 16px ;
+    background: rgba(1, 220, 228, 0.12);
+    text-align: center;
+    line-height: 1;
+}
+
+.header-btn2 {
+    color: #01dce4;
+    font-size: 14px;
+    font-family: BIG SHOT;
+    font-weight: 400;
+    word-wrap: break-word;
+    cursor: pointer;
+    padding: 16px;
     background: rgba(0, 0, 0, 0.32);
     line-height: 1;
-  }
+}
 
-  .menu-text{
+.menu-text {
     color: #fff;
-  }
+}
