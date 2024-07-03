@@ -1,5 +1,4 @@
 import { connect, disconnect, useStarknetkitConnectModal } from "starknetkit"
-import { useConnect } from "@starknet-react/core";
 import { useEffect, useState } from "react";
 import { Col, Flex, Row } from "antd";
 
