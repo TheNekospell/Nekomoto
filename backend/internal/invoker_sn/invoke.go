@@ -258,3 +258,21 @@ func Summon(to string, count *big.Int) error {
 	return nil
 }
 
+func ValidSignature(address *felt.Felt, hash *felt.Felt, r *felt.Felt, s *felt.Felt) error {
+
+	call := rpc.FunctionCall{
+		ContractAddress:    address,
+		EntryPointSelector: utils.GetSelectorFromNameFelt("is_valid_signature"),
+		Calldata:           []*felt.Felt{hash, utils.BigIntToFelt(big.NewInt(2)), r, s},
+	}
+
+	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTag)
+	if errRpc != nil {
+		fmt.Println(errRpc.Error())
+		return errRpc
+	}
+
+	fmt.Println("response:", response)
+	return nil
+
+}

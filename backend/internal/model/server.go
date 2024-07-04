@@ -1,5 +1,11 @@
 package model
 
+import (
+	"github.com/NethermindEth/starknet.go/typed"
+	"github.com/NethermindEth/starknet.go/utils"
+	"math/big"
+)
+
 type ResponseCode int
 
 const (
@@ -17,13 +23,24 @@ type ResponseData struct {
 	Data    interface{}  `json:"data"`
 }
 
+type Message struct {
+	Content string `json:"content"`
+}
+
 type Address struct {
 	Address string `json:"address" form:"address"`
 }
 
+type TypedData struct {
+	Types       map[string]typed.TypeDef
+	PrimaryType string
+	Domain      typed.Domain
+	Message     Message
+}
+
 type Signature struct {
-	Signature string `json:"signature" form:"signature"`
-	SignText  string `json:"text" form:"text"`
+	Signature []*big.Int `json:"signature" form:"signature"`
+	TypedData TypedData  `json:"typedData" form:"typedData"`
 }
 
 type AddressAndSignature struct {
@@ -47,4 +64,9 @@ type AddressAndCodeAndSignature struct {
 	Address   string    `json:"address" form:"address"`
 	Code      string    `json:"code" form:"code"`
 	Signature Signature `json:"signature" form:"signature"`
+}
+
+func (message Message) FmtDefinitionEncoding(input string) (result []*big.Int) {
+	result = append(result, utils.UTF8StrToBig(message.Content))
+	return result
 }

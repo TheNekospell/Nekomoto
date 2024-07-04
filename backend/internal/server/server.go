@@ -52,7 +52,7 @@ func StartServer() {
 	addressGroup.PUT("/generateSignature", GenerateSignature)
 	addressGroup.POST("/info", AddressInfo)
 	addressGroup.POST("/invitation", AcceptInvitation)
-	addressGroup.POST("valid", ValidSignature)
+	addressGroup.POST("/valid", ValidSignature)
 
 	rewardGroup := apiGroup.Group("/reward")
 	rewardGroup.POST("/claim", ClaimReward)
@@ -127,7 +127,7 @@ func SummonBox(c *gin.Context) {
 		return
 	}
 
-	if err := service.ValidSignature(req.Address, req.Signature.SignText, req.Signature.Signature); err != nil {
+	if err := service.ValidSignature(req.Address, req.Signature.TypedData, req.Signature.Signature); err != nil {
 		ErrorResponse(c, model.InvalidSignature, err.Error())
 		return
 	}
@@ -147,7 +147,7 @@ func OpenChest(c *gin.Context) {
 		return
 	}
 
-	if err := service.ValidSignature(req.Address, req.Signature.SignText, req.Signature.Signature); err != nil {
+	if err := service.ValidSignature(req.Address, req.Signature.TypedData, req.Signature.Signature); err != nil {
 		ErrorResponse(c, model.InvalidSignature, err.Error())
 		return
 	}
@@ -166,7 +166,7 @@ func EmpowerChest(c *gin.Context) {
 		ErrorResponse(c, model.WrongParam, err.Error())
 		return
 	}
-	if err := service.ValidSignature(req.Address1, req.Signature.SignText, req.Signature.Signature); err != nil {
+	if err := service.ValidSignature(req.Address1, req.Signature.TypedData, req.Signature.Signature); err != nil {
 		ErrorResponse(c, model.InvalidSignature, err.Error())
 		return
 	}
@@ -186,7 +186,7 @@ func AcceptInvitation(c *gin.Context) {
 		return
 	}
 
-	if err := service.ValidSignature(req.Address, req.Signature.SignText, req.Signature.Signature); err != nil {
+	if err := service.ValidSignature(req.Address, req.Signature.TypedData, req.Signature.Signature); err != nil {
 		ErrorResponse(c, model.InvalidSignature, err.Error())
 		return
 	}
@@ -230,7 +230,7 @@ func ClaimReward(c *gin.Context) {
 		ErrorResponse(c, model.WrongParam, "invalid address")
 		return
 	}
-	if err := service.ValidSignature(req.Address, req.Signature.SignText, req.Signature.Signature); err != nil {
+	if err := service.ValidSignature(req.Address, req.Signature.TypedData, req.Signature.Signature); err != nil {
 		ErrorResponse(c, model.InvalidSignature, err.Error())
 		return
 	}
@@ -248,7 +248,7 @@ func ValidSignature(c *gin.Context) {
 		ErrorResponse(c, model.WrongParam, err.Error())
 		return
 	}
-	if err := service.ValidSignature(req.Address, req.Signature.SignText, req.Signature.Signature); err != nil {
+	if err := service.ValidSignature(req.Address, req.Signature.TypedData, req.Signature.Signature); err != nil {
 		ErrorResponse(c, model.InvalidSignature, err.Error())
 		return
 	}
@@ -265,7 +265,7 @@ func ValidSignature(c *gin.Context) {
 // 		ErrorResponse(c, model.WrongParam, "invalid address")
 // 		return
 // 	}
-// 	if err := service.ValidSignature(req.Address, req.Signature.SignText, req.Signature.Signature); err != nil {
+// 	if err := service.ValidSignature(req.Address,  req.Signature.TypedData, req.Signature.Signature); err != nil {
 // 		ErrorResponse(c, model.InvalidSignature, err.Error())
 // 		return
 // 	}

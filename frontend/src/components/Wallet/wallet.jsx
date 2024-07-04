@@ -15,6 +15,8 @@ import blue from "@assets/blue.png";
 import user from "@assets/user.png";
 import { useNavigate } from "react-router-dom";
 import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
+import { BACKEND } from "@/interface.js";
+import { typedData } from "starknet";
 
 export default function Wallet() {
     
@@ -22,7 +24,7 @@ export default function Wallet() {
     
     const {connect, connectors} = useConnect();
     const {disconnect} = useDisconnect();
-    const {account, address, status, isConnected} = useAccount();
+    const {account, address, status, chainId, isConnected} = useAccount();
     
     const [inputValue, setInputValue] = useState("");
     const [visible, setVisible] = useState(false);
@@ -37,6 +39,42 @@ export default function Wallet() {
     const closeConnection = async () => {
         setVisible(false)
         await disconnect()
+    }
+    
+    const sign = async () => {
+        if (!address || !isConnected) return;
+        
+        const text = await BACKEND.getSignText(address);
+        console.log("text: ", text);
+        
+        const typedMessage = {
+            domain: {
+                name: 'Nekomoto',
+                chainId: chainId,
+                version: '0.1.0'
+            },
+            types: {
+                StarkNetDomain: [
+                    {name: 'name', type: 'felt'},
+                    {name: 'chainId', type: 'felt'},
+                    {name: 'version', type: 'felt'}
+                ],
+                Message: [
+                    {name: 'message', type: 'felt'},
+                ]
+            },
+            primaryType: 'Message',
+            message: {
+                content: text
+            }
+        }
+        
+        const signature = await account.signMessage(typedMessage);
+        console.log("signature: ", signature);
+        
+        const messageHash = typedData.getMessageHash(typedMessage, BigInt(await account.signer.getPubKey()));
+        
+        const result = BACKEND.verifySignature(address, typedMessage, signature)
     }
     
     return (
