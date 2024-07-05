@@ -74,7 +74,9 @@ func resolveShardTransfer(block uint64) {
 	if err != nil {
 		// panic(err)
 		fmt.Println("err: ", err.Code, err.Message, err.Data)
+		return
 	}
+
 	for _, event := range result.Events {
 		from := event.Event.Keys[1].String()
 		to := event.Event.Keys[2].String()
@@ -96,6 +98,7 @@ func resolveAscendUpgrade(block uint64) {
 	if err != nil {
 		// panic(err)
 		fmt.Println("err: ", err.Code, err.Message, err.Data)
+		return
 	}
 	for _, event := range result.Events {
 
@@ -117,6 +120,7 @@ func resolveBoxUpgrade(block uint64) {
 	if err != nil {
 		// panic(err)
 		fmt.Println("err: ", err.Code, err.Message, err.Data)
+		return
 	}
 	for _, event := range result.Events {
 
@@ -138,7 +142,9 @@ func resolveBoxTransfer(block uint64) {
 	if err != nil {
 		// panic(err)
 		fmt.Println("err: ", err.Code, err.Message, err.Data)
+		return
 	}
+	fmt.Println("result: ", result)
 	for _, event := range result.Events {
 
 		from := event.Event.Keys[1].String()

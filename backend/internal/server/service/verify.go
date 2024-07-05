@@ -1,13 +1,15 @@
 package service
 
 import (
+
 	"backend/internal/invoker_sn"
 	"backend/internal/model"
 	"fmt"
+	"math/big"
+
 	"github.com/NethermindEth/starknet.go/curve"
 	"github.com/NethermindEth/starknet.go/typed"
 	"github.com/NethermindEth/starknet.go/utils"
-	"math/big"
 )
 
 //func ValidSignature(address, message, signature string) error {
@@ -48,7 +50,9 @@ import (
 
 func ValidSignature(address string, typedData model.TypedData, signature []*big.Int) error {
 
-	// typedData.Message.Content == generate
+	// if text := database.GetAddressSignatureContext(address); text != typedData.Message.Content {
+	// 	return fmt.Errorf("signature expired. expect: %v, actual: %v", text, typedData.Message.Content)
+	// }
 
 	starknetTypedData, err := typed.NewTypedData(typedData.Types, typedData.PrimaryType, typedData.Domain)
 	if err != nil {

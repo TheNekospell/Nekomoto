@@ -172,6 +172,7 @@ func GetChestConfig() []ServerChestConfig {
 func GetAddressSignatureContext(address string) string {
 
 	if result, found := Cache.Get(CacheSignature + address); found {
+		fmt.Println("SignatureContext: ", result)
 		return result.(string)
 	}
 	signatureContext := strconv.Itoa(time.Now().Nanosecond())

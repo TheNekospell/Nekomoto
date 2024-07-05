@@ -19,34 +19,34 @@ import { BACKEND } from "@/interface.js";
 import { typedData } from "starknet";
 
 export default function Wallet() {
-    
+
     const navigate = useNavigate();
-    
+
     const {connect, connectors} = useConnect();
     const {disconnect} = useDisconnect();
     const {account, address, status, chainId, isConnected} = useAccount();
-    
+
     const [inputValue, setInputValue] = useState("");
     const [visible, setVisible] = useState(false);
     const [nekoCoin, setNekoCoin] = useState(0);
-    
-    
+
+
     const establishConnection = async (connector) => {
         await connect({connector})
         setVisible(false)
     }
-    
+
     const closeConnection = async () => {
         setVisible(false)
         await disconnect()
     }
-    
+
     const sign = async () => {
         if (!address || !isConnected) return;
-        
+
         const text = await BACKEND.getSignText(address);
         console.log("text: ", text);
-        
+
         const typedMessage = {
             domain: {
                 name: 'Nekomoto',
@@ -68,15 +68,15 @@ export default function Wallet() {
                 content: text
             }
         }
-        
+
         const signature = await account.signMessage(typedMessage);
         console.log("signature: ", signature);
-        
+
         const messageHash = typedData.getMessageHash(typedMessage, BigInt(await account.signer.getPubKey()));
-        
+
         const result = BACKEND.verifySignature(address, typedMessage, signature)
     }
-    
+
     return (
         <div>
             <Row>
@@ -127,30 +127,12 @@ export default function Wallet() {
                     }
                 </Col>
             </Row>
-            
+
             {visible && (
-                
+
                 <Modal open={visible} centered={true} footer={null} maskClosable={true}
                        onCancel={() => setVisible(false)}>
-                    
-                    {/*<div style={{*/}
-                    {/*    position: 'fixed',*/}
-                    {/*    top: 0,*/}
-                    {/*    left: 0,*/}
-                    {/*    right: 0,*/}
-                    {/*    bottom: 0,*/}
-                    {/*    backgroundColor: 'rgba(0, 0, 0, 0.5)',*/}
-                    {/*    zIndex: 9999*/}
-                    {/*}}>*/}
-                    {/*    <div style={{*/}
-                    {/*        position: 'absolute',*/}
-                    {/*        top: '50%',*/}
-                    {/*        left: '50%',*/}
-                    {/*        transform: 'translate(-50%, -50%)',*/}
-                    {/*        backgroundColor: 'white',*/}
-                    {/*        padding: '20px'*/}
-                    {/*    }}>*/}
-                    
+
                     <div>
                         <h2 style={{
                             textAlign: "center",
@@ -159,7 +141,10 @@ export default function Wallet() {
                             fontWeight: "bold",
                         }}>{address && isConnected ? "" : "Connect Wallet"}</h2>
                     </div>
-                    
+
+                    <button className={"header-btn"} style={{marginTop: "20px", textAlign: "center"}}
+                                            onClick={sign}>{"TEST"}</button>
+
                     <div style={{marginBottom: "15px", marginTop: "20px", textAlign: "center"}}>
                         {(address && isConnected) ?
                             (
@@ -172,7 +157,7 @@ export default function Wallet() {
                                         color: "#01dce4",
                                         fontWeight: "bold"
                                     }}>{address.slice(0, 6) + "..." + address.slice(-4)}</div>
-                                    
+
                                     <div style={{
                                         fontSize: "20px",
                                         fontFamily: "BIG SHOT",
@@ -181,7 +166,7 @@ export default function Wallet() {
                                         textAlign: "center",
                                     }}>{"My Invitor"}
                                     </div>
-                                    
+
                                     <div style={{
                                         fontSize: "14px",
                                         fontFamily: "BIG SHOT",
@@ -190,7 +175,7 @@ export default function Wallet() {
                                         textAlign: "center",
                                     }}>{"Neko-xxxxxxx"}
                                     </div>
-                                    
+
                                     <button className={"header-btn"} style={{marginTop: "20px", textAlign: "center"}}
                                             onClick={closeConnection}>{"Disconnect"}</button>
                                 </div>
@@ -249,11 +234,10 @@ export default function Wallet() {
                             )
                         }
                     </div>
-                    {/*    </div>*/}
-                    {/*</div>*/}
-                
+
+
                 </Modal>
-            
+
             )}
         </div>
     )

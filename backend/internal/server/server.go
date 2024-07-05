@@ -8,8 +8,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/swaggo/files"
-	"github.com/swaggo/gin-swagger"
 
 	"backend/internal/model"
 	"backend/internal/server/service"
@@ -20,20 +18,21 @@ func StartServer() {
 	fmt.Println("server init")
 
 	gin.SetMode(gin.ReleaseMode)
-	engine := gin.New()
+	engine := gin.Default()
 	//engine.Use(gin.LoggerWithWriter(gin.DefaultWriter), gin.Recovery())
 
 	// cors
-	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
-	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}
-	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
-	config.ExposeHeaders = []string{"Content-Length"}
-	config.AllowCredentials = true
-	engine.Use(cors.New(config))
+	// config := cors.DefaultConfig()
+	// config.AllowAllOrigins = true
+	// config.AllowOrigins = []string{"http://localhost:5173/"}
+	// config.AllowCredentials = true
+	// config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}
+	// config.AllowHeaders = []string{"Origin", "Referer", "Host", "Accept", "Content-Length", "Content-Type", "Authorization", "Token"}
+	// config.ExposeHeaders = []string{"Content-Length", "Access-Control-Allow-Headers", "Token"}
+	engine.Use(cors.Default())
 
 	// fmt.Println("server init swagger")
-	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	apiGroup := engine.Group("/api")
 
@@ -49,7 +48,7 @@ func StartServer() {
 	chestGroup.POST("/empower", EmpowerChest)
 
 	addressGroup := apiGroup.Group("/address")
-	addressGroup.PUT("/generateSignature", GenerateSignature)
+	addressGroup.GET("/generateSignature", GenerateSignature)
 	addressGroup.POST("/info", AddressInfo)
 	addressGroup.POST("/invitation", AcceptInvitation)
 	addressGroup.POST("/valid", ValidSignature)
@@ -81,6 +80,17 @@ func StartServer() {
 	}
 
 }
+
+// func aaa() gin.HandlerFunc {
+// 	cfg := cors.Config{
+// 		AllowMethods:     []string{"*"},
+// 		AllowHeaders:     []string{"*"},
+// 		AllowCredentials: false,
+// 		MaxAge:           12 * time.Hour,
+// 	}
+// 	cfg.AllowAllOrigins = true
+// 	return cors.New(cfg)
+// }
 
 func SuccessResponse(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, model.ResponseData{
