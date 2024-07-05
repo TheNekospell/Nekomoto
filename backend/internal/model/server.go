@@ -27,20 +27,30 @@ type Message struct {
 	Content string `json:"content"`
 }
 
+type Types struct {
+	StarkNetDomain []Definition
+	Message        []Definition
+}
+
+type Definition struct {
+	Name  string `json:"name"`
+	Type string `json:"type"`
+}
+
 type Address struct {
 	Address string `json:"address" form:"address"`
 }
 
 type TypedData struct {
-	Types       map[string]typed.TypeDef
+	Types       Types
 	PrimaryType string
 	Domain      typed.Domain
 	Message     Message
 }
 
 type Signature struct {
-	Signature []*big.Int `json:"signature" form:"signature"`
-	TypedData TypedData  `json:"typedData" form:"typedData"`
+	Signature []string  `json:"signature" form:"signature"`
+	TypedData TypedData `json:"typedData" form:"typedData"`
 }
 
 type AddressAndSignature struct {

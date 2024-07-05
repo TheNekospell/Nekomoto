@@ -34,7 +34,7 @@ func StartIndexer() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("[Indexer] currentBlock", currentBlock)
+		// fmt.Println("[Indexer] currentBlock", currentBlock)
 
 		lastHeight := database.GetIndexerHeight()
 		// fmt.Println("lastHeight", lastHeight)
@@ -144,7 +144,7 @@ func resolveBoxTransfer(block uint64) {
 		fmt.Println("err: ", err.Code, err.Message, err.Data)
 		return
 	}
-	fmt.Println("result: ", result)
+	// fmt.Println("result: ", result)
 	for _, event := range result.Events {
 
 		from := event.Event.Keys[1].String()
@@ -161,7 +161,7 @@ func recordIndexerHeight(height uint64, signal <-chan uint64) {
 	for {
 		select {
 		case newHeight := <-signal:
-			fmt.Println("[Indexer] newHeight", newHeight)
+			// fmt.Println("[Indexer] newHeight", newHeight)
 			if newHeight > height {
 				database.UpdateHeight(height)
 				height = newHeight

@@ -1,15 +1,13 @@
 package service
 
 import (
-
 	"backend/internal/invoker_sn"
 	"backend/internal/model"
 	"fmt"
-	"math/big"
-
 	"github.com/NethermindEth/starknet.go/curve"
 	"github.com/NethermindEth/starknet.go/typed"
 	"github.com/NethermindEth/starknet.go/utils"
+	"math/big"
 )
 
 //func ValidSignature(address, message, signature string) error {
@@ -48,16 +46,37 @@ import (
 //	return nil
 //}
 
-func ValidSignature(address string, typedData model.TypedData, signature []*big.Int) error {
+func ValidSignature(address string, typedData model.TypedData, signature []string) error {
 
 	// if text := database.GetAddressSignatureContext(address); text != typedData.Message.Content {
 	// 	return fmt.Errorf("signature expired. expect: %v, actual: %v", text, typedData.Message.Content)
 	// }
 
-	starknetTypedData, err := typed.NewTypedData(typedData.Types, typedData.PrimaryType, typedData.Domain)
+	newTypes := make(map[string]typed.TypeDef)
+
+	var definitions []typed.Definition
+	for _, v := range typedData.Types.StarkNetDomain {
+		definitions = append(definitions, typed.Definition{
+			Name: v.Name,
+			Type: v.Type,
+		})
+	}
+	newTypes["StarkNetDomain"] = typed.TypeDef{Definitions: definitions}
+	var definitionsM []typed.Definition
+	for _, v := range typedData.Types.Message {
+		definitions = append(definitions, typed.Definition{
+			Name: v.Name,
+			Type: v.Type,
+		})
+	}
+	newTypes["Message"] = typed.TypeDef{Definitions: definitionsM}
+
+	starknetTypedData, err := typed.NewTypedData(newTypes, typedData.PrimaryType, typedData.Domain)
 	if err != nil {
 		fmt.Println("new typedData error:", err.Error())
+		return err
 	}
+	fmt.Println("new typedData:", starknetTypedData)
 
 	hash, err := starknetTypedData.GetMessageHash(utils.HexToBN(address), typedData.Message, curve.Curve)
 	if err != nil {
@@ -69,7 +88,15 @@ func ValidSignature(address string, typedData model.TypedData, signature []*big.
 		return err
 	}
 
-	err = invoker_sn.ValidSignature(addressFelt, utils.BigIntToFelt(hash), utils.BigIntToFelt(signature[0]), utils.BigIntToFelt(signature[0]))
+	r, e := new(big.Int).SetString(signature[0], 10)
+	if !e {
+		fmt.Println("set r error:")
+	}
+	s, e := new(big.Int).SetString(signature[1], 10)
+	if !e {
+		fmt.Println("set s error:")
+	}
+	err = invoker_sn.ValidSignature(addressFelt, utils.BigIntToFelt(hash), utils.BigIntToFelt(r), utils.BigIntToFelt(s))
 	if err != nil {
 		return err
 	}

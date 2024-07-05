@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
@@ -113,14 +112,14 @@ func ErrorResponse(c *gin.Context, code model.ResponseCode, message string) {
 func GenerateSignature(c *gin.Context) {
 	// for now maybe is enough for this
 	var req model.Address
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		ErrorResponse(c, model.WrongParam, err.Error())
 		return
 	}
-	if !common.IsHexAddress(req.Address) {
-		ErrorResponse(c, model.WrongParam, "invalid address")
-		return
-	}
+	// if !common.IsHexAddress(req.Address) {
+	// 	ErrorResponse(c, model.WrongParam, "invalid address")
+	// 	return
+	// }
 	data, code, msg := service.GenerateSignature(req.Address)
 	if code != model.Success {
 		ErrorResponse(c, code, msg)
@@ -218,10 +217,10 @@ func AddressInfo(c *gin.Context) {
 		ErrorResponse(c, model.WrongParam, err.Error())
 		return
 	}
-	if !common.IsHexAddress(req.Address) {
-		ErrorResponse(c, model.WrongParam, "invalid address")
-		return
-	}
+	// if !common.IsHexAddress(req.Address) {
+	// 	ErrorResponse(c, model.WrongParam, "invalid address")
+	// 	return
+	// }
 	data, code, msg := service.AddressInfo(req)
 	if code != model.Success {
 		ErrorResponse(c, code, msg)
@@ -236,10 +235,10 @@ func ClaimReward(c *gin.Context) {
 		ErrorResponse(c, model.WrongParam, err.Error())
 		return
 	}
-	if !common.IsHexAddress(req.Address) {
-		ErrorResponse(c, model.WrongParam, "invalid address")
-		return
-	}
+	// if !common.IsHexAddress(req.Address) {
+	// 	ErrorResponse(c, model.WrongParam, "invalid address")
+	// 	return
+	// }
 	if err := service.ValidSignature(req.Address, req.Signature.TypedData, req.Signature.Signature); err != nil {
 		ErrorResponse(c, model.InvalidSignature, err.Error())
 		return
@@ -254,14 +253,19 @@ func ClaimReward(c *gin.Context) {
 
 func ValidSignature(c *gin.Context) {
 	var req model.AddressAndSignature
+
 	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Println("signature valid error: ", err)
 		ErrorResponse(c, model.WrongParam, err.Error())
 		return
 	}
+
 	if err := service.ValidSignature(req.Address, req.Signature.TypedData, req.Signature.Signature); err != nil {
+		fmt.Println("signature valid error: ", err)
 		ErrorResponse(c, model.InvalidSignature, err.Error())
 		return
 	}
+	fmt.Println("signature valid")
 	SuccessResponse(c, true)
 }
 

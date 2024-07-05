@@ -5,13 +5,8 @@ const BASE_URL = "http://localhost:8972/api"
 export const BACKEND = {
 
     getSignText: async (address) => {
-        const result = await fetch(`${BASE_URL}/address/generateSignature?address=${address}`, {
-            method: "GET",
-            // headers: {
-            //     "Content-Type": "application/json",
-            // },
-        })
-        console.log("result: ", result)
+        const result = await fetch(`${BASE_URL}/address/generateSignature?address=${address}`)
+        // console.log("result: ", result)
         return await result.json()
     },
 
@@ -23,9 +18,13 @@ export const BACKEND = {
             },
             body: JSON.stringify({
                 address,
-                typedData,
-                signature
+                signature: {
+                    signature,
+                    typedData,
+                }
             })
         })
+        // console.log("result: ", result)
+        return await result.json()
     }
 }
