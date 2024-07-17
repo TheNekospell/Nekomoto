@@ -51,7 +51,7 @@ func AllocateProfit() {
 
 		if process.Fade.GreaterThan(decimal.New(0, 0)) {
 			// Mana=0.065*（0.4*SPI+0.3*ATK+0.2*DEF+0.1*SPD
-			manaOfSpirit := process.SPI.Mul(decimal.New(4, -1)).Add(process.ATK.Mul(decimal.New(3, -1))).Add(process.DEF.Mul(decimal.New(2, -1))).Add(process.SPD.Mul(decimal.New(1, -1)))
+			manaOfSpirit := process.Mana
 			if detail.Buff.Level > 0 {
 				manaOfSpirit = manaOfSpirit.Mul(getBoostOfAscend(detail.Buff.Level))
 			}

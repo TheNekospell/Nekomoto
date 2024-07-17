@@ -7,29 +7,97 @@ import Table from "@components/Table/index";
 import PCHeader from "@components/PCHeader/index";
 import logoText from "@assets/text-logo.png";
 import play from "@assets/play.png";
-import { Col, Row } from "antd";
-const style = { background: "#0092ff", padding: "8px 0" };
+import { Col, Flex, Row } from "antd";
+import { useEffect, useState } from "react";
+import { BACKEND, NEKOMOTO_ADDRESS } from "@/interface.js";
+import { useAccount } from "@starknet-react/core";
+import NekoModal from "@components/Modal/index.jsx";
+import CardCorner from "@components/CardCorner/index.jsx";
+import card3 from "@assets/card3.png";
+import Button from "@components/Button/index.jsx";
+import { CallData } from "starknet";
+import { useNavigate } from "react-router-dom";
+
+const style = {background: "#0092ff", padding: "8px 0"};
 
 export default function Assets() {
-  return (
-    <div className="assets padding-top-80 padding-bottom-80">
-      <Row  gutter={16}>
-        <Col style={{marginTop:'16px'}} className="gutter-row"  xs={24}  sm={24}  lg={18}>
-          <InputCard />
-        </Col>
-        <Col style={{marginTop:'16px'}} className="gutter-row" xs={24}  sm={24}  lg={6}>
-          <BoxCard title="Starter Pack"  />
-        </Col>
-      </Row>
-      <Row  style={{marginTop:'16px', marginBottom:'16px'}}>
-        <Col xs={24}>
-          <InfoCard />
-        </Col>
-      </Row>
-
-      <Row>
-        <Table/>
-      </Row>
-    </div>
-  );
+    
+    const [info, setInfo] = useState({})
+    const {account, address, status, chainId, isConnected} = useAccount();
+    const [isModalOpen1, setIsModalOpen1] = useState(false);
+    const navigate = useNavigate()
+    const [addressInfo, setAddressInfo] = useState({})
+    
+    
+    useEffect(() => {
+        BACKEND.staticInfo().then((result) => {
+            console.log("static info: ", result.data)
+            setInfo(result.data)
+        })
+        if (address) {
+            BACKEND.addressInfo(address).then(result => {
+                console.log("address info: ", result.data)
+                setAddressInfo(result.data)
+            })
+        }
+    }, [address])
+    
+    const openChest = async () => {
+        const multiCall = await account.execute([{
+            contractAddress: NEKOMOTO_ADDRESS,
+            entrypoint: "starter_pack",
+            calldata: CallData.compile({})
+        }])
+        // console.log("multiCall: ", multiCall)
+        const result = await account.waitForTransaction(multiCall.transaction_hash)
+        console.log("result: ", result)
+        setIsModalOpen1(true)
+    }
+    
+    return (
+        <div>
+            
+            <NekoModal
+                title="Starter Pack"
+                open={isModalOpen1}
+                onCancel={() => setIsModalOpen1(false)}
+            >
+                <Flex justify="center" vertical="column">
+                    <div className="modal-card">
+                        <div className="modal-card-inner">
+                            <CardCorner/>
+                            <img src={card3} width={192} alt=""/>
+                        </div>
+                    </div>
+                    <Button
+                        text="GO CHECK"
+                        color="yellow"
+                        longness="short"
+                        style={{marginTop: "48px"}}
+                        onClick={() => navigate("/detail2")}
+                    />
+                </Flex>
+            </NekoModal>
+            
+            <div className="assets padding-top-80 padding-bottom-80">
+                <Row gutter={16}>
+                    <Col style={{marginTop: '16px'}} className="gutter-row" xs={24} sm={24} lg={18}>
+                        <InputCard/>
+                    </Col>
+                    <Col style={{marginTop: '16px'}} className="gutter-row" xs={24} sm={24} lg={6}>
+                        <BoxCard title="Starter Pack" onButtonClick={openChest}/>
+                    </Col>
+                </Row>
+                <Row style={{marginTop: '16px', marginBottom: '16px'}}>
+                    <Col xs={24}>
+                        <InfoCard totalRewards={info.totalRewards} treasuryRevenue={info.treasuryRevenue}/>
+                    </Col>
+                </Row>
+                
+                <Row>
+                    <Table records={info.treasuryRevenue}/>
+                </Row>
+            </div>
+        </div>
+    );
 }

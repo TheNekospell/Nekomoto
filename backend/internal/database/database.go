@@ -53,7 +53,9 @@ func initTables() {
 		&ServerBountyWaveConfig{},
 		&ServerTemporalShardRecord{},
 		&ServerStarterChestConfig{},
+		&ServerMintRecord{},
 		&IndexerRecord{},
+		&IndexerTransactionRecord{},
 		&EventNekoCoinTransfer{},
 		&EventPrismTransfer{},
 		&EventNekoSpiritTransfer{},
@@ -251,6 +253,7 @@ type ServerNekoSpiritInfo struct {
 	DEF            decimal.Decimal `gorm:"not null type:decimal(36,18)"`
 	SPD            decimal.Decimal `gorm:"not null type:decimal(36,18)"`
 	Fade           decimal.Decimal `gorm:"not null type:decimal(36,18)"`
+	Mana           decimal.Decimal `gorm:"not null type:decimal(36,18)"`
 	Level          uint64          `gorm:"not null default:1 index"`
 	StakeFromUid   uint64          `gorm:"index"`
 	IsStaked       bool            `gorm:"not null default:false"`
@@ -266,7 +269,7 @@ type ServerBuffRecord struct {
 	Level uint64          `gorm:"not null default:0"`
 	Boost decimal.Decimal `gorm:"not null default:0 type:decimal(4,4)"`
 	// time freeze
-	StartTime time.Time `gorm:"not null default:0"`
+	StartTime time.Time `gorm:"default:'2000-01-01 00:00:00.000'"`
 	// lucky
 	IsLucky bool `gorm:"not null default:false"`
 }
@@ -275,7 +278,6 @@ type ServerClaimNekoSpiritRecord struct {
 	Model
 	Uid       uint64          `gorm:"not null index"`
 	Amount    decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
-	ClaimTime time.Time       `gorm:"not null default:CURRENT_TIMESTAMP"`
 }
 
 type ServerInvitationRecord struct {
@@ -362,17 +364,29 @@ type ServerStarterChestConfig struct {
 	Opened uint64 `gorm:"not null default:0"`
 }
 
+type ServerMintRecord struct {
+	Model
+	Address string `gorm:"not null type:char(66) index"`
+	Count   uint64 `gorm:"not null"`
+	Hash    string `gorm:"not null type:char(66) index"`
+}
+
 type IndexerRecord struct {
 	Model
 	RecordType  uint8  `gorm:"not null default:0"`
 	BlockHeight uint64 `gorm:"not null"`
 }
 
+type IndexerTransactionRecord struct {
+	Model
+	Hash
+}
+
 // blockchain
 
 type Hash struct {
 	TransactionHash string `gorm:"uniqueIndex type:char(66) not null"`
-	BlockNumber     uint64 `gorm:"not null"`
+	BlockNumber     uint64 `gorm:"not null index"`
 	BlockHash       string `gorm:"not null type:char(66)"`
 }
 

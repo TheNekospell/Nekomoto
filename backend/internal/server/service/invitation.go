@@ -7,8 +7,13 @@ import (
 
 func AcceptInvitation(req model.AddressAndCodeAndSignature) (code model.ResponseCode, message string) {
 
+	detail := database.GetAddressDetailByAddress(req.Address)
+	if detail.InviteCode == req.Code {
+		return model.Success, "Can't invite yourself"
+	}
+
 	var record database.ServerInvitationRecord
-	if err := database.DB.Where("uid = ?", database.GetAddressDetailByAddress(req.Address).Uid).Find(&record); err == nil {
+	if err := database.DB.Where("uid = ?", detail.Uid).Find(&record); err == nil {
 		// has record already
 		return model.Success, "Can't accept invitation twice"
 	}

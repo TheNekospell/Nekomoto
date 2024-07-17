@@ -37,36 +37,60 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 			TokenId:        spirit.TokenId,
 			ClaimedRewards: spirit.ClaimedRewards,
 		}
-		if spirit.Fade.LessThanOrEqual(decimal.Zero) {
-			spiritReward = spiritReward.Add(spirit.Rewards)
-			temp.ClaimedRewards = spirit.Rewards
-			spiritToUpdate = append(spiritToUpdate, temp)
-		}
+		// if spirit.Fade.LessThanOrEqual(decimal.Zero) {
+		spiritReward = spiritReward.Add(spirit.Rewards)
+		temp.ClaimedRewards = spirit.Rewards
+		spiritToUpdate = append(spiritToUpdate, temp)
+		// }
 	}
 
 	invitationReward := decimal.Zero
-	if claimable := addressDetail.InvitationReward.UnlockedAmount.Sub(addressDetail.InvitationReward.ClaimedAmount); claimable.GreaterThan(decimal.Zero) {
-		invitationReward = claimable
-	}
+	// if claimable := addressDetail.InvitationReward.UnlockedAmount.Sub(addressDetail.InvitationReward.ClaimedAmount); claimable.GreaterThan(decimal.Zero) {
+	// 	invitationReward = claimable
+	// }
 
 	totalReward := invitationReward.Add(spiritReward)
 	if totalReward.Equal(decimal.Zero) {
 		return model.Success, "Nothing to claim"
 	}
 
+	// invoke chain to send rewards, 10% as tax
+
+	invoker_sn.SendCoinAndNFT(addressDetail.Address, totalReward.Mul(decimal.New(9, -1)).Mul(decimal.New(10, 18)).BigInt(), big.NewInt(0), big.NewInt(0))
+
 	// update related tables
 
 	database.UpdateNekoSpiritList(spiritToUpdate)
 	database.ClaimInvitationRewardStatic(addressDetail.Uid, invitationReward)
-	database.CreateClaimRecord(addressDetail.Uid, totalReward)
-
-	// invoke chain to send rewards, 10% as tax
-
-	invoker_sn.SendCoinAndNFT(addressDetail.Address, totalReward.Mul(decimal.New(9, -1)).Mul(decimal.New(10, 18)).BigInt(), big.NewInt(0), big.NewInt(0))
+	database.CreateClaimRecord(addressDetail.Uid, totalReward.Mul(decimal.New(9, -1)))
 
 	// clear cache
 
 	database.Cache.Delete(database.CacheTagUid + strconv.FormatUint(addressDetail.Uid, 10))
 
 	return model.Success, "Success"
+}
+
+func ClaimRewardOfInvitation(req model.AddressAndSignature) (model.ResponseCode, string) {
+
+	addressDetail := database.GetAddressDetailByAddress(req.Address)
+
+	invitationReward := decimal.Zero
+	if claimable := addressDetail.InvitationReward.UnlockedAmount.Sub(addressDetail.InvitationReward.ClaimedAmount); claimable.GreaterThan(decimal.Zero) {
+		invitationReward = claimable
+	}
+
+	if invitationReward.Equal(decimal.Zero) {
+		return model.Success, "Nothing to claim"
+	}
+
+	invoker_sn.SendCoinAndNFT(addressDetail.Address, invitationReward.Mul(decimal.New(9, -1)).Mul(decimal.New(10, 18)).BigInt(), big.NewInt(0), big.NewInt(0))
+
+	database.ClaimInvitationRewardStatic(addressDetail.Uid, invitationReward.Mul(decimal.New(9, -1)))
+	database.CreateClaimRecord(addressDetail.Uid, invitationReward.Mul(decimal.New(9, -1)))
+
+	database.Cache.Delete(database.CacheTagUid + strconv.FormatUint(addressDetail.Uid, 10))
+
+	return model.Success, "Success"
+
 }

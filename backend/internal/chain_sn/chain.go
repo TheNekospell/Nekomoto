@@ -2,15 +2,15 @@ package chain_sn
 
 import (
 	"backend/internal/env"
+	"backend/starknet/account"
+	"backend/starknet/rpc"
+	"backend/starknet/utils"
 	"encoding/hex"
 	"fmt"
 	"math/big"
 	"strings"
 
 	"github.com/NethermindEth/juno/core/felt"
-	"github.com/NethermindEth/starknet.go/account"
-	"github.com/NethermindEth/starknet.go/rpc"
-	"github.com/NethermindEth/starknet.go/utils"
 )
 
 var (
@@ -22,9 +22,9 @@ var (
 	PrismContractAddress    *felt.Felt
 	ShardContractAddress    *felt.Felt
 
-	MaxFee *felt.Felt
+	MaxFee                  *felt.Felt
 	EmptyAddressStringShort = "0x0"
-	HostAddress = env.GetEnvValue("OWNER_ADDRESS_SN")
+	HostAddress             = env.GetEnvValue("OWNER_ADDRESS_SN")
 )
 
 func init() {
@@ -72,6 +72,13 @@ func init() {
 	}
 
 	MaxFee = utils.Uint64ToFelt(10000000000000000)
+	//MaxFee = new(felt.Felt).SetUint64(1000000000000000)
+	//bigint, _ := new(big.Int).SetString("1000000000000000000000000000000", 10)
+	//MaxFee = utils.BigIntToFelt(bigint)
+	//MaxFee, err = utils.HexToFelt("0x9184e72a000")
+	//if err != nil {
+	//	panic(err.Error())
+	//}
 }
 
 func FeltToString(hexOrigin string) string {

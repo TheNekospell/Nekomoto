@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
@@ -19,12 +18,20 @@ func GetNekoSpiritInfoByTokenId(tokenId uint64) (*ServerNekoSpiritInfo, error) {
 	return &boxInfo, nil
 }
 
-func GetUidByAddress(owner common.Address) (uint64, error) {
+func GetUidByAddress(owner string) (uint64, error) {
 	var user ServerAddress
-	if err := DB.Where("address = ?", owner.Hex()).First(&user).Error; err != nil {
+	if err := DB.Where("address = ?", owner).First(&user).Error; err != nil {
 		return 0, err
 	}
 	return user.ID, nil
+}
+
+func GetAddressByUid(uid uint64) (*ServerAddress, error) {
+	var user ServerAddress
+	if err := DB.Where("id = ?", uid).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 func GetUidByInviteCode(inviteCode string) (uint64, error) {
@@ -140,7 +147,8 @@ func CreateAddress(address *ServerAddress) (uint64, error) {
 // }
 
 func CreateShardRecord(record ServerTemporalShardRecord, address string) error {
-	Cache.Delete(CacheTagUid + strconv.FormatUint(GetAddressDetailByAddress(address).Uid, 10))
+	uid, _ := GetUidByAddress(address)
+	Cache.Delete(CacheTagUid + strconv.FormatUint(uid, 10))
 	return DB.Create(&record).Error
 }
 
@@ -177,6 +185,22 @@ func QueryNotOpenedChest(uid uint64) ServerChest {
 	todayEnd := todayStart.Add(24 * time.Hour)
 	DB.Where("uid = ?", uid).Where("is_open = ?", false).Where("created_at >= ? AND created_at < ?", todayStart, todayEnd).First(&chest)
 	return chest
+}
+
+func QueryChest(uid uint64) ServerChest {
+	var chest ServerChest
+	todayStart := time.Now().Truncate(24 * time.Hour)
+	todayEnd := todayStart.Add(24 * time.Hour)
+	DB.Where("uid = ?", uid).Where("created_at >= ? AND created_at < ?", todayStart, todayEnd).First(&chest)
+	return chest
+}
+
+func QueryEmpowerRecord(cid uint64) []ServerChestEmpowerRecord {
+	var record []ServerChestEmpowerRecord
+	todayStart := time.Now().Truncate(24 * time.Hour)
+	todayEnd := todayStart.Add(24 * time.Hour)
+	DB.Where("cid = ?", cid).Where("created_at >= ? AND created_at < ?", todayStart, todayEnd).Find(&record)
+	return record
 }
 
 func UpdateChest(chest *ServerChest) {
@@ -217,6 +241,19 @@ func QueryStakedSpiritList() []ServerNekoSpiritInfo {
 	var list []ServerNekoSpiritInfo
 	DB.Where("is_staked = ?", true).Find(&list)
 	return list
+}
+
+func IsInBountyWave(uid uint64) bool {
+	now := time.Now()
+	var config ServerBountyWaveConfig
+	if err := DB.First(&config).Error; err != nil || config.StartTime.Compare(now) > 0 || config.EndTime.Compare(now) < 0 {
+		// fmt.Println("GetBountyWaveList error: ", err)
+		return false
+	}
+
+	var count int64
+	DB.Model(&ServerWhiteListOfBountyWave{}).Where("uid = ?", uid).Count(&count)
+	return count > 0
 }
 
 func GetBountyWaveList() ([]ServerWhiteListOfBountyWave, decimal.Decimal, bool) {
@@ -295,4 +332,33 @@ func AddStarterChestOpened() {
 
 func UpdateAddressStarter(address string) {
 	DB.Model(&ServerAddress{}).Where("address = ?", address).Update("is_starter", false)
+}
+
+func AddTreasureRevenue(address string, count uint64, hash string) {
+	DB.Create(&ServerMintRecord{Address: address, Count: count, Hash: hash})
+}
+
+func GetTreasuryRevenue() []ServerMintRecord {
+	var result []ServerMintRecord
+	DB.Order("id desc").Limit(500).Find(&result)
+	return result
+}
+
+func QueryOpenedChest(t uint) uint64 {
+	todayStart := time.Now().Truncate(24 * time.Hour)
+	todayEnd := todayStart.Add(24 * time.Hour)
+
+	var count int64
+	DB.Model(&ServerChest{}).Where("is_open = ?", true).Where("created_at >= ? AND created_at < ?", todayStart, todayEnd).Where("chest_type = ?", t).Count(&count)
+	return uint64(count)
+}
+
+func CheckIndexedEvent(number uint64, hash string) bool {
+	var record IndexerTransactionRecord
+	DB.Where("block_number = ?", number).Where("transaction_hash = ?", hash).First(&record)
+	return record.ID != 0
+}
+
+func AddIndexedTransactionRecord(number uint64, blockHash string, hash string) {
+	DB.Create(&IndexerTransactionRecord{Hash: Hash{BlockNumber: number, BlockHash: blockHash, TransactionHash: hash}})
 }

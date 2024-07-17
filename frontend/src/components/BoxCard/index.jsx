@@ -5,7 +5,7 @@ import { Col, Row } from "antd";
 import Button from "@components/Button/index";
 import BoxBorder from "@components/BoxBorder/index";
 
-export default function BoxCard({ type, title, desc, subTitle, buttonText = 'open', onButtonClick = ()=>{}}) {
+export default function BoxCard({ type, title, desc, subTitle, buttonText = 'open', onButtonClick }) {
   return (
     <div className="box-card">
       <BoxBorder />
@@ -44,7 +44,7 @@ export default function BoxCard({ type, title, desc, subTitle, buttonText = 'ope
         )}
 
         <Col xs={24} className="text-center" style={{ marginTop: "24px" }}>
-          <Button text={buttonText} color="yellow" longness="short" onButtonClick={onButtonClick} />
+          <Button text={buttonText} color="yellow" longness="short" onClick={onButtonClick} />
         </Col>
       </Row>
     </div>

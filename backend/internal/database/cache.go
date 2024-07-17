@@ -3,11 +3,11 @@ package database
 import (
 	"errors"
 	"fmt"
-	"gorm.io/gorm"
 	"strconv"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
+	"gorm.io/gorm"
+
 	"github.com/patrickmn/go-cache"
 	"github.com/shopspring/decimal"
 )
@@ -35,6 +35,13 @@ type AddressInfo struct {
 	NekoSpiritList      []ServerNekoSpiritInfo
 	TemporalShardIdList []uint64
 	LastClaim           time.Time
+	TotalClaimed        decimal.Decimal
+	TotalMana           decimal.Decimal
+	ToClaim             decimal.Decimal
+	ChestOpenable       bool
+	ChestEmpower        []string
+
+	IsInBountyWave bool
 }
 
 func GetAddressDetailByUid(uid uint64) AddressInfo {
@@ -47,7 +54,7 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 	var serverAddress ServerAddress
 	DB.Where("id = ?", uid).Find(&serverAddress)
 
-	fmt.Println("[Server] Rebuild cache for uid:", uid, " address:", serverAddress.Address)
+	//fmt.Println("[Server] Rebuild cache for uid:", uid, " address:", serverAddress.Address)
 
 	var invitation ServerInvitationRecord
 	if err := DB.Where("uid = ?", uid).Find(&invitation); err != nil {
@@ -60,19 +67,42 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 	}
 
 	var lastClaim time.Time
-	if err := DB.Model(&ServerClaimNekoSpiritRecord{}).Where("uid = ?", uid).Order("created_at desc").Limit(1).Find(&lastClaim).Error; err != nil {
+	if err := DB.Model(&ServerClaimNekoSpiritRecord{}).Where("uid = ?", uid).Order("created_at desc").Limit(1).Select("created_at").Find(&lastClaim).Error; err != nil {
 		lastClaim = time.Time{}
+	}
+	var TotalClaimed decimal.Decimal
+	if err := DB.Model(&ServerClaimNekoSpiritRecord{}).Where("uid = ?", uid).Select("ifnull(sum(amount),0) as total_claimed").Scan(&TotalClaimed).Error; err != nil {
+		TotalClaimed = decimal.NewFromInt(0)
+	}
+
+	var Mana decimal.Decimal
+	if err := DB.Model(&ServerNekoSpiritInfo{}).Where("stake_from_uid = ?", uid).Select("ifnull(sum(mana),0) as mana").Scan(&Mana).Error; err != nil {
+		Mana = decimal.NewFromInt(0)
+	}
+	var ToClaim decimal.Decimal
+	if err := DB.Model(&ServerNekoSpiritInfo{}).Where("stake_from_uid = ?", uid).Select("(ifnull(sum(rewards),0) - ifnull(sum(claimed_rewards),0)) as to_claim").Scan(&ToClaim).Error; err != nil {
+		ToClaim = decimal.NewFromInt(0)
+	}
+
+	chest := QueryChest(uid)
+	records := QueryEmpowerRecord(chest.ID)
+	var empower []string
+	for _, record := range records {
+		add, _ := GetAddressByUid(record.Uid)
+		empower = append(empower, add.Address)
 	}
 
 	var buff ServerBuffRecord
 	DB.Where("uid = ?", uid).Find(&buff)
+
+	isInBountyWave := IsInBountyWave(uid)
 
 	var NekoSpiritList []ServerNekoSpiritInfo
 	var idList []uint64
 	DB.Model(&ServerNekoSpiritInfo{}).Where("stake_from_uid = ?", uid).Find(&NekoSpiritList)
 	for _, NekoSpirit := range NekoSpiritList {
 		idList = append(idList, NekoSpirit.TokenId)
-		Cache.Set(CacheTagNekoSpirit+strconv.FormatUint(NekoSpirit.TokenId, 10), NekoSpirit, -1)
+		//Cache.Set(CacheTagNekoSpirit+strconv.FormatUint(NekoSpirit.TokenId, 10), NekoSpirit, -1)
 	}
 
 	var shardIdList []uint64
@@ -91,8 +121,16 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		NekoSpiritList:      NekoSpiritList,
 		TemporalShardIdList: shardIdList,
 		LastClaim:           lastClaim,
+		TotalClaimed:        TotalClaimed,
+		TotalMana:           Mana,
+		ToClaim:             ToClaim,
+		ChestOpenable:       chest.IsOpen == 0,
+		ChestEmpower:        empower,
+
+		IsInBountyWave: isInBountyWave,
 	}
-	Cache.Set(CacheTagUid+strconv.FormatUint(uid, 10), result, -1)
+
+	//Cache.Set(CacheTagUid+strconv.FormatUint(uid, 10), result, -1)
 	// fmt.Println("Rebuild cache for uid:", uid, "Result:", result)
 	return result
 }
@@ -101,11 +139,11 @@ func GetAddressDetailByAddress(address string) AddressInfo {
 	if uid, found := Cache.Get(CacheTagAddress + address); found {
 		return GetAddressDetailByUid(uid.(uint64))
 	}
-	if uid, err := GetUidByAddress(common.HexToAddress(address)); err == nil {
+	if uid, err := GetUidByAddress(address); err == nil {
 		Cache.Set(CacheTagAddress+address, uid, -1)
 		return GetAddressDetailByUid(uid)
 	} else if errors.Is(err, gorm.ErrRecordNotFound) {
-		return GetAddressDetailByUid(CreateAddressInfo(common.HexToAddress(address)))
+		return GetAddressDetailByUid(CreateAddressInfo(address))
 	}
 	return AddressInfo{}
 }
@@ -121,11 +159,11 @@ func GetAddressDetailByInviteCode(inviteCode string) AddressInfo {
 	return AddressInfo{}
 }
 
-func CreateAddressInfo(address common.Address) uint64 {
+func CreateAddressInfo(address string) uint64 {
 	// uid -> address
 	uid, err := CreateAddress(&ServerAddress{
-		Address:    address.Hex(),
-		InviteCode: "neko-" + strconv.Itoa(time.Now().Nanosecond())[:5] + address.Hex()[len(address.Hex())-3:],
+		Address:    address,
+		InviteCode: "neko-" + strconv.Itoa(time.Now().Nanosecond())[:5] + address[len(address)-3:],
 	})
 	if err != nil {
 		panic(err)
@@ -138,7 +176,7 @@ func CreateAddressInfo(address common.Address) uint64 {
 	})
 	// uid -> invitation reward static
 	CreateInvitationRewardStatic(uid)
-	fmt.Println("[Server] Create address info for address:", address.Hex(), "uid:", uid)
+	fmt.Println("[Server] Create address info for address:", address, "uid:", uid)
 	return uid
 }
 
@@ -150,7 +188,7 @@ func GetNekoSpiritListByIdList(idList []uint64) []ServerNekoSpiritInfo {
 		} else {
 			var temp ServerNekoSpiritInfo
 			DB.Where("token_id = ?", id).Find(&temp)
-			Cache.Set(CacheTagNekoSpirit+strconv.FormatUint(id, 10), temp, -1)
+			// Cache.Set(CacheTagNekoSpirit+strconv.FormatUint(id, 10), temp, -1)
 			result = append(result, temp)
 		}
 	}

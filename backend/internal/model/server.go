@@ -1,9 +1,12 @@
 package model
 
 import (
-	"github.com/NethermindEth/starknet.go/typed"
-	"github.com/NethermindEth/starknet.go/utils"
+	"backend/internal/database"
+	"backend/starknet/typed"
+	"backend/starknet/utils"
 	"math/big"
+
+	"github.com/shopspring/decimal"
 )
 
 type ResponseCode int
@@ -33,7 +36,7 @@ type Types struct {
 }
 
 type Definition struct {
-	Name  string `json:"name"`
+	Name string `json:"name"`
 	Type string `json:"type"`
 }
 
@@ -79,4 +82,11 @@ type AddressAndCodeAndSignature struct {
 func (message Message) FmtDefinitionEncoding(input string) (result []*big.Int) {
 	result = append(result, utils.UTF8StrToBig(message.Content))
 	return result
+}
+
+type StaticInfo struct {
+	TotalRewards     decimal.Decimal             `json:"totalRewards" form:"totalRewards"`
+	TreasuryRevenue  []database.ServerMintRecord `json:"treasuryRevenue" form:"treasuryRevenue"`
+	ChestCount       uint64                      `json:"chestCount" form:"chestCount"`
+	MasterChestCount uint64                      `json:"masterChestCount" form:"masterChestCount"`
 }

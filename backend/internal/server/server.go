@@ -1,8 +1,10 @@
 package server
 
 import (
+	"backend/internal/invoker_sn"
 	"fmt"
 	"log"
+	"math/big"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -48,12 +50,16 @@ func StartServer() {
 
 	addressGroup := apiGroup.Group("/address")
 	addressGroup.GET("/generateSignature", GenerateSignature)
-	addressGroup.POST("/info", AddressInfo)
+	addressGroup.GET("/info", AddressInfo)
 	addressGroup.POST("/invitation", AcceptInvitation)
-	addressGroup.POST("/valid", ValidSignature)
+	//addressGroup.POST("/valid", ValidSignature)
 
 	rewardGroup := apiGroup.Group("/reward")
 	rewardGroup.POST("/claim", ClaimReward)
+	rewardGroup.POST("/claimInv", ClaimRewardOfInvitation)
+
+	staticGroup := apiGroup.Group("/static")
+	staticGroup.GET("/info", GetStaticInfo)
 
 	testGroup := apiGroup.Group("/nike")
 	testGroup.GET("/allocate", func(ctx *gin.Context) {
@@ -63,14 +69,7 @@ func StartServer() {
 		service.GiveChest()
 	})
 	testGroup.POST("/summon", func(ctx *gin.Context) {
-		var req model.AddressAndCountAndSignature
-
-		if err := ctx.ShouldBindJSON(&req); err != nil {
-			fmt.Println("error: ", err)
-			ErrorResponse(ctx, model.WrongParam, err.Error())
-			return
-		}
-		_, _ = service.SummonBox(req.Address, req.Count)
+		_ = invoker_sn.SendCoinAndNFT("", big.NewInt(100000), big.NewInt(10000), big.NewInt(10))
 	})
 
 	// fmt.Println("server started at:", engine)
@@ -140,12 +139,12 @@ func SummonBox(c *gin.Context) {
 		ErrorResponse(c, model.InvalidSignature, err.Error())
 		return
 	}
-	code, msg := service.SummonBox(req.Address, req.Count)
+	data, code, msg := service.SummonBox(req.Address, req.Count)
 	if code != model.Success {
 		ErrorResponse(c, code, msg)
 		return
 	}
-	SuccessResponse(c, msg)
+	SuccessResponse(c, data)
 }
 
 func OpenChest(c *gin.Context) {
@@ -161,12 +160,12 @@ func OpenChest(c *gin.Context) {
 		return
 	}
 
-	code, msg := service.OpenChest(req)
+	data, code, msg := service.OpenChest(req)
 	if code != model.Success {
 		ErrorResponse(c, code, msg)
 		return
 	}
-	SuccessResponse(c, msg)
+	SuccessResponse(c, data)
 }
 
 func EmpowerChest(c *gin.Context) {
@@ -213,7 +212,7 @@ func AcceptInvitation(c *gin.Context) {
 
 func AddressInfo(c *gin.Context) {
 	var req model.Address
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		ErrorResponse(c, model.WrongParam, err.Error())
 		return
 	}
@@ -244,6 +243,24 @@ func ClaimReward(c *gin.Context) {
 		return
 	}
 	code, msg := service.ClaimReward(req)
+	if code != model.Success {
+		ErrorResponse(c, code, msg)
+		return
+	}
+	SuccessResponse(c, msg)
+}
+
+func ClaimRewardOfInvitation(c *gin.Context) {
+	var req model.AddressAndSignature
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ErrorResponse(c, model.WrongParam, err.Error())
+		return
+	}
+	if err := service.ValidSignature(req.Address, req.Signature.TypedData, req.Signature.Signature); err != nil {
+		ErrorResponse(c, model.InvalidSignature, err.Error())
+		return
+	}
+	code, msg := service.ClaimRewardOfInvitation(req)
 	if code != model.Success {
 		ErrorResponse(c, code, msg)
 		return
@@ -290,3 +307,12 @@ func ValidSignature(c *gin.Context) {
 // 	}
 // 	SuccessResponse(c, msg)
 // }
+
+func GetStaticInfo(c *gin.Context) {
+	data, code, msg := service.GetStaticInfo()
+	if code != model.Success {
+		ErrorResponse(c, code, msg)
+		return
+	}
+	SuccessResponse(c, data)
+}

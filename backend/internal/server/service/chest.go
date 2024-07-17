@@ -19,15 +19,20 @@ func generateRandomNumber(min, max uint64) uint64 {
 
 // func shakeIt() {}
 
-func OpenChest(req model.AddressAndSignature) (code model.ResponseCode, message string) {
+func OpenChest(req model.AddressAndSignature) (data database.ServerChest, code model.ResponseCode, message string) {
 
 	chest := database.QueryNotOpenedChest(database.GetAddressDetailByAddress(req.Address).Uid)
 	if chest.ID == 0 {
-		return model.NotFound, "chest not found"
+		return database.ServerChest{}, model.NotFound, "chest not found"
+	}
+
+	config := database.GetChestConfig()
+	count := database.QueryOpenedChest(uint(chest.ChestType))
+	if count >= config[0].TotalLimit {
+		return database.ServerChest{}, model.ServerInternalError, "Exceed total limit"
 	}
 
 	random := generateRandomNumber(0, 10000)
-	config := database.GetChestConfig()
 
 	for _, v := range config {
 		if v.ChestType == chest.ChestType && decimal.NewFromUint64(random).LessThan(v.Chance.Mul(decimal.NewFromUint64(10000))) {
@@ -41,20 +46,20 @@ func OpenChest(req model.AddressAndSignature) (code model.ResponseCode, message 
 
 	token1, err := big.NewInt(0).SetString(chest.Token1Amount.StringFixed(0), 10)
 	if !err {
-		return model.ServerInternalError, "server internal error"
+		return database.ServerChest{}, model.ServerInternalError, "server internal error"
 	}
 	token2, err := big.NewInt(0).SetString(chest.Token2Amount.StringFixed(0), 10)
 	if !err {
-		return model.ServerInternalError, "server internal error"
+		return database.ServerChest{}, model.ServerInternalError, "server internal error"
 	}
 	pow := new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)
 	if err := invoker_sn.SendCoinAndNFT(req.Address, new(big.Int).Mul(token1, pow), new(big.Int).Mul(token2, pow), big.NewInt(int64(chest.NFTAmount))); err != nil {
-		return model.ServerInternalError, "server internal error"
+		return database.ServerChest{}, model.ServerInternalError, "server internal error"
 	}
 
 	database.UpdateChest(&chest)
 
-	return model.Success, "Open success"
+	return chest, model.Success, "Open success"
 }
 
 func EmpowerChest(req model.TwoAddressAndSignature) (code model.ResponseCode, message string) {

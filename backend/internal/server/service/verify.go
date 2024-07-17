@@ -3,10 +3,10 @@ package service
 import (
 	"backend/internal/invoker_sn"
 	"backend/internal/model"
+	"backend/starknet/curve"
+	"backend/starknet/typed"
+	"backend/starknet/utils"
 	"fmt"
-	"github.com/NethermindEth/starknet.go/curve"
-	"github.com/NethermindEth/starknet.go/typed"
-	"github.com/NethermindEth/starknet.go/utils"
 	"math/big"
 )
 
@@ -76,7 +76,7 @@ func ValidSignature(address string, typedData model.TypedData, signature []strin
 		fmt.Println("new typedData error:", err.Error())
 		return err
 	}
-	fmt.Println("new typedData:", starknetTypedData)
+	//fmt.Println("new typedData:", starknetTypedData)
 
 	hash, err := starknetTypedData.GetMessageHash(utils.HexToBN(address), typedData.Message, curve.Curve)
 	if err != nil {

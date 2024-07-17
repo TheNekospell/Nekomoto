@@ -285,7 +285,6 @@ pub mod Nekomoto {
             self.lucky.read(input) >= 1
         }
 
-
         fn time_freeze(self: @ContractState, input: ContractAddress) -> bool {
             let time_freeze_start = self.time_freeze.read(input);
             if time_freeze_start == 0 {

@@ -1,14 +1,14 @@
 package service
 
 import (
-	// "backend/internal/chain"
 	"backend/internal/chain_sn"
 	"backend/internal/database"
 	"backend/internal/invoker_sn"
 	"math/big"
+	"strconv"
+	"strings"
 	"time"
 
-	// invoke "backend/internal/invoker"
 	"backend/internal/model"
 	"fmt"
 
@@ -66,18 +66,22 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 	} else {
 
 		info, err := invoker_sn.ReadNekoSpiritInfo(tokenId, false)
+		// fmt.Println("ReadNekoSpiritInfo : ", tokenId, info)
 		if err != nil {
 			fmt.Println("ReadNekoSpiritInfo error: ", err)
 			return
 		}
 
 		toUpdate, err := database.GetNekoSpiritInfoByTokenId(tokenId)
+		// fmt.Println("GetNekoSpiritInfoByTokenId : ", tokenId, toUpdate)
 		if err != nil {
 			fmt.Println("GetNekoSpiritInfoByTokenId error: ", err)
 			return
 		}
-
-		if to == chain_sn.HostAddress {
+		// fmt.Println("to:", to)
+		// fmt.Println("chain_sn.HostAddress:", chain_sn.HostAddress)
+		if strings.EqualFold(to[len(to)-63:], chain_sn.HostAddress[len(chain_sn.HostAddress)-63:]) {
+			// fmt.Println("to == chain_sn.HostAddress")
 			toUpdate.IsStaked = true
 			toUpdate.StakeTime = time.Now()
 		} else {
@@ -86,7 +90,7 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 
 		toUpdate.Fade = info.Fade
 
-		database.UpdateNekoSpiritInfo(toUpdate)
+		_ = database.UpdateNekoSpiritInfo(toUpdate)
 
 	}
 
@@ -117,11 +121,14 @@ func UpdateNekoSpiritByUpgrade(tokenId uint64) {
 		ATK:     info.ATK,
 		DEF:     info.DEF,
 		SPD:     info.SPD,
+		Mana:    info.Mana,
 		Level:   info.Level,
 	}); err != nil {
 		fmt.Println("UpdateNekoSpiritInfo error: ", err)
 		return
 	}
+
+	database.Cache.Delete(database.CacheTagNekoSpirit + strconv.Itoa(int(tokenId)))
 
 }
 
@@ -300,6 +307,7 @@ func UpdateAscendFromChain(sender string, level uint64) {
 	detail := database.GetAddressDetailByAddress(sender)
 
 	_ = database.UpdateBuffRecord(&database.ServerBuffRecord{
+		Model: database.Model{ID: detail.Buff.ID},
 		Uid:   detail.Uid,
 		Level: targetLevel,
 		Boost: boost,
@@ -307,15 +315,20 @@ func UpdateAscendFromChain(sender string, level uint64) {
 
 }
 
-func SummonBox(address string, count uint64) (code model.ResponseCode, message string) {
+func SummonBox(address string, count uint64) (hash string, code model.ResponseCode, message string) {
 
-	if err := invoker_sn.Summon(address, big.NewInt(int64(count))); err != nil {
+	hash, err := invoker_sn.Summon(address, big.NewInt(int64(count)))
+	if err != nil {
 		fmt.Println("SummonBox error: ", err)
+		return "", model.ServerInternalError, err.Error()
 	}
 
 	// half of mint cost
 	database.AddRewardsPool(decimal.New(int64(count*12500), 0))
 
-	return model.Success, "Summon success"
+	// record
+	database.AddTreasureRevenue(address, count, hash)
+
+	return hash, model.Success, "Summon success"
 
 }
