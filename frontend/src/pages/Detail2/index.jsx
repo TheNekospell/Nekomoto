@@ -54,7 +54,7 @@ export default function Detail() {
     const navigate = useNavigate()
     const [isModalOpen1, setIsModalOpen1] = useState(false);
     const [isModalOpen2, setIsModalOpen2] = useState(false);
-    const [isModalOpen3, setIsModalOpen3] = useState(false);
+    const [isModalOpen3, setIsModalOpen3] = useState(true);
     const [isModalOpen4, setIsModalOpen4] = useState(false);
     const [isModalOpen5, setIsModalOpen5] = useState(false);
     const [modalText1, setModalText1] = useState("");
@@ -72,7 +72,7 @@ export default function Detail() {
     const [lucky, setLucky] = useState(false)
     const [copySuccess1, setCopySuccess1] = useState(false);
     const [nekoButton, setNekoButton] = useState("all");
-    const [focus, setFocus] = useState(0)
+    const [focus, setFocus] = useState({})
     const [chestDetail, setChestDetail] = useState({})
     const [info, setInfo] = useState({})
     
@@ -181,7 +181,7 @@ export default function Detail() {
     }
     
     const message = (result) => {
-        return (result.success ? "Success: " : "Something went wrong: ") + (result.message === "" ? result.data : result.message)
+        return ( result.success ? "Success: " : "Something went wrong: " ) + ( result.message === "" ? result.data : result.message )
     }
     
     const claimOfSpirit = async () => {
@@ -377,6 +377,36 @@ export default function Detail() {
         setHhh(mCall.transaction_hash)
         const result = await account.waitForTransaction(mCall.transaction_hash)
         console.log("result: ", result)
+        setSuccess("Success: " + mCall.transaction_hash)
+    }
+    
+    const upgradeCal = [
+        {level: 'Lv2', SPI: 2, ATK: 1, DEF: 1, SPD: 0, Neko: 100},
+        {level: 'Lv3', SPI: 2, ATK: 1, DEF: 1, SPD: 0, Neko: 120},
+        {level: 'Lv4', SPI: 2, ATK: 1, DEF: 1, SPD: 0, Neko: 130},
+        {level: 'Lv5', SPI: 2, ATK: 1, DEF: 1, SPD: 1, Neko: 140},
+        {level: 'Lv6', SPI: 2, ATK: 1, DEF: 1, SPD: 1, Neko: 155},
+        {level: 'Lv7', SPI: 2, ATK: 1, DEF: 1, SPD: 1, Neko: 165},
+        {level: 'Lv8', SPI: 4, ATK: 3, DEF: 2, SPD: 1, Neko: 200, Prism: 1},
+        {level: 'Lv9', SPI: 4, ATK: 3, DEF: 2, SPD: 1, Neko: 245},
+        {level: 'Lv10', SPI: 4, ATK: 3, DEF: 3, SPD: 1, Neko: 300},
+        {level: 'Lv11', SPI: 6, ATK: 5, DEF: 3, SPD: 1, Neko: 370},
+        {level: 'Lv12', SPI: 6, ATK: 7, DEF: 3, SPD: 2, Neko: 455},
+        {level: 'Lv13', SPI: 12, ATK: 9, DEF: 5, SPD: 3, Neko: 1000, Prism: 2},
+        {level: 'Lv', SPI: 0, ATK: 0, DEF: 0, SPD: 0,},
+    ]
+    
+    const upgrade = async (tokenId) => {
+        setWaiting(true)
+        const mCall = await account.execute([{
+            contractAddress: NEKOMOTO_ADDRESS,
+            entrypoint: "upgrade",
+            calldata: CallData.compile({token_id: cairo.uint256(tokenId)})
+        }])
+        
+        setHhh(mCall.transaction_hash)
+        const result = await account.waitForTransaction(mCall.transaction_hash)
+        console.log("result ", result)
         setSuccess("Success: " + mCall.transaction_hash)
     }
     
@@ -635,13 +665,13 @@ export default function Detail() {
                                 <Col xs={12} sm={12} lg={4} key={index}>
                                     <Flex className="card-item" justify="center" vertical="column">
                                         <img src={card1 || card2 || card3} alt=""/>
-                                        <Button onClick={item.IsStaked ? (() => {
+                                        <Button onClick={item.IsStaked ? ( () => {
                                             setIsModalOpen3(true);
-                                            setFocus(item.TokenId);
-                                        }) : (() => {
+                                            setFocus(item);
+                                        } ) : ( () => {
                                             setIsModalOpen2(true);
-                                            setFocus(item.TokenId);
-                                        })}
+                                            setFocus(item);
+                                        } )}
                                                 text={item.IsStaked ? "level up" : "staking"}
                                                 color={item.IsStaked ? "orange" : "yellow"}
                                                 longness="short"/>
@@ -678,16 +708,16 @@ export default function Detail() {
                                 }}
                             >
                                 <Flex className="modal-detail" vertical="column">
-                                    <div className="modal-text1 margin-top-16">{"#" + focus}</div>
+                                    <div className="modal-text1 margin-top-16">{"# " + focus.TokenId}</div>
                                     <Flex justify="space-between" className="margin-bottom-16">
                                         <div className="modal-text2">Earning</div>
                                         <div
-                                            className="modal-text3">{addressInfo.NekoSpiritList?.filter((item) => item.TokenId === focus)[0]?.Rewards}</div>
+                                            className="modal-text3">{focus.Rewards}</div>
                                     </Flex>
                                     <Flex justify="space-between" className="margin-bottom-16">
                                         <div className="modal-text2">Claimed</div>
                                         <div
-                                            className="modal-text3">{addressInfo.NekoSpiritList?.filter((item) => item.TokenId === focus)[0]?.ClaimedRewards}</div>
+                                            className="modal-text3">{focus.ClaimedRewards}</div>
                                     </Flex>
                                     <Flex justify="space-between" className="margin-bottom-16">
                                         <div className="modal-text2">APR</div>
@@ -696,12 +726,12 @@ export default function Detail() {
                                     <Flex justify="space-between" className="margin-bottom-16">
                                         <div className="modal-text2">Status</div>
                                         <div
-                                            className="modal-text3">{addressInfo.NekoSpiritList?.filter((item) => item.TokenId === focus)[0]?.IsStaked ? "Staked" : "Available"}</div>
+                                            className="modal-text3">{focus.IsStaked ? "Staked" : "Available"}</div>
                                     </Flex>
                                     <Flex justify="space-between" className="margin-bottom-16">
                                         <div className="modal-text2">LV</div>
                                         <div
-                                            className="modal-text3">{addressInfo.NekoSpiritList?.filter((item) => item.TokenId === focus)[0]?.Level}</div>
+                                            className="modal-text3">{focus?.Level}</div>
                                     </Flex>
                                 </Flex>
                             </Col>
@@ -740,18 +770,15 @@ export default function Detail() {
                                 }}
                             >
                                 <Flex className="modal-detail" vertical="column">
-                                    <div className="modal-text1 margin-top-16">{"#" + focus}</div>
+                                    <div className="modal-text1 margin-top-16">{"# " + focus.TokenId}</div>
                                     <Flex justify="space-between" className="margin-bottom-16">
                                         <div className="modal-text2">Earning</div>
                                         <div
-                                            className="modal-text3">{addressInfo.NekoSpiritList?.filter((item) => item.TokenId === focus)[0]?.Rewards}</div>
+                                            className="modal-text3">{focus?.Rewards}</div>
                                     </Flex>
                                     <Flex justify="space-between" className="margin-bottom-16">
                                         <div className="modal-text2">Claimed</div>
-                                        <div className="modal-text3">{
-                                            addressInfo
-                                                .NekoSpiritList?.filter((item) => item.TokenId === focus)[0]?.ClaimedRewards
-                                        }</div>
+                                        <div className="modal-text3">{focus?.ClaimedRewards}</div>
                                     </Flex>
                                     <Flex justify="space-between" className="margin-bottom-16">
                                         <div className="modal-text2">APR</div>
@@ -760,21 +787,27 @@ export default function Detail() {
                                     <Flex justify="space-between" className="margin-bottom-16">
                                         <div className="modal-text2">Status</div>
                                         <div
-                                            className="modal-text3">{addressInfo.NekoSpiritList?.filter((item) => item.TokenId === focus)[0]?.IsStaked ? "Staked" : "Available"}</div>
+                                            className="modal-text3">{focus?.IsStaked ? "Staked" : "Available"}</div>
                                     </Flex>
                                     <Flex justify="space-between" className="margin-bottom-16">
                                         <div className="modal-text2">LV</div>
                                         <div
-                                            className="modal-text3">{addressInfo.NekoSpiritList?.filter((item) => item.TokenId === focus)[0]?.Level}</div>
+                                            className="modal-text3">{focus?.Level}</div>
                                     </Flex>
                                 </Flex>
                             </Col>
                         </Row>
                         <Row justify="center">
                             <Col xs={24} sm={24} lg={18}>
-                                <Flex justify="center">
-                                    <div className="modal-text1">LV 7 →</div>
-                                    <div className="modal-text4">&nbsp;LV 8</div>
+                                <Flex justify="center" style={{marginBottom: "10px"}}>
+                                    <div className="modal-text1">{"LV" + focus.Level}< /div>
+                                    {focus.Level !== 13 && (
+                                        <div className="modal-text1">{" → "}</div>
+                                    )}
+                                    {focus.Level !== 13 && (
+                                        <div
+                                            className="modal-text4">&nbsp;{"LV" + ( focus.Level === 13 ? 13 : ( Number(focus.Level) + 1 ) )}</div>
+                                    )}
                                 </Flex>
                                 <Flex justify="space-between">
                                     <Flex align="center" className="modal-text5">
@@ -788,9 +821,14 @@ export default function Detail() {
                                         SPI
                                     </Flex>
                                     <Flex>
-                                        <div className="modal-text6">12</div>
-                                        <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
-                                        <div className="modal-text7">14</div>
+                                        <div className="modal-text6">{focus.SPI}</div>
+                                        {focus.Level !== 13 && (
+                                            <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
+                                        )}
+                                        {focus.Level !== 13 && (
+                                            <div
+                                                className={upgradeCal[focus.Level - 1].SPI > 0 ? "modal-text7" : "modal-text8"}>{Number(focus.SPI) + upgradeCal[focus.Level - 1].SPI}</div>
+                                        )}
                                     </Flex>
                                 </Flex>
                                 <Flex justify="space-between">
@@ -802,12 +840,17 @@ export default function Detail() {
                                             alt=""
                                             style={{marginRight: "10px"}}
                                         />
-                                        STK
+                                        ATK
                                     </Flex>
                                     <Flex>
-                                        <div className="modal-text6">1764</div>
-                                        <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
-                                        <div className="modal-text7">1764</div>
+                                        <div className="modal-text6">{focus.ATK}</div>
+                                        {focus.Level !== 13 && (
+                                            <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
+                                        )}
+                                        {focus.Level !== 13 && (
+                                            <div
+                                                className={upgradeCal[focus.Level - 1].ATK > 0 ? "modal-text7" : "modal-text8"}>{Number(focus.ATK) + upgradeCal[focus.Level - 1].ATK}</div>
+                                        )}
                                     </Flex>
                                 </Flex>
                                 <Flex justify="space-between">
@@ -822,9 +865,14 @@ export default function Detail() {
                                         DEF
                                     </Flex>
                                     <Flex>
-                                        <div className="modal-text6">12</div>
-                                        <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
-                                        <div className="modal-text7">14</div>
+                                        <div className="modal-text6">{focus.DEF}</div>
+                                        {focus.Level !== 13 && (
+                                            <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
+                                        )}
+                                        {focus.Level !== 13 && (
+                                            <div
+                                                className={upgradeCal[focus.Level - 1].DEF > 0 ? "modal-text7" : "modal-text8"}>{Number(focus.DEF) + upgradeCal[focus.Level - 1].DEF}</div>
+                                        )}
                                     </Flex>
                                 </Flex>
                                 <Flex justify="space-between">
@@ -839,9 +887,14 @@ export default function Detail() {
                                         SPD
                                     </Flex>
                                     <Flex>
-                                        <div className="modal-text6">365</div>
-                                        <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
-                                        <div className="modal-text7">400</div>
+                                        <div className="modal-text6">{focus.SPD}</div>
+                                        {focus.Level !== 13 && (
+                                            <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
+                                        )}
+                                        {focus.Level !== 13 && (
+                                            <div
+                                                className={upgradeCal[focus.Level - 1].SPD > 0 ? "modal-text7" : "modal-text8"}>{Number(focus.SPD) + upgradeCal[focus.Level - 1].SPD}</div>
+                                        )}
                                     </Flex>
                                 </Flex>
                                 <Flex justify="space-between">
@@ -856,50 +909,64 @@ export default function Detail() {
                                         MANA
                                     </Flex>
                                     <Flex>
-                                        <div className="modal-text6">4680</div>
-                                        <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
-                                        <div className="modal-text7">4690</div>
+                                        <div className="modal-text6">{focus.Mana}</div>
+                                        {focus.Level !== 13 && (
+                                            <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
+                                        )}
+                                        {focus.Level !== 13 && (
+                                            <div
+                                                className="modal-text7">{Number(focus.Mana) + 0.065 * ( 0.4 * Number(upgradeCal[focus.Level - 1].SPI) + 0.3 * Number(upgradeCal[focus.Level - 1].ATK) + 0.2 * Number(upgradeCal[focus.Level - 1].DEF) + 0.1 * Number(upgradeCal[focus.Level - 1].SPD) )}</div>
+                                        )}
                                     </Flex>
                                 </Flex>
-                                <Flex
-                                    className="black-bg2"
-                                    justify="space-between"
-                                    align="center"
-                                    style={{marginTop: "16px"}}
-                                >
-                                    <Flex align="center">
-                                        <img
-                                            src={purple}
-                                            width={24}
-                                            style={{marginRight: "10px"}}
-                                            alt=""
-                                        />
-                                        <div className="modal-text3">Prism</div>
-                                    </Flex>
-                                    <Flex>
-                                        <div className="modal-text3">342</div>
-                                        <div className="modal-text9">/9</div>
-                                    </Flex>
-                                </Flex>
-                                <Flex
-                                    className="black-bg3"
-                                    justify="space-between"
-                                    align="center"
-                                >
-                                    <Flex align="center">
-                                        <img
-                                            src={blue}
-                                            width={24}
-                                            style={{marginRight: "10px"}}
-                                            alt=""
-                                        />
-                                        <div className="modal-text3">Neko</div>
-                                    </Flex>
-                                    <Flex>
-                                        <div className="modal-text3">546436</div>
-                                        <div className="modal-text9">/50000</div>
-                                    </Flex>
-                                </Flex>
+                                {
+                                    ( upgradeCal[focus.Level - 1].Prism && upgradeCal[focus.Level - 1].Prism > 0 ) && (
+                                        <Flex
+                                            className="black-bg2"
+                                            justify="space-between"
+                                            align="center"
+                                            style={{marginTop: "16px"}}
+                                        >
+                                            <Flex align="center">
+                                                <img
+                                                    src={purple}
+                                                    width={24}
+                                                    style={{marginRight: "10px"}}
+                                                    alt=""
+                                                />
+                                                <div className="modal-text3">Prism</div>
+                                            </Flex>
+                                            <Flex>
+                                                <div className="modal-text3">{prism}</div>
+                                                <div className="modal-text9">{"/" + upgradeCal[focus.Level - 1].Prism}</div>
+                                            </Flex>
+                                        </Flex>
+                                    )
+                                }
+                                {
+                                    ( upgradeCal[focus.Level - 1].Neko && upgradeCal[focus.Level - 1].Neko > 0 ) && (
+                                        <Flex
+                                            className="black-bg3"
+                                            justify="space-between"
+                                            align="center"
+                                            style={{marginTop: "16px"}}
+                                        >
+                                            <Flex align="center">
+                                                <img
+                                                    src={blue}
+                                                    width={24}
+                                                    style={{marginRight: "10px"}}
+                                                    alt=""
+                                                />
+                                                <div className="modal-text3">Neko</div>
+                                            </Flex>
+                                            <Flex>
+                                                <div className="modal-text3">{nekocoin}</div>
+                                                <div className="modal-text9">{"/" + upgradeCal[focus.Level - 1].Neko}</div>
+                                            </Flex>
+                                        </Flex>
+                                    )
+                                }
                             </Col>
                         </Row>
                         <div style={{display: "flex", justifyContent: "space-between", padding: "24px 80px",}}>
@@ -908,12 +975,14 @@ export default function Detail() {
                                 color="orange"
                                 longness="short"
                                 style={{marginTop: "24px"}}
+                                onClick={() => upgrade(focus.TokenId)}
                             />
                             <Button
                                 text={"Unstake"}
                                 color={"blue"}
                                 longness={"short"}
                                 style={{marginTop: "24px"}}
+                                onClick={() => unstake(focus.TokenId)}
                             />
                         </div>
                     </Flex>
@@ -1035,7 +1104,7 @@ export default function Detail() {
                             text={"EMPOWER"}
                             color={"yellow"}
                             longness="long"
-                        />) : (
+                        /> ) : (
                         <Button
                             style={{marginTop: "20px", textAlign: "center"}}
                             onClick={() => {
