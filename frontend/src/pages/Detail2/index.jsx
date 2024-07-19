@@ -801,10 +801,10 @@ export default function Detail() {
                             <Col xs={24} sm={24} lg={18}>
                                 <Flex justify="center" style={{marginBottom: "10px"}}>
                                     <div className="modal-text1">{"LV" + focus.Level}</div>
-                                    {focus.Level !== 13 && (
+                                    {(focus.Level !== 13 && focus.Level >0) && (
                                         <div className="modal-text1">{" → "}</div>
                                     )}
-                                    {focus.Level !== 13 && (
+                                    {(focus.Level !== 13 && focus.Level >0) && (
                                         <div
                                             className="modal-text4">&nbsp;{"LV" + ( focus.Level === 13 ? 13 : ( Number(focus.Level) + 1 ) )}</div>
                                     )}
@@ -822,10 +822,10 @@ export default function Detail() {
                                     </Flex>
                                     <Flex>
                                         <div className="modal-text6">{focus.SPI}</div>
-                                        {focus.Level !== 13 && (
+                                        {(focus.Level !== 13 && focus.Level >0) && (
                                             <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
                                         )}
-                                        {focus.Level !== 13 && (
+                                        {(focus.Level !== 13 && focus.Level >0) && (
                                             <div
                                                 className={upgradeCal[focus.Level - 1].SPI > 0 ? "modal-text7" : "modal-text8"}>{Number(focus.SPI) + upgradeCal[focus.Level - 1].SPI}</div>
                                         )}
@@ -844,10 +844,10 @@ export default function Detail() {
                                     </Flex>
                                     <Flex>
                                         <div className="modal-text6">{focus.ATK}</div>
-                                        {focus.Level !== 13 && (
+                                        {(focus.Level !== 13 && focus.Level >0) && (
                                             <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
                                         )}
-                                        {focus.Level !== 13 && (
+                                        {(focus.Level !== 13 && focus.Level >0) && (
                                             <div
                                                 className={upgradeCal[focus.Level - 1].ATK > 0 ? "modal-text7" : "modal-text8"}>{Number(focus.ATK) + upgradeCal[focus.Level - 1].ATK}</div>
                                         )}
@@ -866,10 +866,10 @@ export default function Detail() {
                                     </Flex>
                                     <Flex>
                                         <div className="modal-text6">{focus.DEF}</div>
-                                        {focus.Level !== 13 && (
+                                        {(focus.Level !== 13 && focus.Level >0) && (
                                             <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
                                         )}
-                                        {focus.Level !== 13 && (
+                                        {(focus.Level !== 13 && focus.Level >0) && (
                                             <div
                                                 className={upgradeCal[focus.Level - 1].DEF > 0 ? "modal-text7" : "modal-text8"}>{Number(focus.DEF) + upgradeCal[focus.Level - 1].DEF}</div>
                                         )}
@@ -888,10 +888,10 @@ export default function Detail() {
                                     </Flex>
                                     <Flex>
                                         <div className="modal-text6">{focus.SPD}</div>
-                                        {focus.Level !== 13 && (
+                                        {(focus.Level !== 13 && focus.Level >0) && (
                                             <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
                                         )}
-                                        {focus.Level !== 13 && (
+                                        {(focus.Level !== 13 && focus.Level >0) && (
                                             <div
                                                 className={upgradeCal[focus.Level - 1].SPD > 0 ? "modal-text7" : "modal-text8"}>{Number(focus.SPD) + upgradeCal[focus.Level - 1].SPD}</div>
                                         )}
@@ -910,17 +910,17 @@ export default function Detail() {
                                     </Flex>
                                     <Flex>
                                         <div className="modal-text6">{focus.Mana}</div>
-                                        {focus.Level !== 13 && (
+                                        {(focus.Level !== 13 && focus.Level >0) && (
                                             <div className="modal-text8">&nbsp;{">"}&nbsp;</div>
                                         )}
-                                        {focus.Level !== 13 && (
+                                        {(focus.Level !== 13 && focus.Level >0) && (
                                             <div
                                                 className="modal-text7">{Number(focus.Mana) + 0.065 * ( 0.4 * Number(upgradeCal[focus.Level - 1].SPI) + 0.3 * Number(upgradeCal[focus.Level - 1].ATK) + 0.2 * Number(upgradeCal[focus.Level - 1].DEF) + 0.1 * Number(upgradeCal[focus.Level - 1].SPD) )}</div>
                                         )}
                                     </Flex>
                                 </Flex>
                                 {
-                                    ( upgradeCal[focus.Level - 1].Prism && upgradeCal[focus.Level - 1].Prism > 0 ) && (
+                                    ( upgradeCal[focus.Level - 1]?.Prism && upgradeCal[focus.Level - 1].Prism > 0 ) && (
                                         <Flex
                                             className="black-bg2"
                                             justify="space-between"
@@ -944,7 +944,7 @@ export default function Detail() {
                                     )
                                 }
                                 {
-                                    ( upgradeCal[focus.Level - 1].Neko && upgradeCal[focus.Level - 1].Neko > 0 ) && (
+                                    ( upgradeCal[focus.Level - 1]?.Neko && upgradeCal[focus.Level - 1].Neko > 0 ) && (
                                         <Flex
                                             className="black-bg3"
                                             justify="space-between"
