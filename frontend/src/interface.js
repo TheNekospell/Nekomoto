@@ -5,7 +5,7 @@ import prismAbi from "./abi/prism.json" assert { type: "json" };
 import shardAbi from "./abi/temporalshard.json" assert { type: "json" };
 import { useAccount } from "@starknet-react/core";
 
-const BASE_URL = "http://localhost:8972/api"
+const BASE_URL = "https://api.nekomoto.xyz/api"
 
 export const NEKOMOTO_ADDRESS = "0x029112b5457e23d4279668bfed5d6a8f9523857c7ce33e8b362903f9d4cbeda9"
 export const NEKOCOIN_ADDRESS = "0x05cbdbe1194c7acffb5c4dde29245dbb30c6fdddc580b38bbf22671d6ddc5c9e"
@@ -26,10 +26,10 @@ export const waitTx = async (hash) => {
 
 export const sign = async (account) => {
     // if (!address || !isConnected) return;
-    
+
     const text = (await BACKEND.getSignText(account.address)).data;
     console.log("text: ", text);
-    
+
     const typedMessage = {
         domain: {
             name: "Nekomoto",
@@ -38,38 +38,38 @@ export const sign = async (account) => {
         },
         types: {
             StarkNetDomain: [
-                {name: "name", type: "felt"},
-                {name: "chainId", type: "felt"},
-                {name: "version", type: "felt"},
+                { name: "name", type: "felt" },
+                { name: "chainId", type: "felt" },
+                { name: "version", type: "felt" },
             ],
-            Message: [{name: "content", type: "string"}],
+            Message: [{ name: "content", type: "string" }],
         },
         primaryType: "Message",
         message: {
             content: text,
         },
     };
-    
+
     const signature = await account.signMessage(typedMessage);
     // console.log("signature: ", signature);
-    
+
     // const messageHash = typedData.getMessageHash(
     // 	typedMessage,
     // 	BigInt(await account.signer.getPubKey())
     // );
     // console.log("messageHash: ", messageHash);
-    
-    return {typedMessage, signature}
+
+    return { typedMessage, signature }
 };
 
 export const BACKEND = {
-    
+
     getSignText: async (address) => {
         const result = await fetch(`${BASE_URL}/address/generateSignature?address=${address}`)
         // console.log("result: ", result)
         return await result.json()
     },
-    
+
     verifySignature: async (address, typedData, signature) => {
         const result = await fetch(`${BASE_URL}/address/valid`, {
             method: "POST",
@@ -87,7 +87,7 @@ export const BACKEND = {
         // console.log("result: ", result)
         return await result.json()
     },
-    
+
     summonBox: async (address, count, typedData, signature) => {
         // console.log("summonBox: ", address, count, typedData, signature)
         const result = await fetch(`${BASE_URL}/box/summon`, {
@@ -107,7 +107,7 @@ export const BACKEND = {
         // console.log("result: ", result)
         return await result.json()
     },
-    
+
     openChest: async (address, typedData, signature) => {
         const result = await fetch(`${BASE_URL}/chest/open`, {
             method: "POST",
@@ -125,7 +125,7 @@ export const BACKEND = {
         // console.log("result: ", result)
         return await result.json()
     },
-    
+
     empowerChest: async (address1, address2, typedData, signature) => {
         const result = await fetch(`${BASE_URL}/chest/empower`, {
             method: "POST",
@@ -144,13 +144,13 @@ export const BACKEND = {
         // console.log("result: ", result)
         return await result.json()
     },
-    
+
     addressInfo: async (address) => {
         const result = await fetch(`${BASE_URL}/address/info?address=${address}`)
         // console.log("result: ", result)
         return await result.json()
     },
-    
+
     acceptInvitation: async (address, code, typedData, signature) => {
         const result = await fetch(`${BASE_URL}/address/invitation`, {
             method: "POST",
@@ -169,7 +169,7 @@ export const BACKEND = {
         // console.log("result: ", result)
         return await result.json()
     },
-    
+
     claimReward: async (address, typedData, signature) => {
         const result = await fetch(`${BASE_URL}/reward/claim`, {
             method: "POST",
@@ -187,7 +187,7 @@ export const BACKEND = {
         // console.log("result: ", result)
         return await result.json()
     },
-    
+
     claimRewardOfInvitation: async (address, typedData, signature) => {
         const result = await fetch(`${BASE_URL}/reward/claimInv`, {
             method: "POST",
@@ -205,16 +205,16 @@ export const BACKEND = {
         // console.log("result: ", result)
         return await result.json()
     },
-    
+
     staticInfo: async () => {
         const result = await fetch(`${BASE_URL}/static/info`)
         // console.log("result: ", await result.json())
         return await result.json()
     },
-    
+
     getPriceUSD: async () => {
         const response = await fetch("https://api.dexscreener.com/latest/dex/tokens/0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d")
         return await response.json();
     },
-    
+
 }

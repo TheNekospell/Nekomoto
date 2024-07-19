@@ -58,7 +58,7 @@ export default function Detail() {
     const [isModalOpen4, setIsModalOpen4] = useState(false);
     const [isModalOpen5, setIsModalOpen5] = useState(false);
     const [modalText1, setModalText1] = useState("");
-    
+
     const {account, address, status, chainId, isConnected} = useAccount();
     const [addressInfo, setAddressInfo] = useState({})
     const [hhh, setHhh] = useState("")
@@ -75,20 +75,20 @@ export default function Detail() {
     const [focus, setFocus] = useState({})
     const [chestDetail, setChestDetail] = useState({})
     const [info, setInfo] = useState({})
-    
-    
+
+
     const options = [{value: 'ALL', label: 'ALL'}, {value: 'LEGENDARY', label: 'LEGENDARY'}, {
         value: 'EPIC',
         label: 'EPIC'
     }, {value: 'RARE', label: 'RARE'}, {value: 'UNCOMMON', label: 'UNCOMMON'}, {value: 'COMMON', label: 'COMMON'}]
-    
-    
+
+
     useEffect(() => {
         BACKEND.staticInfo().then((result) => {
             console.log("static info: ", result.data)
             setInfo(result.data)
         })
-        
+
         if (address) {
             BACKEND.addressInfo(address).then(result => {
                 console.log("address info: ", result.data)
@@ -118,17 +118,17 @@ export default function Detail() {
                 // console.log("nekocoin allowance: ", result)
                 setLucky(result)
             })
-            
+
             const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('addr');
             if (code) {
                 setIsModalOpen1(true)
                 console.log("find empower code: ", code)
             }
-            
+
         }
     }, [address])
-    
+
     const empower = async () => {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('addr');
@@ -141,11 +141,11 @@ export default function Detail() {
             })
         })
     }
-    
+
     const timeFreeze = async () => {
-        
+
         setWaiting(true)
-        
+
         const multiCall = await account.execute([
             {
                 contractAddress: SHARD_ADDRESS,
@@ -163,13 +163,13 @@ export default function Detail() {
                 })
             }
         ])
-        
+
         setHhh(multiCall.transaction_hash)
         const result = await account.waitForTransaction(multiCall.transaction_hash)
         console.log("result: ", result)
         setSuccess("Success: " + multiCall.transaction_hash)
     }
-    
+
     const openChest = async () => {
         setWaiting(true)
         const {typedMessage, signature} = await sign(account)
@@ -179,11 +179,11 @@ export default function Detail() {
         setIsModalOpen4(true)
         setChestDetail(result.data)
     }
-    
+
     const message = (result) => {
         return ( result.success ? "Success: " : "Something went wrong: " ) + ( result.message === "" ? result.data : result.message )
     }
-    
+
     const claimOfSpirit = async () => {
         setWaiting(true)
         const {typedMessage, signature} = await sign(account)
@@ -191,7 +191,7 @@ export default function Detail() {
         console.log("result: ", result)
         setSuccess(message(result))
     }
-    
+
     const claimOfInvitation = async () => {
         setWaiting(true)
         const {typedMessage, signature} = await sign(account)
@@ -199,7 +199,7 @@ export default function Detail() {
         console.log("result: ", result)
         setSuccess(message(result))
     }
-    
+
     const getAscendUpgradePrism = (level) => {
         if (level === 0) {
             return 9
@@ -221,7 +221,7 @@ export default function Detail() {
             return 746
         }
     }
-    
+
     const getAscendUpgradeNeko = (level) => {
         if (level === 0) {
             return 100
@@ -243,7 +243,7 @@ export default function Detail() {
             return 13299996
         }
     }
-    
+
     const getAscendUpgrade = (level) => {
         if (level === 0) {
             return 2
@@ -265,7 +265,7 @@ export default function Detail() {
             return 51
         }
     }
-    
+
     const upgradeAscend = async () => {
         setWaiting(true)
         const {typedMessage, signature} = await sign(account)
@@ -303,9 +303,9 @@ export default function Detail() {
         console.log("result: ", result)
         setSuccess("Success: " + multiCall.transaction_hash)
     }
-    
+
     const copyOnClick = (address) => {
-        
+
         if (navigator.clipboard) {
             navigator.clipboard.writeText(address).then(() => {
                 console.log('Address copied to clipboard:', address);
@@ -317,9 +317,9 @@ export default function Detail() {
                 setCopySuccess1(false);
             }, 2000);
         }
-        
+
     }
-    
+
     const stake = async (input) => {
         setWaiting(true)
         const mCall = await account.execute([{
@@ -327,13 +327,13 @@ export default function Detail() {
             entrypoint: "stake",
             calldata: CallData.compile({token_id: cairo.uint256(input)})
         }])
-        
+
         setHhh(mCall.transaction_hash)
         const result = await account.waitForTransaction(mCall.transaction_hash)
         console.log("result: ", result)
         setSuccess("Success: " + mCall.transaction_hash)
     }
-    
+
     const unstake = async (input) => {
         setWaiting(true)
         const mCall = await account.execute([{
@@ -341,13 +341,13 @@ export default function Detail() {
             entrypoint: "withdraw",
             calldata: CallData.compile({token_id: cairo.uint256(input)})
         }])
-        
+
         setHhh(mCall.transaction_hash)
         const result = await account.waitForTransaction(mCall.transaction_hash)
         console.log("result: ", result)
         setSuccess("Success: " + mCall.transaction_hash)
     }
-    
+
     const stakeAll = async () => {
         setWaiting(true)
         const mCall = await account.execute([{
@@ -357,13 +357,13 @@ export default function Detail() {
                 token_id: addressInfo.NekoSpiritList?.filter(x => !x.IsStaked).map(x => cairo.uint256(x.TokenId))
             })
         }])
-        
+
         setHhh(mCall.transaction_hash)
         const result = await account.waitForTransaction(mCall.transaction_hash)
         console.log("result: ", result)
         setSuccess("Success: " + mCall.transaction_hash)
     }
-    
+
     const unStakeAll = async () => {
         setWaiting(true)
         const mCall = await account.execute([{
@@ -373,13 +373,13 @@ export default function Detail() {
                 token_id: addressInfo.NekoSpiritList?.filter(x => x.IsStaked).map(x => cairo.uint256(x.TokenId))
             })
         }])
-        
+
         setHhh(mCall.transaction_hash)
         const result = await account.waitForTransaction(mCall.transaction_hash)
         console.log("result: ", result)
         setSuccess("Success: " + mCall.transaction_hash)
     }
-    
+
     const upgradeCal = [
         {level: 'Lv2', SPI: 2, ATK: 1, DEF: 1, SPD: 0, Neko: 100},
         {level: 'Lv3', SPI: 2, ATK: 1, DEF: 1, SPD: 0, Neko: 120},
@@ -395,7 +395,7 @@ export default function Detail() {
         {level: 'Lv13', SPI: 12, ATK: 9, DEF: 5, SPD: 3, Neko: 1000, Prism: 2},
         {level: 'Lv', SPI: 0, ATK: 0, DEF: 0, SPD: 0,},
     ]
-    
+
     const upgrade = async (tokenId) => {
         setWaiting(true)
         const mCall = await account.execute([{
@@ -403,16 +403,16 @@ export default function Detail() {
             entrypoint: "upgrade",
             calldata: CallData.compile({token_id: cairo.uint256(tokenId)})
         }])
-        
+
         setHhh(mCall.transaction_hash)
         const result = await account.waitForTransaction(mCall.transaction_hash)
         console.log("result ", result)
         setSuccess("Success: " + mCall.transaction_hash)
     }
-    
+
     return (
         <div>
-            
+
             <NekoModal
                 open={waiting}
                 centered={true}
@@ -443,7 +443,7 @@ export default function Detail() {
                     >
                         {success !== "" ? success : "Please sign in your wallet and wait..."}
                     </h3>
-                    
+
                     {success && (
                         <Button
                             style={{
@@ -463,11 +463,11 @@ export default function Detail() {
                             }}
                         />
                     )}
-                
+
                 </div>
             </NekoModal>
-            
-            
+
+
             <div className="detail padding-top-80 padding-bottom-80">
                 <Flex className="back-btn" align="center" onClick={() => navigate('/assets')}>
                     <img
@@ -478,7 +478,7 @@ export default function Detail() {
                     />
                     Assets
                 </Flex>
-                
+
                 <Row gutter={{md: 0, lg: 16}}>
                     <Col xs={24} sm={24} lg={12} className="margin-top-16">
                         <InviteCard chestEmpower={addressInfo.ChestEmpower || []}
@@ -494,8 +494,8 @@ export default function Detail() {
                                      bountyWave={addressInfo.IsInBountyWave} startTimeFreeze={timeFreeze}/>
                     </Col>
                 </Row>
-                
-                
+
+
                 {/* <Row gutter={{ xs: 0, sm: 16 }}>
         <Col xs={24} sm={12}>
           <InviteCard />
@@ -504,8 +504,8 @@ export default function Detail() {
           <ClaimedCard type="short" />
         </Col>
       </Row> */}
-                
-                
+
+
                 <Row gutter={{md: 0, lg: 16}}>
                     <Col xs={24} sm={24} lg={6} className="margin-top-16">
                         <BoxCard
@@ -575,7 +575,7 @@ export default function Detail() {
                                 <Col xs={24} sm={24}>
                                     <div className="card-little-title">Referral Rewards</div>
                                 </Col>
-                                
+
                                 <Col xs={24} sm={24} style={{margin: "8px 0 18px"}}>
                                     <Flex align="center" className="blue-text">
                                         {addressInfo.InviteCode}
@@ -613,7 +613,7 @@ export default function Detail() {
                         </EmptyCard>
                     </Col>
                 </Row>
-                
+
                 <div className="cards-wrapper margin-top-16">
                     <BoxBorder color="#0E222F"/>
                     <div
@@ -645,7 +645,7 @@ export default function Detail() {
                                              onClick={() => setNekoButton("COMMON")}/>
                             </div>
                         )}
-                        
+
                         <Flex>
                             <div className="card-desc-title"
                                  style={{marginRight: "18px", fontSize: '12px', cursor: 'pointer'}}
@@ -656,9 +656,9 @@ export default function Detail() {
                             </div>
                         </Flex>
                     </Flex>
-                    
+
                     <Row gutter={16}>
-                        
+
                         {addressInfo.NekoSpiritList?.filter((item) => nekoButton === "all" ? true : item.Rarity?.toLowerCase() === nekoButton.toLowerCase()).map((item, index) => {
                             // console.log("index: ", item, index)
                             return (
@@ -679,11 +679,11 @@ export default function Detail() {
                                 </Col>
                             )
                         })}
-                    
+
                     </Row>
                 </div>
-                
-                
+
+
                 <NekoModal
                     title="Details"
                     open={isModalOpen2}
@@ -736,7 +736,7 @@ export default function Detail() {
                                 </Flex>
                             </Col>
                         </Row>
-                        
+
                         <Button
                             text="Staking"
                             color="yellow"
@@ -746,7 +746,7 @@ export default function Detail() {
                         />
                     </Flex>
                 </NekoModal>
-                
+
                 <NekoModal
                     title="Details - LV UP"
                     open={isModalOpen3}
@@ -800,7 +800,7 @@ export default function Detail() {
                         <Row justify="center">
                             <Col xs={24} sm={24} lg={18}>
                                 <Flex justify="center" style={{marginBottom: "10px"}}>
-                                    <div className="modal-text1">{"LV" + focus.Level}< /div>
+                                    <div className="modal-text1">{"LV" + focus.Level}</div>
                                     {focus.Level !== 13 && (
                                         <div className="modal-text1">{" → "}</div>
                                     )}
@@ -987,7 +987,7 @@ export default function Detail() {
                         </div>
                     </Flex>
                 </NekoModal>
-                
+
                 <NekoModal
                     title=""
                     open={isModalOpen4}
@@ -1007,7 +1007,7 @@ export default function Detail() {
                                 </div>
                             </Col>
                         )}
-                        
+
                         {chestDetail?.Token1Amount && (
                             <Col>
                                 <div className="adept-bg">
@@ -1018,7 +1018,7 @@ export default function Detail() {
                                 </div>
                             </Col>
                         )}
-                        
+
                         {chestDetail?.NFTAmount && (
                             <Col>
                                 <div className="adept-bg">
@@ -1039,7 +1039,7 @@ export default function Detail() {
                         />
                     </Flex>
                 </NekoModal>
-                
+
                 <NekoModal
                     title=""
                     open={isModalOpen5}
@@ -1069,7 +1069,7 @@ export default function Detail() {
                     </Flex>
                 </NekoModal>
             </div>
-            
+
             <NekoModal
                 open={isModalOpen1}
                 centered={true}
@@ -1080,7 +1080,7 @@ export default function Detail() {
                     setModalText1("");
                 }}
             >
-                
+
                 <h2
                     style={{
                         textAlign: "center",
@@ -1091,7 +1091,7 @@ export default function Detail() {
                 >
                     {modalText1 === "" ? "Click Empower to help your friends!" : modalText1}
                 </h2>
-                
+
                 <div style={{
                     display: "flex",
                     alignItems: "center",
@@ -1118,8 +1118,8 @@ export default function Detail() {
                     )}
                 </div>
             </NekoModal>
-        
+
         </div>
     )
-    
+
 }
