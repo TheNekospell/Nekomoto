@@ -12,6 +12,7 @@ import NekoModal from "@components/Modal/index.jsx";
 import CardCorner from "@components/CardCorner/index.jsx";
 import card3 from "@assets/card3.png";
 import { useNavigate } from "react-router-dom";
+import BigNumber from "bignumber.js";
 
 
 export default function InputCard() {
@@ -49,8 +50,8 @@ export default function InputCard() {
         
         setVisible(true)
         
-        console.log("allowance: ", allowance, count * 25000 * 10 ** 18)
-        if (allowance < BigInt(count * 25000 * 10 ** 18)) {
+        if (new BigNumber(allowance) < new BigNumber(count * 25000 * ( 10 ** 18 ))) {
+            // console.log("allowance: ", BigInt(allowance), count * 25000 * ( 10 ** 18 ))
             const approve = await account.execute([{
                 contractAddress: NEKOCOIN_ADDRESS,
                 entrypoint: "approve",
