@@ -27,13 +27,13 @@ export default function InputCard() {
     useEffect(() => {
             if (!address) return
             const allowance = async () => {
-                return await nekocoinContract.allowance(account.address, NEKOMOTO_ADDRESS).then((res) => {
+                return await nekocoinContract.allowance(account.address, NEKOMOTO_ADDRESS)
+            }
+            try {
+                allowance().then((res) => {
                     console.log("allowance: ", res)
                     setAllowance(res)
                 })
-            }
-            try {
-                allowance().then(res => setAllowance(res))
             } catch (e) {
                 console.log("allowance error: ", e)
             }
@@ -49,7 +49,8 @@ export default function InputCard() {
         
         setVisible(true)
         
-        if (allowance < count * 25000 * 10 ** 18) {
+        console.log("allowance: ", allowance, count * 25000 * 10 ** 18)
+        if (allowance < BigInt(count * 25000 * 10 ** 18)) {
             const approve = await account.execute([{
                 contractAddress: NEKOCOIN_ADDRESS,
                 entrypoint: "approve",

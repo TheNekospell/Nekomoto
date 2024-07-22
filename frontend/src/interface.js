@@ -10,7 +10,7 @@ const BASE_URL = "https://api.nekomoto.xyz/api"
 export const NEKOMOTO_ADDRESS = "0x02c18d251ce1ebf4146f539f4c9fce373eaa1b019fb689477c4badaf9fb43615"
 export const NEKOCOIN_ADDRESS = "0x06f16e4cfdbd1e5d51ba686153fe8ed63c06c1a2336dcaeca35c154cdf8abfbc"
 export const PRISM_ADDRESS = "0x050b0a5ea22afb482ade81368ffd704c58dac45ca844cda888dce3ad5019ab02"
-export const SHARD_ADDRESS = "0x06CDE1B4698Af3430CD7D06CEF61B07dAde18289EDEb8252B2B1322a18C4eC7C"
+export const SHARD_ADDRESS = "0x0625c41931adefe7e3bd073f4eaa1706ef4f627312da13877f925a8570c89694"
 
 const provider = new RpcProvider({
     nodeUrl: "https://rpc-sepolia.staging.nethermind.dev",
