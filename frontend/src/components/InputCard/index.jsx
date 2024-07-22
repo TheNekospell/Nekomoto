@@ -6,7 +6,7 @@ import { Col, Row, Flex, Input } from "antd";
 import { useAppStore } from "@stores/index";
 import { useEffect, useState } from "react";
 import { useAccount } from "@starknet-react/core";
-import { BACKEND, nekocoinContract, NEKOMOTO_ADDRESS, sign, waitTx } from "@/interface.js";
+import { BACKEND, nekocoinContract, NEKOMOTO_ADDRESS, sign, waitTx, NEKOCOIN_ADDRESS } from "@/interface.js";
 import { cairo, CallData } from "starknet";
 import NekoModal from "@components/Modal/index.jsx";
 import CardCorner from "@components/CardCorner/index.jsx";
@@ -51,13 +51,16 @@ export default function InputCard() {
         
         if (allowance < count * 25000 * 10 ** 18) {
             const approve = await account.execute([{
-                contractAddress: NEKOMOTO_ADDRESS,
+                contractAddress: NEKOCOIN_ADDRESS,
                 entrypoint: "approve",
                 calldata: CallData.compile({
                     spender: NEKOMOTO_ADDRESS,
                     amount: cairo.uint256(BigInt(count * 25000 * 10 ** 18)),
                 })
             }])
+            console.log("approve: ", approve)
+            const approveResult = await waitTx(approve.transaction_hash)
+            console.log("approveResult: ", approveResult)
         }
         
         const {typedMessage, signature} = await sign(account)
@@ -68,7 +71,7 @@ export default function InputCard() {
         if (result.success) {
             const summonResult = await waitTx(result.data)
             console.log("summonResult: ", summonResult)
-            setText("Success: " )
+            setText("Success: ")
         } else {
             setText("Something went wrong: " + result.message)
         }
