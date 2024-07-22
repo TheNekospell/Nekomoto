@@ -57,7 +57,7 @@ export default function InputCard() {
                 entrypoint: "approve",
                 calldata: CallData.compile({
                     spender: NEKOMOTO_ADDRESS,
-                    amount: cairo.uint256(BigInt(count * 25000 * 10 ** 18)),
+                    amount: cairo.uint256(BigInt(count) * 25000n * ( 10n ** 18n )),
                 })
             }])
             console.log("approve: ", approve)
