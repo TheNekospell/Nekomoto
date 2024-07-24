@@ -28,7 +28,6 @@ export default function Assets() {
     const navigate = useNavigate()
     const [addressInfo, setAddressInfo] = useState({})
     
-    
     useEffect(() => {
         BACKEND.staticInfo().then((result) => {
             console.log("static info: ", result.data)

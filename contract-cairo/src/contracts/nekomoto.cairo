@@ -240,7 +240,7 @@ pub mod Nekomoto {
                 let seed = self.seed.read(id);
                 // let with_buff = self.with_buff.read(id);
                 let is_starter = self.starter.read(id) == 1;
-                let (rarity, _, _) = generate_basic_info(seed,  is_starter);
+                let (rarity, _, _) = generate_basic_info(seed, is_starter);
                 let to = self.stake_from.read(id);
                 if rarity == 4 || rarity == 5 {
                     substract_lucky(ref self, to);
@@ -273,6 +273,14 @@ pub mod Nekomoto {
             self.erc721.mint(sender, token_id);
             self.token_id.write(token_id);
             self.emit(Summon { to: sender, token_id: token_id });
+        }
+
+        fn check_starter_pack(self: @ContractState, address: ContractAddress) -> bool {
+            if self.open_pack.read(address) != 0 || self.starter_pack_limit.read() == 0 {
+                false
+            } else {
+                true
+            }
         }
 
         // BUFF

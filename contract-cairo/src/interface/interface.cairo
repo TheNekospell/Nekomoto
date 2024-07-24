@@ -34,6 +34,7 @@ pub trait NekomotoTrait<ContractState> {
     fn withdraw(ref self: ContractState, token_id: Array<u256>);
     fn add_limit(ref self: ContractState, input: u256);
     fn starter_pack(ref self: ContractState);
+    fn check_starter_pack(self: @ContractState, address: ContractAddress) -> bool;
     fn burn(ref self: ContractState, token_id: u256);
     fn lucky(self: @ContractState, input: ContractAddress) -> bool;
     fn time_freeze(self: @ContractState, input: ContractAddress) -> bool;

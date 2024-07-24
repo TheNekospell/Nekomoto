@@ -21,7 +21,8 @@ import (
 )
 
 var (
-	rpcTag rpc.BlockID = rpc.BlockID{Tag: "latest"}
+	rpcTagLatest rpc.BlockID = rpc.BlockID{Tag: "latest"}
+	rpcTagPending rpc.BlockID = rpc.BlockID{Tag: "pending"}
 )
 
 func ReadNekoSpiritInfo(tokenId uint64, origin bool) (database.ServerNekoSpiritInfo, error) {
@@ -39,7 +40,7 @@ func ReadNekoSpiritInfo(tokenId uint64, origin bool) (database.ServerNekoSpiritI
 		Calldata:           []*felt.Felt{utils.BigIntToFelt(big.NewInt(int64(tokenId))), utils.BigIntToFelt(big.NewInt(0)), tag},
 	}
 
-	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTag)
+	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTagPending)
 	if errRpc != nil {
 		fmt.Println(errRpc.Error())
 		return database.ServerNekoSpiritInfo{}, errRpc
@@ -83,7 +84,7 @@ func ReadOwnerOfNekoSpirit(tokenId uint64) (string, error) {
 		Calldata:           []*felt.Felt{utils.BigIntToFelt(big.NewInt(int64(tokenId))), utils.BigIntToFelt(big.NewInt(0))},
 	}
 
-	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTag)
+	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTagPending)
 	if errRpc != nil {
 		fmt.Println(errRpc.Error())
 		return "", errRpc
@@ -109,7 +110,7 @@ func ReadTimeFreeze(address string) (time.Time, error) {
 		Calldata:           []*felt.Felt{addressFelt},
 	}
 
-	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTag)
+	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTagPending)
 	if errRpc != nil {
 		fmt.Println(errRpc.Error())
 		return time.Time{}, errRpc
@@ -464,7 +465,7 @@ func ValidSignature(address *felt.Felt, hash *felt.Felt, r *felt.Felt, s *felt.F
 		Calldata:           []*felt.Felt{hash, utils.BigIntToFelt(big.NewInt(2)), r, s},
 	}
 
-	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTag)
+	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTagLatest)
 	if errRpc != nil {
 		fmt.Println(errRpc.Error())
 		return errRpc

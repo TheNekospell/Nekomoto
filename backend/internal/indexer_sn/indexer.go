@@ -39,7 +39,7 @@ func StartIndexer() {
 		lastHeight := database.GetIndexerHeight()
 		// fmt.Println("lastHeight", lastHeight)
 
-		for i := lastHeight + 1; i <= currentBlock; i++ {
+		for i := lastHeight + 1; i <= currentBlock+1; i++ {
 
 			resolveBoxTransfer(i)
 
@@ -62,11 +62,19 @@ func StartIndexer() {
 }
 
 func checkIndexedTransaction(event *rpc.EmittedEvent) bool {
-	return database.CheckIndexedEvent(event.BlockNumber, event.TransactionHash.String())
+	return database.CheckIndexedEvent(event.TransactionHash.String())
 }
 
 func recordIndexedTransaction(event *rpc.EmittedEvent) {
-	database.AddIndexedTransactionRecord(event.BlockNumber, event.BlockHash.String(), event.TransactionHash.String())
+	var blockNumber uint64
+	if event.BlockNumber > 0 {
+		blockNumber = event.BlockNumber
+	}
+	var blockHash string
+	if event.BlockHash != nil {
+		blockHash = event.BlockHash.String()
+	}
+	database.AddIndexedTransactionRecord(blockNumber, blockHash, event.TransactionHash.String())
 }
 
 func resolveShardTransfer(block uint64) {

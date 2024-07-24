@@ -353,12 +353,20 @@ func QueryOpenedChest(t uint) uint64 {
 	return uint64(count)
 }
 
-func CheckIndexedEvent(number uint64, hash string) bool {
+func CheckIndexedEvent(hash string) bool {
 	var record IndexerTransactionRecord
-	DB.Where("block_number = ?", number).Where("transaction_hash = ?", hash).First(&record)
+	DB.Where("transaction_hash = ?", hash).First(&record)
 	return record.ID != 0
 }
 
 func AddIndexedTransactionRecord(number uint64, blockHash string, hash string) {
-	DB.Create(&IndexerTransactionRecord{Hash: Hash{BlockNumber: number, BlockHash: blockHash, TransactionHash: hash}})
+	var record IndexerTransactionRecord
+	DB.Where("transaction_hash = ?", hash).First(&record)
+	if record.ID != 0 {
+		if record.BlockNumber != number || record.BlockHash != blockHash {
+			DB.Model(&record).Updates(IndexerTransactionRecord{Model: Model{ID: record.ID}, Hash: Hash{BlockNumber: number, BlockHash: blockHash}})
+		}
+	} else {
+		DB.Create(&IndexerTransactionRecord{Hash: Hash{BlockNumber: number, BlockHash: blockHash, TransactionHash: hash}})
+	}
 }

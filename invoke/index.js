@@ -82,7 +82,7 @@ app.post("/send", async function (req, res) {
     } catch (e) {
 
         console.log("send error: ", e)
-        res.send(0)
+        res.status(400).send(e)
         return
 
     }
