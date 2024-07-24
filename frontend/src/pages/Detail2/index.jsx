@@ -135,7 +135,15 @@ export default function Detail() {
                 console.log("find empower code: ", code);
             }
         }
-    }, [address]);
+    }, [address, hhh]);
+    
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setHhh(new Date().getTime().toString());
+        }, 5000);
+        
+        return () => clearInterval(interval);
+    }, []);
     
     const empower = async () => {
         const urlParams = new URLSearchParams(window.location.search);

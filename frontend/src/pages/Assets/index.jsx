@@ -27,6 +27,8 @@ export default function Assets() {
     const [isModalOpen1, setIsModalOpen1] = useState(false);
     const navigate = useNavigate()
     const [addressInfo, setAddressInfo] = useState({})
+    const [hhh, setHhh] = useState("");
+    
     
     useEffect(() => {
         BACKEND.staticInfo().then((result) => {
@@ -39,7 +41,15 @@ export default function Assets() {
                 setAddressInfo(result.data)
             })
         }
-    }, [address])
+    }, [address, hhh])
+    
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setHhh(new Date().getTime().toString());
+        }, 5000);
+        
+        return () => clearInterval(interval);
+    }, []);
     
     const openChest = async () => {
         const multiCall = await account.execute([{
@@ -84,7 +94,9 @@ export default function Assets() {
                         <InputCard/>
                     </Col>
                     <Col style={{marginTop: '16px'}} className="gutter-row" xs={24} sm={24} lg={6}>
-                        <BoxCard title="Starter Pack" onButtonClick={openChest}/>
+                        <BoxCard title="Starter Pack"
+                                 buttonText={addressInfo.IsStarter === true ? "open" : "already opened"}
+                                 onButtonClick={addressInfo.IsStarter === true ? openChest : null}/>
                     </Col>
                 </Row>
                 <Row style={{marginTop: '16px', marginBottom: '16px'}}>

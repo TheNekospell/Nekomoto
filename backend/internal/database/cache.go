@@ -25,7 +25,7 @@ var (
 type AddressInfo struct {
 	Uid     uint64
 	Address string
-	// IsStarter           bool
+	IsStarter           bool
 	InviteCode          string
 	SecondInviter       uint64
 	ThirdInviter        uint64
@@ -111,7 +111,7 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 	result := AddressInfo{
 		Uid:     uid,
 		Address: serverAddress.Address,
-		// IsStarter:           serverAddress.IsStarter,
+		IsStarter:           serverAddress.IsStarter,
 		InviteCode:          serverAddress.InviteCode,
 		SecondInviter:       invitation.SecondUid,
 		ThirdInviter:        invitation.ThirdUid,
