@@ -6,7 +6,7 @@ import BoxBorder from "@components/BoxBorder/index";
 import { useEffect, useState } from "react";
 import { BACKEND } from "@/interface.js";
 
-export default function InfoCard({totalRewards, treasuryRevenue}) {
+export default function InfoCard({totalRewards, treasuryRevenue, totalBurn}) {
     
     const [usd, setUsd] = useState(0);
     
@@ -31,7 +31,7 @@ export default function InfoCard({totalRewards, treasuryRevenue}) {
                         {totalRewards}
                         <span className="card-sub-title">NKO</span>
                     </div>
-                    {(usd > 0) && <div className="grey-text">{usd * totalRewards} USD</div>}
+                    {( usd > 0 ) && <div className="grey-text">{usd * totalRewards} USD</div>}
                 </Col>
                 
                 <Col xs={24} sm={24} lg={12} style={{alignSelf: 'center'}}>
@@ -51,7 +51,7 @@ export default function InfoCard({totalRewards, treasuryRevenue}) {
                         </Col>
                         <Col xs={12} sm={12} lg={7}>
                             <div className="info-item">
-                                <div className="card-sub-title">{0}</div>
+                                <div className="card-sub-title">{totalBurn}</div>
                                 <div className="grey-text" style={{marginTop: '12px'}}>Total Burn</div>
                             </div>
                         </Col>

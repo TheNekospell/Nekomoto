@@ -101,7 +101,7 @@ export default function Assets() {
                 </Row>
                 <Row style={{marginTop: '16px', marginBottom: '16px'}}>
                     <Col xs={24}>
-                        <InfoCard totalRewards={info.totalRewards} treasuryRevenue={info.treasuryRevenue}/>
+                        <InfoCard totalRewards={info.totalRewards} treasuryRevenue={info.treasuryRevenue} totalBurn={info.totalBurn}/>
                     </Col>
                 </Row>
                 
