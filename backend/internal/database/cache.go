@@ -23,8 +23,8 @@ var (
 )
 
 type AddressInfo struct {
-	Uid     uint64
-	Address string
+	Uid                 uint64
+	Address             string
 	IsStarter           bool
 	InviteCode          string
 	SecondInviter       uint64
@@ -109,8 +109,8 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 	DB.Model(&ServerTemporalShardRecord{}).Where("uid = ?", uid).Select("token_id").Find(&shardIdList)
 
 	result := AddressInfo{
-		Uid:     uid,
-		Address: serverAddress.Address,
+		Uid:                 uid,
+		Address:             serverAddress.Address,
 		IsStarter:           serverAddress.IsStarter,
 		InviteCode:          serverAddress.InviteCode,
 		SecondInviter:       invitation.SecondUid,
@@ -164,6 +164,7 @@ func CreateAddressInfo(address string) uint64 {
 	uid, err := CreateAddress(&ServerAddress{
 		Address:    address,
 		InviteCode: "neko-" + strconv.Itoa(time.Now().Nanosecond())[:5] + address[len(address)-3:],
+		IsStarter:  true,
 	})
 	if err != nil {
 		panic(err)

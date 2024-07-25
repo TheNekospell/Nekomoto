@@ -60,6 +60,7 @@ export default function Detail() {
     const [isModalOpen4, setIsModalOpen4] = useState(false);
     const [isModalOpen5, setIsModalOpen5] = useState(false);
     const [modalText1, setModalText1] = useState("");
+    const [ascendInfo, setAscendInfo] = useState(true);
     
     const {account, address, status, chainId, isConnected} = useAccount();
     const [addressInfo, setAddressInfo] = useState({});
@@ -480,6 +481,18 @@ export default function Detail() {
         setSuccess("Success: " + mCall.transaction_hash);
     };
     
+    const ascendData = [
+        {level: 9, prism: 746, neko: 13299996, percentage: '51%'},
+        {level: 8, prism: 429, neko: 3043477, percentage: '43%'},
+        {level: 7, prism: 247, neko: 696448, percentage: '35%'},
+        {level: 6, prism: 142, neko: 159370, percentage: '28%'},
+        {level: 5, prism: 82, neko: 36469, percentage: '20%'},
+        {level: 4, prism: 47, neko: 8345, percentage: '15%'},
+        {level: 3, prism: 27, neko: 1910, percentage: '10%'},
+        {level: 2, prism: 16, neko: 437, percentage: '5%'},
+        {level: 1, prism: 9, neko: 100, percentage: '2%'}
+    ];
+    
     return (
         <div>
             <NekoModal
@@ -611,6 +624,7 @@ export default function Detail() {
                                                     style={{marginLeft: "8px"}}
                                                     src={exclamation}
                                                     alt=""
+                                                    onClick={() => setAscendInfo(true)}
                                                 />
                                             </Flex>
                                         </div>
@@ -1323,6 +1337,106 @@ export default function Detail() {
                         />
                     )}
                 </div>
+            </NekoModal>
+            
+            <NekoModal
+                open={ascendInfo}
+                centered={true}
+                footer={null}
+                maskClosable={true}
+                onCancel={() => setAscendInfo(false)}
+                title={"Ascend: Mana Bonus"}
+            >
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex",
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        color: "#90A6AF",
+                        fontFamily: "BIG SHOT",
+                        fontSize: "14px",
+                        lineHeight: "18px",
+                        fontWeight: "400",
+                    }}
+                >
+                    <div
+                        style={{marginRight: "10px"}}>&#8226;</div>
+                    <div>
+                        {"Ascend has a total of 1-9 levels, and different levels bring different bonuses. Users spend "}
+                        <span style={{color: "#01DCE4", display: "inline"}}>{"Prism"}</span>
+                        <span> {" "}</span>
+                        <span style={{color: "#FBA323", display: "inline"}}>{"+$NKO"}</span>
+                        {" to upgrade"}
+                    </div>
+                </div>
+                <div
+                    style={{
+                        marginTop: "20px",
+                        display: "flex",
+                        alignItems: "flex",
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        color: "#90A6AF",
+                        fontFamily: "BIG SHOT",
+                        fontSize: "14px",
+                        lineHeight: "18px",
+                        fontWeight: "400",
+                    }}
+                >
+                    <div style={{marginRight: "10px"}}>&#8226;</div>
+                    <div>Ascend bonus extends the total mana of NFT pledged by users permanently</div>
+                </div>
+                <div style={{
+                    backgroundColor: "#253b4b",
+                    marginTop: "20px",
+                    fontSize: "12px",
+                    fontFamily: "BIG SHOT",
+                    fontWeight: "400"
+                }}>
+                    <table style={{border: "none", borderCollapse: "collapse", width: "100%"}}>
+                        <thead style={{backgroundColor: "#162734"}}>
+                        <tr style={{color: "#90A6AF"}}>
+                            <th style={{padding: "8px"}}>Level</th>
+                            <th style={{padding: "8px"}}>Prism Consume</th>
+                            <th style={{padding: "8px"}}>NKO Consume</th>
+                            <th style={{padding: "8px"}}>Global Mana</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {ascendData.map((item, index) => {
+                            return ( <tr key={index} style={{color: "white"}}>
+                                <td style={{
+                                    padding: "10px",
+                                    paddingLeft: "15px",
+                                    verticalAlign: "top",
+                                    marginLeft: "8px"
+                                }}>{item.level}</td>
+                                <td style={{
+                                    padding: "10px",
+                                    paddingLeft: "20px",
+                                    verticalAlign: "top",
+                                    marginLeft: "8px"
+                                }}>{item.prism}</td>
+                                <td style={{
+                                    padding: "10px",
+                                    paddingLeft: "20px",
+                                    verticalAlign: "top",
+                                    marginLeft: "8px"
+                                }}>{item.neko}</td>
+                                <td style={{
+                                    padding: "10px",
+                                    paddingLeft: "20px",
+                                    verticalAlign: "top",
+                                    marginLeft: "8px"
+                                }}>{item.percentage}</td>
+                            </tr> )
+                        })
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            
             </NekoModal>
         </div>
     );
