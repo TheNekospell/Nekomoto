@@ -650,7 +650,7 @@ export default function Detail() {
                                 <Col xs={12} sm={12} style={{marginTop: "24px"}}>
                                     <GemItem
                                         color="blue"
-                                        title="Neko"
+                                        title="NKO"
                                         descLeft={nekocoin}
                                         descRight={getAscendUpgradeNeko(addressInfo.Buff?.Level)}
                                     />

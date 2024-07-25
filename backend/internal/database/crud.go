@@ -370,3 +370,13 @@ func AddIndexedTransactionRecord(number uint64, blockHash string, hash string) {
 		DB.Create(&IndexerTransactionRecord{Hash: Hash{BlockNumber: number, BlockHash: blockHash, TransactionHash: hash}})
 	}
 }
+
+func AddNekoCoinBurn(amount decimal.Decimal) {
+	DB.Model(&ServerBurnStatic{}).Where("id = 1").Update("count", gorm.Expr("count + ?", amount))
+}
+
+func GetNekoCoinBurn() decimal.Decimal {
+	var burn ServerBurnStatic
+	DB.First(&burn)
+	return burn.Count
+}

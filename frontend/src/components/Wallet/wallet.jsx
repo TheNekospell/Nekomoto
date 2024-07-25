@@ -75,7 +75,7 @@ export default function Wallet() {
                         {/*    alt=""*/}
                         {/*/>*/}
                         <img src={t6} width={15} style={{marginRight: "6px"}} alt=""/>
-                        <span>Buy NEKO</span>
+                        <span>Buy NKO</span>
                     </Flex>
                 </Col>
                 <Col style={{width: "170px", textAlign: "center"}}>

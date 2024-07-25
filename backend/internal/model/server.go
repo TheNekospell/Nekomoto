@@ -89,4 +89,5 @@ type StaticInfo struct {
 	TreasuryRevenue  []database.ServerMintRecord `json:"treasuryRevenue" form:"treasuryRevenue"`
 	ChestCount       uint64                      `json:"chestCount" form:"chestCount"`
 	MasterChestCount uint64                      `json:"masterChestCount" form:"masterChestCount"`
+	TotalBurn        decimal.Decimal             `json:"totalBurn" form:"totalBurn"`
 }

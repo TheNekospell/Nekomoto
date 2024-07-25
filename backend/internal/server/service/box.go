@@ -52,12 +52,21 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 			Amount:  decimal.NewFromInt(1250),
 		}
 		database.CreateInvitationRewardRecords([]database.ServerInvitationRewardRecord{second, third})
+		var toBurn uint64
 		if detail.SecondInviter != 0 {
 			database.AddInvitationRewardStatic(detail.SecondInviter, decimal.NewFromInt(2500))
+		} else {
+			toBurn += 2500
 		}
 		if detail.ThirdInviter != 0 {
 			database.AddInvitationRewardStatic(detail.ThirdInviter, decimal.NewFromInt(1250))
+		} else {
+			toBurn += 1250
 		}
+		if toBurn != 0 {
+			invoker_sn.BurnNekoCoin(decimal.NewFromUint64(toBurn))
+		}
+
 		// unlock reward of invitation
 		database.UnlockInvitationRewardStatic(detail.Uid, decimal.NewFromInt(2500))
 		// burn 25% of mint cost

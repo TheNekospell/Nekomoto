@@ -25,7 +25,7 @@ export default function InviteCard({
     const createEmpower = () => {
         setVisible(true)
         if (navigator.clipboard) {
-            navigator.clipboard.writeText(address).then(() => {
+            navigator.clipboard.writeText("https://game.nekomoto.xyz/detail2?addr=" + address).then(() => {
                 console.log('Address copied to clipboard:', address);
             }).catch(err => {
                 console.error('Failed to copy: ', err);
@@ -97,7 +97,7 @@ export default function InviteCard({
                             </Col>
                             <div className={`${isMobile ? "" : "invite-btn-wrapper"}`}>
                                 <Button disabled={!chestOpenable || isMaster} text={buttonText} color="yellow"
-                                        longness="short" onClick={(!chestOpenable || isMaster) ? null : openChest}/>
+                                        longness="short" onClick={( !chestOpenable || isMaster ) ? null : openChest}/>
                             </div>
                         </Row>
                     </Col>
@@ -133,7 +133,7 @@ export default function InviteCard({
                                     text={buttonText}
                                     color="yellow"
                                     longness="short"
-                                    onClick={(!chestOpenable || !isMaster) ? null : openChest}
+                                    onClick={( !chestOpenable || !isMaster ) ? null : openChest}
                                 />
                             </div>
                         </Row>
@@ -153,7 +153,7 @@ export default function InviteCard({
                 <Row justify={'center'} gutter='8'>
                     <Col xs={4} sm={4} lg={3} className="friend">
                         {chestEmpower[0] ?
-                            (<div>
+                            ( <div>
                                     <div className="friend-avatar text-center">
                                         <img src={inviteSuccess} width="100%" alt=""/>
                                     </div>
@@ -171,7 +171,7 @@ export default function InviteCard({
                     </Col>
                     <Col xs={4} sm={4} lg={3} className="friend">
                         {chestEmpower[1] ?
-                            (<div>
+                            ( <div>
                                     <div className="friend-avatar text-center">
                                         <img src={inviteSuccess} width="100%" alt=""/>
                                     </div>
@@ -189,7 +189,7 @@ export default function InviteCard({
                     </Col>
                     <Col xs={4} sm={4} lg={3} className="friend">
                         {chestEmpower[2] ?
-                            (<div>
+                            ( <div>
                                     <div className="friend-avatar text-center">
                                         <img src={inviteSuccess} width="100%" alt=""/>
                                     </div>
@@ -207,7 +207,7 @@ export default function InviteCard({
                     </Col>
                     <Col xs={4} sm={4} lg={3} className="friend">
                         {chestEmpower[3] ?
-                            (<div>
+                            ( <div>
                                     <div className="friend-avatar text-center">
                                         <img src={inviteSuccess} width="100%" alt=""/>
                                     </div>
@@ -225,7 +225,7 @@ export default function InviteCard({
                     </Col>
                     <Col xs={4} sm={4} lg={3} className="friend">
                         {chestEmpower[4] ?
-                            (<div>
+                            ( <div>
                                     <div className="friend-avatar text-center">
                                         <img src={inviteSuccess} width="100%" alt=""/>
                                     </div>

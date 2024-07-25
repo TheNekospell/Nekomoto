@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/NethermindEth/juno/core/felt"
+	"github.com/shopspring/decimal"
 )
 
 func init() {
@@ -49,6 +50,8 @@ func StartIndexer() {
 
 			resolveShardTransfer(i)
 
+			resolveNekoCoinBurn(i)
+
 			channel <- i
 
 			// time.Sleep(1 * time.Second)
@@ -75,6 +78,39 @@ func recordIndexedTransaction(event *rpc.EmittedEvent) {
 		blockHash = event.BlockHash.String()
 	}
 	database.AddIndexedTransactionRecord(blockNumber, blockHash, event.TransactionHash.String())
+}
+
+func resolveNekoCoinBurn(block uint64) {
+	result, err := chain_sn.Account.Events(context.Background(), rpc.EventsInput{
+		EventFilter: rpc.EventFilter{
+			FromBlock: rpc.BlockID{Number: &block},
+			ToBlock:   rpc.BlockID{Number: &block},
+			Address:   chain_sn.NekomotoContractAddress,
+			Keys:      [][]*felt.Felt{{utils.GetSelectorFromNameFelt("Transfer")}},
+		},
+		ResultPageRequest: rpc.ResultPageRequest{ChunkSize: 1000},
+	})
+	if err != nil {
+		// panic(err)
+		fmt.Println("err : ", err.Error())
+		return
+	}
+
+	for _, event := range result.Events {
+		if checkIndexedTransaction(&event) {
+			continue
+		}
+		// from := event.Event.Keys[1].String()
+		to := event.Event.Keys[2].String()
+		amount := decimal.NewFromBigInt(utils.FeltToBigInt(event.Event.Data[0]), 0)
+		if to == chain_sn.EmptyAddressStringShort {
+			service.RecordNekoCoinBurn(amount)
+		}
+	}
+
+	for _, event := range result.Events {
+		recordIndexedTransaction(&event)
+	}
 }
 
 func resolveShardTransfer(block uint64) {

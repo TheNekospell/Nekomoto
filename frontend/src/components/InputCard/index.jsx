@@ -198,7 +198,7 @@ export default function InputCard() {
                             </Col>
                             
                             <Col className={`input-card-text3 font-14px ${device}-center`}>
-                                {inputValue * 25000} Neko
+                                {inputValue * 25000} NKO
                             </Col>
                         </Flex>
                     </Col>

@@ -21,7 +21,7 @@ import (
 )
 
 var (
-	rpcTagLatest rpc.BlockID = rpc.BlockID{Tag: "latest"}
+	rpcTagLatest  rpc.BlockID = rpc.BlockID{Tag: "latest"}
 	rpcTagPending rpc.BlockID = rpc.BlockID{Tag: "pending"}
 )
 
@@ -474,4 +474,28 @@ func ValidSignature(address *felt.Felt, hash *felt.Felt, r *felt.Felt, s *felt.F
 	fmt.Println("response:", response)
 	return nil
 
+}
+
+func BurnNekoCoin(amount decimal.Decimal) error {
+
+	data := make(map[string]interface{})
+	data["count"] = amount
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("json err: ", err.Error())
+		return err
+	}
+	req, err := http.Post("http://localhost:8973/burn", "application/json", bytes.NewReader(jsonData))
+	if err != nil {
+		fmt.Println("req err: ", err.Error())
+		return err
+	}
+	body, err := io.ReadAll(req.Body)
+	if err != nil {
+		fmt.Println("read err: ", err.Error())
+		return err
+	}
+	fmt.Println("response: ", string(body))
+	return nil
+	
 }

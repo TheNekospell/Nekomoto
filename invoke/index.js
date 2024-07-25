@@ -116,12 +116,42 @@ app.post("/summon", async function (req, res) {
     } catch (e) {
 
         console.log("summon error: ", e)
-        res.send(0)
+        res.status(400).send(e)
         return
 
     }
 
 })
+
+app.post("/burn", async function (req, res) {
+    console.log("-----------------burn ")
+    try {
+
+        const { count } = req.body;
+        if (!count) {
+            res.status(400).send("count is required");
+            return;
+        }
+
+        const multicall = await account.execute([{
+            contractAddress: process.env.NEKO_CONTRACT_SN,
+            entrypoint: "burn",
+            calldata: CallData.compile({
+                count: cairo.uint256(BigInt(count)),
+            })
+        }])
+        const result = await account.waitForTransaction(multicall.transaction_hash)
+        // console.log("result: ", result)
+
+        res.send(multicall.transaction_hash)
+
+    } catch (e) {
+        console.log("burn error: ", e)
+        res.status(400).send(e)
+        return
+    }
+})
+
 
 app.listen(8973, function () {
     console.log("Server is running on port 8973");

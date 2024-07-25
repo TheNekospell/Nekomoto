@@ -54,6 +54,7 @@ func initTables() {
 		&ServerTemporalShardRecord{},
 		&ServerStarterChestConfig{},
 		&ServerMintRecord{},
+		&ServerBurnStatic{},
 		&IndexerRecord{},
 		&IndexerTransactionRecord{},
 		&EventNekoCoinTransfer{},
@@ -212,6 +213,13 @@ func initTables() {
 		})
 	}
 
+	// burn record
+	if err := DB.First(&ServerBurnStatic{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		DB.Create(&ServerBurnStatic{
+			Count: decimal.Zero,
+		})
+	}
+
 }
 
 type ChestType uint8
@@ -276,8 +284,8 @@ type ServerBuffRecord struct {
 
 type ServerClaimNekoSpiritRecord struct {
 	Model
-	Uid       uint64          `gorm:"not null index"`
-	Amount    decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
+	Uid    uint64          `gorm:"not null index"`
+	Amount decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
 }
 
 type ServerInvitationRecord struct {
@@ -369,6 +377,11 @@ type ServerMintRecord struct {
 	Address string `gorm:"not null type:char(66) index"`
 	Count   uint64 `gorm:"not null"`
 	Hash    string `gorm:"not null type:char(66) index"`
+}
+
+type ServerBurnStatic struct {
+	Model
+	Count decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
 }
 
 type IndexerRecord struct {
