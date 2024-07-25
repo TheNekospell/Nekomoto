@@ -24,7 +24,8 @@ app.post("/send", async function (req, res) {
 
         const { to, nekocoin, prism, nft } = req.body;
         if (!to) {
-            res.status(400).send("to is required");
+            res.status(500).send("to is required");
+            res.
             return;
         }
 
@@ -68,7 +69,7 @@ app.post("/send", async function (req, res) {
         }
 
         if (!arr.length) {
-            res.status(400).send("nekocoin or prism or nft is required");
+            res.status(500).send("nekocoin or prism or nft is required");
             return;
         }
 
@@ -84,7 +85,7 @@ app.post("/send", async function (req, res) {
     } catch (e) {
 
         console.log("send error: ", e)
-        res.status(400).send(e)
+        res.status(500).send(e)
         return
 
     }
@@ -97,7 +98,7 @@ app.post("/summon", async function (req, res) {
 
         const { to, count, random } = req.body;
         if (!to) {
-            res.status(400).send("to is required");
+            res.status(500).send("to is required");
             return;
         }
         console.log("summon: ", to, count, random)
@@ -119,7 +120,7 @@ app.post("/summon", async function (req, res) {
     } catch (e) {
 
         console.log("summon error: ", e)
-        res.status(400).send(e)
+        res.status(500).send(e)
         return
 
     }
@@ -132,7 +133,7 @@ app.post("/burn", async function (req, res) {
 
         const { count } = req.body;
         if (!count) {
-            res.status(400).send("count is required");
+            res.status(500).send("count is required");
             return;
         }
 
@@ -152,7 +153,7 @@ app.post("/burn", async function (req, res) {
 
     } catch (e) {
         console.log("burn error: ", e)
-        res.status(400).send(e)
+        res.status(500).send(e)
         return
     }
 })
