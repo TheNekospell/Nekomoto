@@ -45,7 +45,7 @@ export default function InfoCard({totalRewards, treasuryRevenue, totalBurn}) {
                         <Col xs={12} sm={12} lg={7}>
                             <div className="info-item">
                                 <div
-                                    className="card-sub-title">{treasuryRevenue?.reduce((acc, cur) => acc + cur.Count, 0) * 2500}</div>
+                                    className="card-sub-title">{treasuryRevenue?.reduce((acc, cur) => acc + cur.Count, 0) * 25000}</div>
                                 <div className="grey-text" style={{marginTop: '12px'}}>Total Marketcap</div>
                             </div>
                         </Col>
