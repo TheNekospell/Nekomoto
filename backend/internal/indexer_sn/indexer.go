@@ -41,17 +41,25 @@ func StartIndexer() {
 		// fmt.Println("[Indexer] lastHeight", lastHeight)
 
 		for i := lastHeight + 1; i <= currentBlock+1; i++ {
-			// now := time.Now()
+			now := time.Now()
 			resolveBoxTransfer(i)
+			fmt.Println("------------------resolveBoxTransfer cost time: ", time.Since(now)/time.Millisecond)
 
+			now = time.Now()
 			resolveBoxUpgrade(i)
+			fmt.Println("------------------resolveBoxUpgrade cost time: ", time.Since(now)/time.Millisecond)
 
+			now = time.Now()
 			resolveAscendUpgrade(i)
+			fmt.Println("------------------resolveAscendUpgrade cost time: ", time.Since(now)/time.Millisecond)
 
+			now = time.Now()
 			resolveShardTransfer(i)
+			fmt.Println("------------------resolveShardTransfer cost time: ", time.Since(now)/time.Millisecond)
 
+			now = time.Now()
 			resolveNekoCoinBurn(i)
-			// fmt.Println("------------------update cost time: ", time.Since(now)/time.Millisecond)
+			fmt.Println("------------------resolveNekoCoinBurn cost time: ", time.Since(now)/time.Millisecond)
 
 			channel <- i
 
