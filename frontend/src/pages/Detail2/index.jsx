@@ -60,7 +60,7 @@ export default function Detail() {
     const [isModalOpen4, setIsModalOpen4] = useState(false);
     const [isModalOpen5, setIsModalOpen5] = useState(false);
     const [modalText1, setModalText1] = useState("");
-    const [ascendInfo, setAscendInfo] = useState(true);
+    const [ascendInfo, setAscendInfo] = useState(false);
     
     const {account, address, status, chainId, isConnected} = useAccount();
     const [addressInfo, setAddressInfo] = useState({});

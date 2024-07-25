@@ -28,6 +28,8 @@ app.post("/send", async function (req, res) {
             return;
         }
 
+        console.log("send: ", to, nekocoin, prism, nft)
+
 
         let arr = []
         // console.log("arr: ", arr)
@@ -98,6 +100,7 @@ app.post("/summon", async function (req, res) {
             res.status(400).send("to is required");
             return;
         }
+        console.log("summon: ", to, count, random)
 
         const multicall = await account.execute([{
             contractAddress: process.env.BOX_CONTRACT_SN,
@@ -132,6 +135,8 @@ app.post("/burn", async function (req, res) {
             res.status(400).send("count is required");
             return;
         }
+
+        console.log("burn: ", count)
 
         const multicall = await account.execute([{
             contractAddress: process.env.NEKO_CONTRACT_SN,
