@@ -38,10 +38,10 @@ func StartIndexer() {
 		// fmt.Println("[Indexer] currentBlock", currentBlock)
 
 		lastHeight := database.GetIndexerHeight()
-		// fmt.Println("lastHeight", lastHeight)
+		// fmt.Println("[Indexer] lastHeight", lastHeight)
 
 		for i := lastHeight + 1; i <= currentBlock+1; i++ {
-
+			// now := time.Now()
 			resolveBoxTransfer(i)
 
 			resolveBoxUpgrade(i)
@@ -51,6 +51,7 @@ func StartIndexer() {
 			resolveShardTransfer(i)
 
 			resolveNekoCoinBurn(i)
+			// fmt.Println("------------------update cost time: ", time.Since(now)/time.Millisecond)
 
 			channel <- i
 
@@ -85,11 +86,12 @@ func resolveNekoCoinBurn(block uint64) {
 		EventFilter: rpc.EventFilter{
 			FromBlock: rpc.BlockID{Number: &block},
 			ToBlock:   rpc.BlockID{Number: &block},
-			Address:   chain_sn.NekomotoContractAddress,
+			Address:   chain_sn.NekoCoinContractAddress,
 			Keys:      [][]*felt.Felt{{utils.GetSelectorFromNameFelt("Transfer")}},
 		},
 		ResultPageRequest: rpc.ResultPageRequest{ChunkSize: 1000},
 	})
+
 	if err != nil {
 		// panic(err)
 		fmt.Println("err : ", err.Error())
@@ -100,7 +102,7 @@ func resolveNekoCoinBurn(block uint64) {
 		if checkIndexedTransaction(&event) {
 			continue
 		}
-		// from := event.Event.Keys[1].String()
+		fmt.Println("event : ", event.Event)
 		to := event.Event.Keys[2].String()
 		amount := decimal.NewFromBigInt(utils.FeltToBigInt(event.Event.Data[0]), 0)
 		if to == chain_sn.EmptyAddressStringShort {

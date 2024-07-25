@@ -30,7 +30,10 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 		toSave.TokenId = tokenId
 		toSave.StakeFromUid = database.GetAddressDetailByAddress(to).Uid
 		toSave.StakeTime = time.Now()
-		database.CreateNekoSpiritInfo(&toSave)
+		if err := database.CreateNekoSpiritInfo(&toSave); err != nil {
+			fmt.Println("CreateNekoSpiritInfo error: ", err)
+			return
+		}
 		fmt.Println("CreateNekoSpiritInfo: ", toSave)
 
 		// starter pack
@@ -51,7 +54,10 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 			FromUid: detail.Uid,
 			Amount:  decimal.NewFromInt(1250),
 		}
-		database.CreateInvitationRewardRecords([]database.ServerInvitationRewardRecord{second, third})
+		if err := database.CreateInvitationRewardRecords([]database.ServerInvitationRewardRecord{second, third}); err != nil {
+			fmt.Println("CreateInvitationRewardRecords error: ", err)
+			return
+		}
 		var toBurn uint64
 		if detail.SecondInviter != 0 {
 			database.AddInvitationRewardStatic(detail.SecondInviter, decimal.NewFromInt(2500))

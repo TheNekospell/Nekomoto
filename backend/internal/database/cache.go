@@ -140,7 +140,7 @@ func GetAddressDetailByAddress(address string) AddressInfo {
 		return GetAddressDetailByUid(uid.(uint64))
 	}
 	if uid, err := GetUidByAddress(address); err == nil {
-		Cache.Set(CacheTagAddress+address, uid, -1)
+		// Cache.Set(CacheTagAddress+address, uid, -1)
 		return GetAddressDetailByUid(uid)
 	} else if errors.Is(err, gorm.ErrRecordNotFound) {
 		return GetAddressDetailByUid(CreateAddressInfo(address))
@@ -160,6 +160,11 @@ func GetAddressDetailByInviteCode(inviteCode string) AddressInfo {
 }
 
 func CreateAddressInfo(address string) uint64 {
+
+	if len(address) >= 66 {
+		address = "0x" + address[len(address)-63:]
+	}
+
 	// uid -> address
 	uid, err := CreateAddress(&ServerAddress{
 		Address:    address,

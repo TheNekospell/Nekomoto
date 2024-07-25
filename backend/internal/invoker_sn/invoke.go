@@ -116,7 +116,7 @@ func ReadTimeFreeze(address string) (time.Time, error) {
 		return time.Time{}, errRpc
 	}
 
-	fmt.Println("response: ", response)
+	// fmt.Println("response: ", response)
 	return time.Unix(int64(response[0].Uint64()-uint64(3*24*60*60)), 0), nil
 }
 
@@ -153,13 +153,13 @@ func SendCoinAndNFT(to string, nekocoinAmount *big.Int, prismAmount *big.Int, nf
 		return err
 	}
 
-	body, err := io.ReadAll(req.Body)
+	_, err = io.ReadAll(req.Body)
 	if err != nil {
 		fmt.Println("body err: ", err.Error())
 		return err
 	}
 
-	fmt.Println("response: ", string(body))
+	// fmt.Println("response: ", string(body))
 
 	// if nekocoinAmount.Cmp(big.NewInt(0)) > 0 {
 	// nonce, errRpc := chain_sn.Account.Nonce(context.Background(), rpcTag, chain_sn.Account.AccountAddress)
@@ -453,7 +453,7 @@ func Summon(to string, count *big.Int) (string, error) {
 		return "", err
 	}
 
-	fmt.Println("response: ", string(body))
+	// fmt.Println("response: ", string(body))
 	return string(body), nil
 }
 
@@ -465,13 +465,13 @@ func ValidSignature(address *felt.Felt, hash *felt.Felt, r *felt.Felt, s *felt.F
 		Calldata:           []*felt.Felt{hash, utils.BigIntToFelt(big.NewInt(2)), r, s},
 	}
 
-	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTagLatest)
+	_, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTagLatest)
 	if errRpc != nil {
 		fmt.Println(errRpc.Error())
 		return errRpc
 	}
 
-	fmt.Println("response:", response)
+	// fmt.Println("response:", response)
 	return nil
 
 }
@@ -490,12 +490,12 @@ func BurnNekoCoin(amount decimal.Decimal) error {
 		fmt.Println("req err: ", err.Error())
 		return err
 	}
-	body, err := io.ReadAll(req.Body)
+	_, err = io.ReadAll(req.Body)
 	if err != nil {
 		fmt.Println("read err: ", err.Error())
 		return err
 	}
-	fmt.Println("response: ", string(body))
+	// fmt.Println("response: ", string(body))
 	return nil
-	
+
 }

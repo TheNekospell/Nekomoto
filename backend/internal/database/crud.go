@@ -18,9 +18,12 @@ func GetNekoSpiritInfoByTokenId(tokenId uint64) (*ServerNekoSpiritInfo, error) {
 	return &boxInfo, nil
 }
 
-func GetUidByAddress(owner string) (uint64, error) {
+func GetUidByAddress(address string) (uint64, error) {
+	if len(address) >= 66 {
+		address = "0x" + address[len(address)-63:]
+	}
 	var user ServerAddress
-	if err := DB.Where("address = ?", owner).First(&user).Error; err != nil {
+	if err := DB.Where("address = ?", address).First(&user).Error; err != nil {
 		return 0, err
 	}
 	return user.ID, nil
