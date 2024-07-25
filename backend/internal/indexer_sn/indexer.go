@@ -102,7 +102,7 @@ func resolveNekoCoinBurn(block uint64) {
 		if checkIndexedTransaction(&event) {
 			continue
 		}
-		fmt.Println("event : ", event.Event)
+		// fmt.Println("event : ", event.Event)
 		to := event.Event.Keys[2].String()
 		amount := decimal.NewFromBigInt(utils.FeltToBigInt(event.Event.Data[0]), 0)
 		if to == chain_sn.EmptyAddressStringShort {
