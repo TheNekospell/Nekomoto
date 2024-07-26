@@ -4,6 +4,7 @@ import (
 	// "backend/internal/chain"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -21,7 +22,10 @@ func GetNekoSpiritInfoByTokenId(tokenId uint64) (*ServerNekoSpiritInfo, error) {
 func GetUidByAddress(address string) (uint64, error) {
 	if len(address) >= 66 {
 		address = "0x" + address[len(address)-63:]
+	} else if len(address) < 65 {
+		address = "0x" + strings.Repeat("0", 65-len(address)) + address[2:]
 	}
+
 	var user ServerAddress
 	if err := DB.Where("address = ?", address).First(&user).Error; err != nil {
 		return 0, err
