@@ -20,10 +20,10 @@ func GetNekoSpiritInfoByTokenId(tokenId uint64) (*ServerNekoSpiritInfo, error) {
 }
 
 func GetUidByAddress(address string) (uint64, error) {
-	if len(address) >= 66 {
-		address = "0x" + address[len(address)-63:]
-	} else if len(address) < 65 {
-		address = "0x" + strings.Repeat("0", 65-len(address)) + address[2:]
+	if len(address) > 66 {
+		address = "0x" + address[len(address)-64:]
+	} else if len(address) < 66 {
+		address = "0x" + strings.Repeat("0", 66-len(address)) + address[2:]
 	}
 
 	var user ServerAddress

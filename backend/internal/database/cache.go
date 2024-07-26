@@ -162,10 +162,10 @@ func GetAddressDetailByInviteCode(inviteCode string) AddressInfo {
 
 func CreateAddressInfo(address string) uint64 {
 
-	if len(address) >= 66 {
-		address = "0x" + address[len(address)-63:]
-	} else if len(address) < 65 {
-		address = "0x" + strings.Repeat("0", 65-len(address)) + address[2:]
+	if len(address) > 66 {
+		address = "0x" + address[len(address)-64:]
+	} else if len(address) < 66 {
+		address = "0x" + strings.Repeat("0", 66-len(address)) + address[2:]
 	}
 
 	// uid -> address
