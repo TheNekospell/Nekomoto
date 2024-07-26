@@ -26,7 +26,7 @@ app.post("/send", async function (req, res) {
         if (!to) {
             res.status(500).send("to is required");
             res.
-            return;
+                return;
         }
 
         console.log("send: ", to, nekocoin, prism, nft)

@@ -77,7 +77,7 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 	}
 
 	var Mana decimal.Decimal
-	if err := DB.Model(&ServerNekoSpiritInfo{}).Where("stake_from_uid = ?", uid).Select("ifnull(sum(mana),0) as mana").Scan(&Mana).Error; err != nil {
+	if err := DB.Model(&ServerNekoSpiritInfo{}).Where("stake_from_uid = ?", uid).Where("is_staked = ?", true).Select("ifnull(sum(mana),0) as mana").Scan(&Mana).Error; err != nil {
 		Mana = decimal.NewFromInt(0)
 	}
 	var ToClaim decimal.Decimal

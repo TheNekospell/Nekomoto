@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 
@@ -151,6 +152,11 @@ func SendCoinAndNFT(to string, nekocoinAmount *big.Int, prismAmount *big.Int, nf
 	if err != nil {
 		fmt.Println("req err: ", err.Error())
 		return err
+	}
+
+	if req.StatusCode != 200 {
+		fmt.Println("response err: ", req.StatusCode)
+		return errors.New("response err: " + req.Status)
 	}
 
 	_, err = io.ReadAll(req.Body)
@@ -442,9 +448,14 @@ func Summon(to string, count *big.Int) (string, error) {
 	}
 
 	req, err := http.Post("http://localhost:8973/summon", "application/json", bytes.NewReader(jsonData))
+	// fmt.Println("req: ", req, " req.StatusCode: ", req.StatusCode)
 	if err != nil {
 		fmt.Println("req err: ", err.Error())
 		return "", err
+	}
+	if req.StatusCode != 200 {
+		fmt.Println("response err: ", req.StatusCode)
+		return "", errors.New("response err: " + req.Status)
 	}
 
 	body, err := io.ReadAll(req.Body)
@@ -465,13 +476,13 @@ func ValidSignature(address *felt.Felt, hash *felt.Felt, r *felt.Felt, s *felt.F
 		Calldata:           []*felt.Felt{hash, utils.BigIntToFelt(big.NewInt(2)), r, s},
 	}
 
-	_, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTagLatest)
+	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTagLatest)
 	if errRpc != nil {
 		fmt.Println(errRpc.Error())
 		return errRpc
 	}
 
-	// fmt.Println("response:", response)
+	fmt.Println("valid signature response:", response)
 	return nil
 
 }
@@ -489,6 +500,10 @@ func BurnNekoCoin(amount decimal.Decimal) error {
 	if err != nil {
 		fmt.Println("req err: ", err.Error())
 		return err
+	}
+	if req.StatusCode != 200 {
+		fmt.Println("response err: ", req.StatusCode)
+		return errors.New("response err: " + req.Status)
 	}
 	_, err = io.ReadAll(req.Body)
 	if err != nil {
