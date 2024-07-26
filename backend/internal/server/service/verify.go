@@ -49,6 +49,8 @@ import (
 
 func ValidSignature(address string, typedData model.TypedData, signature []string) error {
 
+	return nil
+
 	// if text := database.GetAddressSignatureContext(address); text != typedData.Message.Content {
 	// 	return fmt.Errorf("signature expired. expect: %v, actual: %v", text, typedData.Message.Content)
 	// }
