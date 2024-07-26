@@ -8,6 +8,7 @@ import (
 	"backend/starknet/utils"
 	"fmt"
 	"math/big"
+	"strings"
 )
 
 //func ValidSignature(address, message, signature string) error {
@@ -51,6 +52,12 @@ func ValidSignature(address string, typedData model.TypedData, signature []strin
 	// if text := database.GetAddressSignatureContext(address); text != typedData.Message.Content {
 	// 	return fmt.Errorf("signature expired. expect: %v, actual: %v", text, typedData.Message.Content)
 	// }
+
+	if len(address) > 66 {
+		address = "0x" + address[len(address)-64:]
+	} else if len(address) < 66 {
+		address = "0x" + strings.Repeat("0", 66-len(address)) + address[2:]
+	}
 
 	newTypes := make(map[string]typed.TypeDef)
 
