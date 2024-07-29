@@ -819,14 +819,24 @@ export default function Detail() {
 									fontSize: "12px",
 									cursor: "pointer",
 								}}
-								onClick={stakeAll}
+								onClick={
+									addressInfo.NekoSpiritList?.filter((item) => !item.IsStaked)
+										.length > 0
+										? stakeAll
+										: null
+								}
 							>
 								Stake All
 							</div>
 							<div
 								className="card-desc-title"
 								style={{ fontSize: "12px", cursor: "pointer" }}
-								onClick={unStakeAll}
+								onClick={
+									addressInfo.NekoSpiritList?.filter((item) => item.IsStaked)
+										.length > 0
+										? unStakeAll
+										: null
+								}
 							>
 								UnStake All
 							</div>
@@ -963,11 +973,21 @@ export default function Detail() {
 									</div>
 									<Flex justify="space-between" className="margin-bottom-16">
 										<div className="modal-text2">Earning</div>
-										<div className="modal-text3">{focus?.Rewards}</div>
+										<div className="modal-text3">
+											{focus?.Rewards?.substring(
+												0,
+												focus?.Rewards?.indexOf(".") + 3
+											)}
+										</div>
 									</Flex>
 									<Flex justify="space-between" className="margin-bottom-16">
 										<div className="modal-text2">Claimed</div>
-										<div className="modal-text3">{focus?.ClaimedRewards}</div>
+										<div className="modal-text3">
+											{focus?.ClaimedRewards?.substring(
+												0,
+												focus?.ClaimedRewards?.indexOf(".") + 3
+											)}
+										</div>
 									</Flex>
 									{/*<Flex justify="space-between" className="margin-bottom-16">*/}
 									{/*    <div className="modal-text2">APR</div>*/}
@@ -1129,18 +1149,22 @@ export default function Detail() {
 										MANA
 									</Flex>
 									<Flex>
-										<div className="modal-text6">{focus.Mana}</div>
+										<div className="modal-text6">
+											{parseFloat(focus.Mana).toFixed(2)}
+										</div>
 										{focus.Level !== 13 && focus.Level > 0 && (
 											<div className="modal-text8">&nbsp;{">"}&nbsp;</div>
 										)}
 										{focus.Level !== 13 && focus.Level > 0 && (
 											<div className="modal-text7">
-												{Number(focus.Mana) +
-													0.065 *
-														(0.4 * Number(upgradeCal[focus.Level - 1].SPI) +
-															0.3 * Number(upgradeCal[focus.Level - 1].ATK) +
-															0.2 * Number(upgradeCal[focus.Level - 1].DEF) +
-															0.1 * Number(upgradeCal[focus.Level - 1].SPD))}
+												{parseFloat(
+													Number(focus.Mana) +
+														0.065 *
+															(0.4 * Number(upgradeCal[focus.Level - 1].SPI) +
+																0.3 * Number(upgradeCal[focus.Level - 1].ATK) +
+																0.2 * Number(upgradeCal[focus.Level - 1].DEF) +
+																0.1 * Number(upgradeCal[focus.Level - 1].SPD))
+												).toFixed(2)}
 											</div>
 										)}
 									</Flex>
@@ -1185,7 +1209,7 @@ export default function Detail() {
 													style={{ marginRight: "10px" }}
 													alt=""
 												/>
-												<div className="modal-text3">Neko</div>
+												<div className="modal-text3">NKO</div>
 											</Flex>
 											<Flex>
 												<div className="modal-text3">{nekocoin}</div>
