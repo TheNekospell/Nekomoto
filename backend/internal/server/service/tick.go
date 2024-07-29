@@ -101,7 +101,7 @@ func calTheRewardCoefficient(mana decimal.Decimal) decimal.Decimal {
 
 func inList(uid uint64, list []database.ServerWhiteListOfBountyWave) bool {
 	for _, v := range list {
-		if v.Uid == uid {
+		if database.GetAddressDetailByAddress(v.Address).Uid == uid {
 			return true
 		}
 	}

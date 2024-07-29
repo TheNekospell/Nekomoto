@@ -32,11 +32,11 @@ func InitDatabaseSn() {
 	DB, err = gorm.Open(mysql.Open(env.GetEnvValue("DSN_SN")), &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true, Logger: logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
-			SlowThreshold:             time.Second,   // Slow SQL threshold
+			SlowThreshold:             time.Second, // Slow SQL threshold
 			LogLevel:                  logger.Warn, // Log level
-			IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
+			IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
 			// ParameterizedQueries:      true,          // Don't include params in the SQL log
-			Colorful:                  true,         // Disable color
+			Colorful: true, // Disable color
 		},
 	)})
 	if err != nil {
@@ -361,7 +361,7 @@ type ServerRewardPool struct {
 
 type ServerWhiteListOfBountyWave struct {
 	Model
-	Uid     uint64 `gorm:"not null index"`
+	// Uid     uint64 `gorm:"not null index"`
 	Address string `gorm:"uniqueIndex type:char(66) not null"`
 }
 
