@@ -731,9 +731,12 @@ export default function Detail() {
 							<Flex justify="space-between" className="card-mini-title">
 								<div>Locked</div>
 								<div>
-									{Number(addressInfo.InvitationReward?.TotalAmount) -
-										Number(addressInfo.InvitationReward?.ClaimedAmount) -
-										Number(addressInfo.InvitationReward?.UnlockedAmount)}
+									{Math.min(
+										Number(addressInfo.InvitationReward?.TotalAmount) -
+											Number(addressInfo.InvitationReward?.ClaimedAmount) -
+											Number(addressInfo.InvitationReward?.UnlockedAmount),
+										0
+									)}
 								</div>
 							</Flex>
 							<Row style={{ flex: 1 }}>
