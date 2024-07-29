@@ -732,7 +732,8 @@ export default function Detail() {
 								<div>Locked</div>
 								<div>
 									{Number(addressInfo.InvitationReward?.TotalAmount) -
-										Number(addressInfo.InvitationReward?.ClaimedAmount)}
+										Number(addressInfo.InvitationReward?.ClaimedAmount) -
+										Number(addressInfo.InvitationReward?.UnlockedAmount)}
 								</div>
 							</Flex>
 							<Row style={{ flex: 1 }}>
