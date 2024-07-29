@@ -27,6 +27,7 @@ export default function InputCard() {
 	const { account, address, status, chainId, isConnected } = useAccount();
 	const [inputValue, setInputValue] = useState(0);
 	const [allowance, setAllowance] = useState(0);
+	const [balance, setBalance] = useState(0);
 	const [visible, setVisible] = useState(false);
 	const [text, setText] = useState("");
 	const navigate = useNavigate();
@@ -44,6 +45,10 @@ export default function InputCard() {
 				console.log("allowance: ", res);
 				setAllowance(res);
 			});
+			nekocoinContract.balance_of(address).then((res) => {
+				console.log("balance: ", res);
+				setBalance(res);
+			});
 		} catch (e) {
 			console.log("allowance error: ", e);
 		}
@@ -56,6 +61,11 @@ export default function InputCard() {
 		}
 
 		setVisible(true);
+
+		if (new BigNumber(balance) < new BigNumber(count * 25000 * 10 ** 18)) {
+			setText("Insufficient balance");
+			return;
+		}
 
 		if (new BigNumber(allowance) < new BigNumber(count * 25000 * 10 ** 18)) {
 			// console.log("allowance: ", BigInt(allowance), count * 25000 * ( 10 ** 18 ))
@@ -128,7 +138,23 @@ export default function InputCard() {
 						{text !== "" ? text : "Please sign in your wallet and wait..."}
 					</h2>
 
-					{text && (
+					{text && text == "Insufficient balance" && (
+						<Button
+							style={{
+								marginTop: "20px",
+								fontSize: "15px",
+								flexDirection: "row",
+								display: "flex",
+								justifyContent: "center",
+								alignItems: "center",
+							}}
+							text={"Buy NKO"}
+							color={"yellow"}
+							longness="long"
+							onClick={() => {}}
+						/>
+					)}
+					{text && text != "Insufficient balance" && (
 						<Button
 							style={{
 								marginTop: "20px",
