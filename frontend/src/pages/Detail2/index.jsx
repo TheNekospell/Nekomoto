@@ -142,6 +142,14 @@ export default function Detail() {
 				setIsModalOpen1(true);
 				console.log("find empower code: ", code);
 			}
+		} else {
+			setAddressInfo({});
+			setPrism(0);
+			setNekocoin(0);
+			setPrismAllowance(0);
+			setNekocoinAllowance(0);
+			setShardApprove(false);
+			setLucky(false);
 		}
 	}, [address, hhh]);
 
@@ -202,13 +210,13 @@ export default function Detail() {
 		console.log("result: ", result);
 		if (result.success) {
 			setSuccess("Success: " + result.data);
+			setIsModalOpen4(true);
+			setChestDetail(result.data);
 		} else {
 			setSuccess(
 				"Something went wrong: Please try again tomorrow at 8:00 AM (UTC)"
 			);
 		}
-		setIsModalOpen4(true);
-		setChestDetail(result.data);
 	};
 
 	const message = (result) => {
@@ -1217,7 +1225,10 @@ export default function Detail() {
 				<NekoModal
 					title=""
 					open={isModalOpen4}
-					onCancel={() => setIsModalOpen4(false)}
+					onCancel={() => {
+						setIsModalOpen4(false);
+						setSuccess("");
+					}}
 				>
 					<div className="modal-title text-center margin-bottom-16">
 						Open Adept's Chest
@@ -1265,6 +1276,10 @@ export default function Detail() {
 							color="yellow"
 							longness="short"
 							style={{ marginTop: "48px" }}
+							onButtonClick={() => {
+								setIsModalOpen4(false);
+								setSuccess("");
+							}}
 						/>
 					</Flex>
 				</NekoModal>
