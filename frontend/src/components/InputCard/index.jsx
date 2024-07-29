@@ -62,12 +62,17 @@ export default function InputCard() {
 
 		setVisible(true);
 
-		if (new BigNumber(balance) < new BigNumber(count * 25000 * 10 ** 18)) {
+		if (new BigNumber(balance).lt(new BigNumber(count * 25000 * 10 ** 18))) {
+			console.log(
+				"balance: ",
+				new BigNumber(balance),
+				new BigNumber(count * 25000 * 10 ** 18)
+			);
 			setText("Insufficient balance");
 			return;
 		}
 
-		if (new BigNumber(allowance) < new BigNumber(count * 25000 * 10 ** 18)) {
+		if (new BigNumber(allowance).lt(new BigNumber(count * 25000 * 10 ** 18))) {
 			// console.log("allowance: ", BigInt(allowance), count * 25000 * ( 10 ** 18 ))
 			const approve = await account.execute([
 				{
