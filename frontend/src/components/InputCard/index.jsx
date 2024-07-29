@@ -97,7 +97,7 @@ export default function InputCard() {
 		if (result.success) {
 			const summonResult = await waitTx(result.data);
 			console.log("summonResult: ", summonResult);
-			setText("Success: ", result.data);
+			setText("Success: " + result.data);
 		} else {
 			setText("Something went wrong: " + result.message);
 		}

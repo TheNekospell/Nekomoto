@@ -5,8 +5,8 @@ import prismAbi from "./abi/prism.json" assert { type: "json" };
 import shardAbi from "./abi/temporalshard.json" assert { type: "json" };
 import { useAccount } from "@starknet-react/core";
 
-const BASE_URL = "https://api.nekomoto.xyz/api"
-// const BASE_URL = "http://localhost:8972/api"
+// const BASE_URL = "https://api.nekomoto.xyz/api"
+const BASE_URL = "http://localhost:8972/api"
 
 export const NEKOMOTO_ADDRESS = "0x06cb278ff9d7c837c0f17abcac11a84bd7cf90010203e67a61297b87be4a32a3"
 export const NEKOCOIN_ADDRESS = "0x0195420f271957cc541c792a483b06b869037b14bb94af2364381eb2f6d8cd51"

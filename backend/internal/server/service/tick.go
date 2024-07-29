@@ -152,6 +152,7 @@ func GiveChest() {
 
 func BurnCoin() {
 	list := database.GetTempBurn()
+	fmt.Println("to burn list: ", list)
 
 	if list != nil {
 		var toBurn decimal.Decimal
