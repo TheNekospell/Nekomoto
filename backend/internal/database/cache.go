@@ -58,14 +58,10 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 	//fmt.Println("[Server] Rebuild cache for uid:", uid, " address:", serverAddress.Address)
 
 	var invitation ServerInvitationRecord
-	if err := DB.Where("uid = ?", uid).Find(&invitation); err != nil {
-		invitation = ServerInvitationRecord{}
-	}
+	DB.Where("uid = ?", uid).Find(&invitation)
 
 	var invitationReward ServerInvitationRewardStatic
-	if err := DB.Where("uid = ?", uid).Find(&invitationReward); err != nil {
-		invitationReward = ServerInvitationRewardStatic{}
-	}
+	DB.Where("uid = ?", uid).Find(&invitationReward)
 
 	var lastClaim time.Time
 	if err := DB.Model(&ServerClaimNekoSpiritRecord{}).Where("uid = ?", uid).Order("created_at desc").Limit(1).Select("created_at").Find(&lastClaim).Error; err != nil {
