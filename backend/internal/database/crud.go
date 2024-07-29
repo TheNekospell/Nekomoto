@@ -235,9 +235,9 @@ func CountEmpower(cid uint64) uint64 {
 }
 
 func QueryInviterOfInviter(uid uint64) uint64 {
-	var inviter ServerAddress
-	DB.Where("id = ?", uid).First(&inviter)
-	return inviter.ID
+	var inviter ServerInvitationRecord
+	DB.Where("uid = ?", uid).First(&inviter)
+	return inviter.SecondUid
 }
 
 func CreateInvitationRecord(record ServerInvitationRecord) error {

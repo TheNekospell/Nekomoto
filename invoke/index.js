@@ -20,8 +20,6 @@ app.post("/send", async function (req, res) {
     try {
         // console.log("req.body: ", req.body)
 
-
-
         const { to, nekocoin, prism, nft } = req.body;
         if (!to) {
             res.status(500).send("to is required");

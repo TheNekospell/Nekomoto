@@ -41,25 +41,25 @@ func StartIndexer() {
 		// fmt.Println("[Indexer] lastHeight", lastHeight)
 
 		for i := lastHeight + 1; i <= currentBlock+1; i++ {
-			now := time.Now()
+			// now := time.Now()
 			resolveBoxTransfer(i)
-			fmt.Println("------------------resolveBoxTransfer cost time: ", time.Since(now)/time.Millisecond)
+			// fmt.Println("------------------resolveBoxTransfer cost time: ", time.Since(now)/time.Millisecond)
 
-			now = time.Now()
+			// now = time.Now()
 			resolveBoxUpgrade(i)
-			fmt.Println("------------------resolveBoxUpgrade cost time: ", time.Since(now)/time.Millisecond)
+			// fmt.Println("------------------resolveBoxUpgrade cost time: ", time.Since(now)/time.Millisecond)
 
-			now = time.Now()
+			// now = time.Now()
 			resolveAscendUpgrade(i)
-			fmt.Println("------------------resolveAscendUpgrade cost time: ", time.Since(now)/time.Millisecond)
+			// fmt.Println("------------------resolveAscendUpgrade cost time: ", time.Since(now)/time.Millisecond)
 
-			now = time.Now()
+			// now = time.Now()
 			resolveShardTransfer(i)
-			fmt.Println("------------------resolveShardTransfer cost time: ", time.Since(now)/time.Millisecond)
+			// fmt.Println("------------------resolveShardTransfer cost time: ", time.Since(now)/time.Millisecond)
 
-			now = time.Now()
+			// now = time.Now()
 			resolveNekoCoinBurn(i)
-			fmt.Println("------------------resolveNekoCoinBurn cost time: ", time.Since(now)/time.Millisecond)
+			// fmt.Println("------------------resolveNekoCoinBurn cost time: ", time.Since(now)/time.Millisecond)
 
 			channel <- i
 
@@ -112,7 +112,7 @@ func resolveNekoCoinBurn(block uint64) {
 		}
 		// fmt.Println("event : ", event.Event)
 		to := event.Event.Keys[2].String()
-		amount := decimal.NewFromBigInt(utils.FeltToBigInt(event.Event.Data[0]), 0)
+		amount := decimal.NewFromBigInt(utils.FeltToBigInt(event.Event.Data[0]), -18)
 		if to == chain_sn.EmptyAddressStringShort {
 			service.RecordNekoCoinBurn(amount)
 		}

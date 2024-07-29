@@ -200,7 +200,13 @@ export default function Detail() {
 		const { typedMessage, signature } = await sign(account);
 		const result = await BACKEND.openChest(address, typedMessage, signature);
 		console.log("result: ", result);
-		setSuccess(message(result));
+		if (result.success) {
+			setSuccess("Success: " + result.data);
+		} else {
+			setSuccess(
+				"Something went wrong: Please try again tomorrow at 8:00 AM (UTC)"
+			);
+		}
 		setIsModalOpen4(true);
 		setChestDetail(result.data);
 	};
