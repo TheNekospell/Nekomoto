@@ -70,7 +70,7 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 			toBurn += 1250
 		}
 		if toBurn != 0 {
-			invoker_sn.BurnNekoCoin(decimal.NewFromUint64(toBurn).Mul(decimal.NewFromBigInt(big.NewInt(10), 18)))
+			database.TempBurn(decimal.NewFromUint64(toBurn).Mul(decimal.NewFromBigInt(big.NewInt(10), 18)))
 		}
 
 		// unlock reward of invitation

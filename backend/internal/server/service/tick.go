@@ -2,6 +2,7 @@ package service
 
 import (
 	"backend/internal/database"
+	"backend/internal/invoker_sn"
 	"fmt"
 	"time"
 
@@ -147,4 +148,25 @@ func GiveChest() {
 		database.DB.CreateInBatches(toSave, 100)
 	}
 
+}
+
+func BurnCoin() {
+	list := database.GetTempBurn()
+
+	if list != nil {
+		var toBurn decimal.Decimal
+		for _, v := range list {
+			toBurn = toBurn.Add(v.Count)
+		}
+		if err := invoker_sn.BurnNekoCoin(toBurn); err != nil {
+			fmt.Println("BurnNekoCoin error: ", err)
+			return
+		} else {
+			var id []uint64
+			for _, v := range list {
+				id = append(id, v.ID)
+			}
+			database.UpdateTempBurn(id)
+		}
+	}
 }

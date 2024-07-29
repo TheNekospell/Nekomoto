@@ -27,6 +27,8 @@ func StartTicker() {
 	waitTime2 := nextMidnight.Sub(now)
 	chestTimer := time.NewTimer(waitTime2)
 
+	burnTimer := time.NewTimer(5 * time.Minute)
+
 	for {
 		select {
 
@@ -50,6 +52,9 @@ func StartTicker() {
 
 			allocateTimer.Reset(waitTime)
 
+		case <-burnTimer.C:
+			service.BurnCoin()
+			
 		}
 	}
 

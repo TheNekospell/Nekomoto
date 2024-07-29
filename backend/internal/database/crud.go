@@ -387,3 +387,20 @@ func GetNekoCoinBurn() decimal.Decimal {
 	DB.First(&burn)
 	return burn.Count
 }
+
+func TempBurn(amount decimal.Decimal) {
+	DB.Create(&ServerBurnTemp{Count: amount, BurnOrNot: false})
+}
+
+func GetTempBurn() []ServerBurnTemp {
+	var toBurn []ServerBurnTemp
+	DB.Where("burn_or_not = ?", false).Find(&toBurn)
+	if len(toBurn) == 0 {
+		return nil
+	}
+	return toBurn
+}
+
+func UpdateTempBurn(id []uint64) {
+	DB.Model(&ServerBurnTemp{}).Where("id in ?", id).Update("burn_or_not", true)
+}

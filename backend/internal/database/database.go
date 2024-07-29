@@ -67,6 +67,7 @@ func initTables() {
 		&ServerStarterChestConfig{},
 		&ServerMintRecord{},
 		&ServerBurnStatic{},
+		&ServerBurnTemp{},
 		&IndexerRecord{},
 		&IndexerTransactionRecord{},
 		&EventNekoCoinTransfer{},
@@ -394,6 +395,12 @@ type ServerMintRecord struct {
 type ServerBurnStatic struct {
 	Model
 	Count decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
+}
+
+type ServerBurnTemp struct {
+	Model
+	Count     decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
+	BurnOrNot bool            `gorm:"not null default:false"`
 }
 
 type IndexerRecord struct {
