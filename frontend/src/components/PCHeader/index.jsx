@@ -24,38 +24,7 @@ export default function PCHeader() {
     const assetsPage = pathname === "/assets";
     const detailPage = pathname.includes("detail");
     const isMobile = useAppStore().device === "mobile";
-    const items = [
-        {
-            key: "1",
-            label: (
-                <Flex align="center" justify="space-between" className="menu-text">
-                    <img src={t5} width={24} style={{marginRight: "6px"}} alt=""/>
-                    <span>MY ASSETS</span>
-                </Flex>
-            ),
-        },
-        {
-            key: "2",
-            label: (
-                <Flex align="center" justify="space-between" className="menu-text">
-                    <Flex align="center">
-                        <img src={blue} width={24} style={{marginRight: "6px"}} alt=""/>
-                        <span>485</span>
-                    </Flex>
-                    <img src={t6} width={20} style={{marginLeft: "24px"}} alt=""/>
-                </Flex>
-            ),
-        },
-        {
-            key: "3",
-            label: (
-                <Flex align="center" justify="flex-start" style={{width: "100%", textAlign: 'left'}}>
-                    <img src={user} width={16} height={20} alt=""/>
-                </Flex>
-            ),
-        },
-    ];
-    
+
     return (
         <div className="pcHeader flex justify-between align-center">
             <div
@@ -73,9 +42,7 @@ export default function PCHeader() {
                 </div>
             )}
             {isMobile ? (
-                <Dropdown menu={{items}} placement="bottomRight">
-                    <img src={t7} width={18} alt=""/>
-                </Dropdown>
+                <Wallet isMobile={isMobile}/>
             ) : (
                 !homePage && (
                     <>

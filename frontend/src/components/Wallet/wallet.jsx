@@ -1,6 +1,6 @@
 // import { connect, disconnect, useStarknetkitConnectModal } from "starknetkit"
 import { useEffect, useState } from "react";
-import { Col, Flex, Row, Modal, Input } from "antd";
+import { Col, Flex, Row, Modal, Input, Dropdown } from "antd";
 
 import x from "@assets/x.png";
 import t1 from "@assets/ti1.png";
@@ -20,7 +20,7 @@ import { typedData, shortString } from "starknet";
 import Button from "@components/Button/index.jsx";
 import NekoModal from "@components/Modal/index.jsx";
 
-export default function Wallet() {
+export default function Wallet({ isMobile = false }) {
 	const navigate = useNavigate();
 
 	const { connect, connectors } = useConnect();
@@ -30,7 +30,7 @@ export default function Wallet() {
 	const [inputValue, setInputValue] = useState("");
 	const [visible, setVisible] = useState(false);
 	const [accept, setAccept] = useState(false);
-	const [nekoCoin, setNekoCoin] = useState(0);
+
 	const [text, setText] = useState("");
 
 	useEffect(() => {
@@ -66,29 +66,38 @@ export default function Wallet() {
 		await disconnect();
 	};
 
-	return (
-		<div>
-			<Row>
-				<Col className="header-btn2" onClick={() => navigate("/detail2")}>
-					<Flex align="center" justify="space-between">
-						<img src={t5} width={15} style={{ marginRight: "6px" }} alt="" />
-						<span>My Assets</span>
-					</Flex>
-				</Col>
-				<Col className="header-btn2" style={{ margin: "0px 12px" }}>
-					{/*<Flex align="center" justify="space-between">*/}
-					<Flex align="center">
-						{/*<img*/}
-						{/*    src={blue}*/}
-						{/*    width={20}*/}
-						{/*    style={{marginRight: "6px"}}*/}
-						{/*    alt=""*/}
-						{/*/>*/}
-						<img src={t6} width={15} style={{ marginRight: "6px" }} alt="" />
-						<span>Buy NKO</span>
-					</Flex>
-				</Col>
-				<Col style={{ width: "170px", textAlign: "center" }}>
+	const items = [
+		{
+			key: "1",
+			label: (
+				<Flex
+					align="center"
+					className="header-btn2"
+					justify="space-between"
+					onClick={() => navigate("/detail2")}
+				>
+					<img src={t5} width={15} style={{ marginRight: "6px" }} alt="" />
+					<span>My Assets</span>
+				</Flex>
+			),
+		},
+		{
+			key: "2",
+			label: (
+				<Flex align="center" justify="space-between" className="header-btn2">
+					<img src={t6} width={15} style={{ marginRight: "6px" }} alt="" />
+					<span>Buy NKO</span>
+				</Flex>
+			),
+		},
+		{
+			key: "3",
+			label: (
+				<Flex
+					align="center"
+					justify="flex-start"
+					style={{ width: "100%", textAlign: "left" }}
+				>
 					{address && isConnected ? (
 						<div className="header-btn2" onClick={() => setVisible(true)}>
 							{address.slice(0, 6) + "..." + address.slice(-4)}
@@ -102,9 +111,57 @@ export default function Wallet() {
 						>
 							Connect Wallet
 						</div>
-					)}
-				</Col>
-			</Row>
+					)}{" "}
+				</Flex>
+			),
+		},
+	];
+
+	return (
+		<div>
+			{!isMobile ? (
+				<Row>
+					<Col className="header-btn2" onClick={() => navigate("/detail2")}>
+						<Flex align="center" justify="space-between">
+							<img src={t5} width={15} style={{ marginRight: "6px" }} alt="" />
+							<span>My Assets</span>
+						</Flex>
+					</Col>
+					<Col className="header-btn2" style={{ margin: "0px 12px" }}>
+						{/*<Flex align="center" justify="space-between">*/}
+						<Flex align="center">
+							{/*<img*/}
+							{/*    src={blue}*/}
+							{/*    width={20}*/}
+							{/*    style={{marginRight: "6px"}}*/}
+							{/*    alt=""*/}
+							{/*/>*/}
+							<img src={t6} width={15} style={{ marginRight: "6px" }} alt="" />
+							<span>Buy NKO</span>
+						</Flex>
+					</Col>
+					<Col style={{ width: "170px", textAlign: "center" }}>
+						{address && isConnected ? (
+							<div className="header-btn2" onClick={() => setVisible(true)}>
+								{address.slice(0, 6) + "..." + address.slice(-4)}
+							</div>
+						) : (
+							<div
+								className="header-btn"
+								onClick={() => {
+									setVisible(true);
+								}}
+							>
+								Connect Wallet
+							</div>
+						)}
+					</Col>
+				</Row>
+			) : (
+				<Dropdown menu={{ items }} placement="bottomRight">
+					<img src={t7} width={18} alt="" />
+				</Dropdown>
+			)}
 
 			{accept && (
 				<NekoModal
