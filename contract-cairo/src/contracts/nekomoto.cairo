@@ -271,6 +271,7 @@ pub mod Nekomoto {
             self.starter_pack_limit.write(self.starter_pack_limit.read() - 1);
             let token_id = self.token_id.read() + 1;
             self.erc721.mint(sender, token_id);
+            self.starter.write(token_id, 1);
             self.token_id.write(token_id);
             self.emit(Summon { to: sender, token_id: token_id });
         }

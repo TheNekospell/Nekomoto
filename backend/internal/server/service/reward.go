@@ -84,10 +84,10 @@ func ClaimRewardOfInvitation(req model.AddressAndSignature) (model.ResponseCode,
 		return model.Success, "Nothing to claim"
 	}
 
-	invoker_sn.SendCoinAndNFT(addressDetail.Address, invitationReward.Mul(decimal.New(9, -1)).Mul(decimal.New(10, 18)).BigInt(), big.NewInt(0), big.NewInt(0))
+	invoker_sn.SendCoinAndNFT(addressDetail.Address, invitationReward.Mul(decimal.New(10, 18)).BigInt(), big.NewInt(0), big.NewInt(0))
 
-	database.ClaimInvitationRewardStatic(addressDetail.Uid, invitationReward.Mul(decimal.New(9, -1)))
-	database.CreateClaimRecord(addressDetail.Uid, invitationReward.Mul(decimal.New(9, -1)))
+	database.ClaimInvitationRewardStatic(addressDetail.Uid, invitationReward)
+	database.CreateClaimRecord(addressDetail.Uid, invitationReward)
 
 	database.Cache.Delete(database.CacheTagUid + strconv.FormatUint(addressDetail.Uid, 10))
 
