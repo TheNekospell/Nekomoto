@@ -82,11 +82,15 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 	}
 
 	chest := QueryChest(uid)
-	records := QueryEmpowerRecord(chest.ID)
+	openable := false
 	var empower []string
-	for _, record := range records {
-		add, _ := GetAddressByUid(record.Uid)
-		empower = append(empower, add.Address)
+	if chest.ID != 0 {
+		openable = chest.IsOpen == 0
+		records := QueryEmpowerRecord(chest.ID)
+		for _, record := range records {
+			add, _ := GetAddressByUid(record.Uid)
+			empower = append(empower, add.Address)
+		}
 	}
 
 	var buff ServerBuffRecord
@@ -121,7 +125,7 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		TotalClaimed:        TotalClaimed,
 		TotalMana:           Mana,
 		ToClaim:             ToClaim,
-		ChestOpenable:       chest.IsOpen == 0,
+		ChestOpenable:       openable,
 		ChestEmpower:        empower,
 
 		IsInBountyWave: isInBountyWave,
