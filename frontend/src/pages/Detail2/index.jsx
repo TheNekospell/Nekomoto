@@ -1265,7 +1265,9 @@ export default function Detail() {
 					}}
 				>
 					<div className="modal-title text-center margin-bottom-16">
-						Open Adept's Chest
+						{ascendInfo?.ChestEmpower && ascendInfo?.ChestEmpower.length >= 5
+							? "Open Master's Box"
+							: "Open Adept's Chest"}
 					</div>
 					<Row justify="center" gutter={16}>
 						{chestDetail?.Token2Amount && (
