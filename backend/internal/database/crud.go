@@ -337,8 +337,8 @@ func AddStarterChestOpened() {
 	DB.Model(&ServerStarterChestConfig{}).Where("id = 1").Update("opened", gorm.Expr("opened + ?", 1))
 }
 
-func UpdateAddressStarter(address string) {
-	DB.Model(&ServerAddress{}).Where("address = ?", address).Update("is_starter", false)
+func UpdateAddressStarter(uid uint64) {
+	DB.Model(&ServerAddress{}).Where("id = ?", uid).Update("is_starter", false)
 }
 
 func AddTreasureRevenue(address string, count uint64, hash string) {

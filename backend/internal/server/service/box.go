@@ -36,14 +36,16 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 		}
 		fmt.Println("CreateNekoSpiritInfo: ", toSave)
 
+		detail := database.GetAddressDetailByAddress(to)
+
 		// starter pack
 		if toSave.Fade.Equal(decimal.New(125, 0)) {
 			fmt.Println("This spirit is a starter pack")
+			database.UpdateAddressStarter(detail.Uid)
 			return
 		}
 
 		// reward to inviter
-		detail := database.GetAddressDetailByAddress(to)
 		var second = database.ServerInvitationRewardRecord{
 			Uid:     detail.SecondInviter,
 			FromUid: detail.Uid,
@@ -70,7 +72,7 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 			toBurn += 1250
 		}
 		if toBurn != 0 {
-			database.TempBurn(tokenId,decimal.NewFromUint64(toBurn).Mul(decimal.NewFromBigInt(big.NewInt(10), 18)))
+			database.TempBurn(tokenId, decimal.NewFromUint64(toBurn).Mul(decimal.NewFromBigInt(big.NewInt(10), 18)))
 		}
 
 		// unlock reward of invitation

@@ -48,6 +48,7 @@ import {
 	SHARD_ADDRESS,
 	shardContract,
 	sign,
+	addCommaInNumber
 } from "@/interface.js";
 import { cairo, CallData } from "starknet";
 
@@ -626,7 +627,7 @@ export default function Detail() {
 					<Col xs={24} sm={24} lg={6} className="margin-top-16">
 						<BoxCard
 							type="gem"
-							title={parseFloat(addressInfo.ToClaim).toFixed(2) + " NKO"}
+							title={addCommaInNumber(addressInfo.ToClaim) + " NKO"}
 							subTitle="Earnings"
 							buttonText="Claim"
 							onButtonClick={claimOfSpirit}
@@ -1154,21 +1155,21 @@ export default function Detail() {
 									</Flex>
 									<Flex>
 										<div className="modal-text6">
-											{parseFloat(focus.Mana).toFixed(2)}
+											{addCommaInNumber(focus.Mana)}
 										</div>
 										{focus.Level !== 13 && focus.Level > 0 && (
 											<div className="modal-text8">&nbsp;{">"}&nbsp;</div>
 										)}
 										{focus.Level !== 13 && focus.Level > 0 && (
 											<div className="modal-text7">
-												{parseFloat(
+												{addCommaInNumber(
 													Number(focus.Mana) +
 														0.065 *
 															(0.4 * Number(upgradeCal[focus.Level - 1].SPI) +
 																0.3 * Number(upgradeCal[focus.Level - 1].ATK) +
 																0.2 * Number(upgradeCal[focus.Level - 1].DEF) +
 																0.1 * Number(upgradeCal[focus.Level - 1].SPD))
-												).toFixed(2)}
+												)}
 											</div>
 										)}
 									</Flex>

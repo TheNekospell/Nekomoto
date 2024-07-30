@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import freeze from "@assets/freeze.png";
 import luckyLogo from "@assets/lucky.png";
 import bounty from "@assets/bounty.png";
+import { addCommaInNumber } from "@/interface.js";
 
 export default function ClaimedCard({
 	type,
@@ -36,14 +37,14 @@ export default function ClaimedCard({
 				<Col xs={24} sm={12}>
 					<div className="card-title">Total Claimed</div>
 					<div className="num-44-white" style={{ margin: "12px 0 " }}>
-						{parseFloat(totalClaimed).toFixed(2)}
+						{addCommaInNumber(totalClaimed)}
 						<span className="card-sub-title">NKO</span>
 					</div>
 				</Col>
 				<Col xs={24} sm={12}>
 					<div className="card-title">Mana</div>
 					<div className="num-44-orange" style={{ margin: "12px 0" }}>
-						{parseFloat(totalMana).toFixed(2)}
+						{addCommaInNumber(totalMana)}
 					</div>
 				</Col>
 

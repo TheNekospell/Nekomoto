@@ -4,7 +4,7 @@ import { Col, Row } from "antd";
 import Button from "@components/Button/index";
 import BoxBorder from "@components/BoxBorder/index";
 import { useEffect, useState } from "react";
-import { BACKEND } from "@/interface.js";
+import { BACKEND, addCommaInNumber } from "@/interface.js";
 
 export default function InfoCard({ totalRewards, treasuryRevenue, totalBurn }) {
 	const [usd, setUsd] = useState(0);
@@ -31,12 +31,12 @@ export default function InfoCard({ totalRewards, treasuryRevenue, totalBurn }) {
 				<Col xs={24} sm={24} lg={12}>
 					<div className="card-sub-title">Total Rewards</div>
 					<div className="num-60" style={{ margin: "16px 0 8px" }}>
-						{parseFloat(totalRewards).toFixed(2)}
+						{addCommaInNumber(totalRewards)}
 						<span className="card-sub-title">NKO</span>
 					</div>
 					{usd > 0 && (
 						<div className="grey-text">
-							{parseFloat(usd * totalRewards).toFixed(2)} USD
+							{addCommaInNumber(usd * totalRewards)} USD
 						</div>
 					)}
 				</Col>
@@ -45,9 +45,7 @@ export default function InfoCard({ totalRewards, treasuryRevenue, totalBurn }) {
 					<Row gutter={[16, 16]} className="text-center">
 						<Col xs={12} sm={12} lg={7}>
 							<div className="info-item">
-								<div className="card-sub-title">
-									{parseFloat(usd).toFixed(2)}
-								</div>
+								<div className="card-sub-title">{addCommaInNumber(usd)}</div>
 								<div className="grey-text" style={{ marginTop: "12px" }}>
 									Nko Price
 								</div>
@@ -56,10 +54,10 @@ export default function InfoCard({ totalRewards, treasuryRevenue, totalBurn }) {
 						<Col xs={12} sm={12} lg={7}>
 							<div className="info-item">
 								<div className="card-sub-title">
-									{parseFloat(
+									{addCommaInNumber(
 										treasuryRevenue?.reduce((acc, cur) => acc + cur.Count, 0) *
 											25000
-									).toFixed(2)}
+									)}
 								</div>
 								<div className="grey-text" style={{ marginTop: "12px" }}>
 									Total Marketcap
@@ -69,7 +67,7 @@ export default function InfoCard({ totalRewards, treasuryRevenue, totalBurn }) {
 						<Col xs={12} sm={12} lg={7}>
 							<div className="info-item">
 								<div className="card-sub-title">
-									{parseFloat(totalBurn).toFixed(2)}
+									{addCommaInNumber(totalBurn)}
 								</div>
 								<div className="grey-text" style={{ marginTop: "12px" }}>
 									Total Burn

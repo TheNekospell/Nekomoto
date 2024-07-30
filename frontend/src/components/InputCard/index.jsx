@@ -13,6 +13,7 @@ import {
 	sign,
 	waitTx,
 	NEKOCOIN_ADDRESS,
+	addCommaInNumber,
 } from "@/interface.js";
 import { cairo, CallData } from "starknet";
 import NekoModal from "@components/Modal/index.jsx";
@@ -92,7 +93,7 @@ export default function InputCard() {
 		const { typedMessage, signature } = await sign(account);
 		// console.log("typedMessage: ", typedMessage);
 		// console.log("signature: ", signature);
-        // return
+		// return
 
 		const result = await BACKEND.summonBox(
 			address,
@@ -266,7 +267,7 @@ export default function InputCard() {
 							</Col>
 
 							<Col className={`input-card-text3 font-14px ${device}-center`}>
-								{inputValue * 25000} NKO
+								{addCommaInNumber(inputValue * 25000, true)} NKO
 							</Col>
 						</Flex>
 					</Col>
