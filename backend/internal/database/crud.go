@@ -388,8 +388,8 @@ func GetNekoCoinBurn() decimal.Decimal {
 	return burn.Count
 }
 
-func TempBurn(amount decimal.Decimal) {
-	DB.Create(&ServerBurnTemp{Count: amount, BurnOrNot: false})
+func TempBurn(tokenId uint64, amount decimal.Decimal) {
+	DB.Create(&ServerBurnTemp{TokenId: tokenId, Count: amount, BurnOrNot: false})
 }
 
 func GetTempBurn() []ServerBurnTemp {

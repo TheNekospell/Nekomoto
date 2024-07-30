@@ -399,6 +399,7 @@ type ServerBurnStatic struct {
 
 type ServerBurnTemp struct {
 	Model
+	TokenId   uint64          `gorm:"not null"`
 	Count     decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
 	BurnOrNot bool            `gorm:"not null default:false"`
 }
