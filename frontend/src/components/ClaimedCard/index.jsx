@@ -44,7 +44,9 @@ export default function ClaimedCard({
 				<Col xs={24} sm={12}>
 					<div className="card-title">Mana</div>
 					<div className="num-44-orange" style={{ margin: "12px 0" }}>
-						{addCommaInNumber(totalMana * (1 + boost) * (bountyWave ? 1.1 : 1))}
+						{addCommaInNumber(
+							totalMana * (1 + Number(boost)) * (bountyWave ? 1.1 : 1)
+						)}
 					</div>
 				</Col>
 
