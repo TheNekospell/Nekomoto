@@ -33,7 +33,9 @@ func StartIndexer() {
 
 		currentBlock, err := chain_sn.Client.BlockNumber(context.Background())
 		if err != nil {
-			panic(err)
+			// panic(err)
+			fmt.Println("get current block err : ", err.Error())
+			time.Sleep(5 * time.Second)
 		}
 		// fmt.Println("[Indexer] currentBlock", currentBlock)
 

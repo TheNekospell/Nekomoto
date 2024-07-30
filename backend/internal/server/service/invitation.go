@@ -13,7 +13,7 @@ func AcceptInvitation(req model.AddressAndCodeAndSignature) (code model.Response
 	}
 
 	var record database.ServerInvitationRecord
-	if err := database.DB.Where("uid = ?", detail.Uid).Find(&record); err == nil {
+	if database.DB.Where("uid = ?", detail.Uid).Find(&record); record.ID != 0 {
 		// has record already
 		return model.Success, "Can't accept invitation twice"
 	}
