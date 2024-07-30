@@ -73,11 +73,11 @@ func StartIndexer() {
 
 }
 
-func checkIndexedTransaction(event *rpc.EmittedEvent) bool {
-	return database.CheckIndexedEvent(event.TransactionHash.String())
+func checkIndexedTransaction(event *rpc.EmittedEvent, recordType uint8) bool {
+	return database.CheckIndexedEvent(event.TransactionHash.String(), recordType)
 }
 
-func recordIndexedTransaction(event *rpc.EmittedEvent) {
+func recordIndexedTransaction(event *rpc.EmittedEvent, recordType uint8) {
 	var blockNumber uint64
 	if event.BlockNumber > 0 {
 		blockNumber = event.BlockNumber
@@ -86,7 +86,7 @@ func recordIndexedTransaction(event *rpc.EmittedEvent) {
 	if event.BlockHash != nil {
 		blockHash = event.BlockHash.String()
 	}
-	database.AddIndexedTransactionRecord(blockNumber, blockHash, event.TransactionHash.String())
+	database.AddIndexedTransactionRecord(blockNumber, blockHash, event.TransactionHash.String(), recordType)
 }
 
 func resolveNekoCoinBurn(block uint64) {
@@ -107,7 +107,7 @@ func resolveNekoCoinBurn(block uint64) {
 	}
 
 	for _, event := range result.Events {
-		if checkIndexedTransaction(&event) {
+		if checkIndexedTransaction(&event, 1) {
 			continue
 		}
 		// fmt.Println("event : ", event.Event)
@@ -119,7 +119,7 @@ func resolveNekoCoinBurn(block uint64) {
 	}
 
 	for _, event := range result.Events {
-		recordIndexedTransaction(&event)
+		recordIndexedTransaction(&event, 1)
 	}
 }
 
@@ -140,7 +140,7 @@ func resolveShardTransfer(block uint64) {
 	}
 
 	for _, event := range result.Events {
-		if checkIndexedTransaction(&event) {
+		if checkIndexedTransaction(&event, 2) {
 			continue
 		}
 		from := event.Event.Keys[1].String()
@@ -150,7 +150,7 @@ func resolveShardTransfer(block uint64) {
 	}
 
 	for _, event := range result.Events {
-		recordIndexedTransaction(&event)
+		recordIndexedTransaction(&event, 2)
 	}
 
 }
@@ -172,15 +172,14 @@ func resolveAscendUpgrade(block uint64) {
 	}
 	// fmt.Println("event : ", result.Events)
 	for _, event := range result.Events {
-		if checkIndexedTransaction(&event) {
+		if checkIndexedTransaction(&event, 3) {
 			continue
 		}
 		service.UpdateAscendFromChain(event.Event.Keys[1].String(), event.Event.Data[0].Uint64())
-
 	}
 
 	for _, event := range result.Events {
-		recordIndexedTransaction(&event)
+		recordIndexedTransaction(&event, 3)
 	}
 }
 
@@ -200,7 +199,7 @@ func resolveBoxUpgrade(block uint64) {
 		return
 	}
 	for _, event := range result.Events {
-		if checkIndexedTransaction(&event) {
+		if checkIndexedTransaction(&event, 4) {
 			continue
 		}
 		service.UpdateNekoSpiritByUpgrade(event.Event.Keys[2].Uint64())
@@ -208,7 +207,7 @@ func resolveBoxUpgrade(block uint64) {
 	}
 
 	for _, event := range result.Events {
-		recordIndexedTransaction(&event)
+		recordIndexedTransaction(&event, 4)
 	}
 }
 
@@ -230,7 +229,7 @@ func resolveBoxTransfer(block uint64) {
 	// fmt.Println("result: ", result.ContinuationToken)
 	// panic("stop")
 	for _, event := range result.Events {
-		if checkIndexedTransaction(&event) {
+		if checkIndexedTransaction(&event, 5) {
 			// fmt.Println("continue")
 			continue
 		}
@@ -243,7 +242,7 @@ func resolveBoxTransfer(block uint64) {
 	}
 
 	for _, event := range result.Events {
-		recordIndexedTransaction(&event)
+		recordIndexedTransaction(&event, 5)
 	}
 }
 

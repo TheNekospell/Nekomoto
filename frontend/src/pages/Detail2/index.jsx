@@ -626,7 +626,7 @@ export default function Detail() {
 					<Col xs={24} sm={24} lg={6} className="margin-top-16">
 						<BoxCard
 							type="gem"
-							title={addressInfo.ToClaim + " NKO"}
+							title={parseFloat(addressInfo.ToClaim).toFixed(2) + " NKO"}
 							subTitle="Earnings"
 							buttonText="Claim"
 							onButtonClick={claimOfSpirit}

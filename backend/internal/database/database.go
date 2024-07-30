@@ -412,7 +412,10 @@ type IndexerRecord struct {
 
 type IndexerTransactionRecord struct {
 	Model
-	Hash
+	TransactionHash string `gorm:"index type:char(66) not null"`
+	BlockNumber     uint64 `gorm:"not null index"`
+	BlockHash       string `gorm:"not null type:char(66)"`
+	RecordType      uint8  `gorm:"index not null"`
 }
 
 // blockchain
