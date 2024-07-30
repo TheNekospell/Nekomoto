@@ -6,9 +6,12 @@ import (
 	"backend/starknet/curve"
 	"backend/starknet/typed"
 	"backend/starknet/utils"
+	"errors"
 	"fmt"
 	"math/big"
 	"strings"
+
+	"github.com/NethermindEth/juno/core/felt"
 )
 
 //func ValidSignature(address, message, signature string) error {
@@ -89,24 +92,39 @@ func ValidSignature(address string, typedData model.TypedData, signature []strin
 
 	hash, err := starknetTypedData.GetMessageHash(utils.HexToBN(address), typedData.Message, curve.Curve)
 	if err != nil {
+		fmt.Println("get message hash error:", err.Error())
 		return err
 	}
 
 	addressFelt, err := utils.HexToFelt(address)
 	if err != nil {
+		fmt.Println("address err: ", err.Error())
 		return err
 	}
 
-	r, e := new(big.Int).SetString(signature[0], 10)
-	if !e {
-		fmt.Println("set r error:")
+	// r, e := new(big.Int).SetString(signature[3], 10)
+	// if !e {
+	// 	fmt.Println("set r error:")
+	// }
+	// s, e := new(big.Int).SetString(signature[4], 10)
+	// if !e {
+	// 	fmt.Println("set s error:")
+	// }
+
+	var signatureFelt []*felt.Felt
+
+	for _, v := range signature {
+		res, b := new(big.Int).SetString(v, 10)
+		if !b {
+			fmt.Println("set signature error:")
+			return errors.New("set signature error")
+		}
+		signatureFelt = append(signatureFelt, utils.BigIntToFelt(res))
 	}
-	s, e := new(big.Int).SetString(signature[1], 10)
-	if !e {
-		fmt.Println("set s error:")
-	}
-	err = invoker_sn.ValidSignature(addressFelt, utils.BigIntToFelt(hash), utils.BigIntToFelt(r), utils.BigIntToFelt(s))
+
+	err = invoker_sn.ValidSignature(addressFelt, utils.BigIntToFelt(hash), signatureFelt)
 	if err != nil {
+		fmt.Println("valid signature error:", err.Error())
 		return err
 	}
 	return nil

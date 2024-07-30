@@ -252,7 +252,7 @@ func recordIndexerHeight(height uint64, signal <-chan uint64) {
 	for {
 		select {
 		case newHeight := <-signal:
-			fmt.Println("[Indexer] newHeight", newHeight)
+			// fmt.Println("[Indexer] newHeight", newHeight)
 			if newHeight > height {
 				database.UpdateHeight(height)
 				height = newHeight

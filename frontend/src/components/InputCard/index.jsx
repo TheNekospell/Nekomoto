@@ -90,6 +90,9 @@ export default function InputCard() {
 		}
 
 		const { typedMessage, signature } = await sign(account);
+		// console.log("typedMessage: ", typedMessage);
+		// console.log("signature: ", signature);
+        // return
 
 		const result = await BACKEND.summonBox(
 			address,

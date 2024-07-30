@@ -76,7 +76,7 @@ func ClaimRewardOfInvitation(req model.AddressAndSignature) (model.ResponseCode,
 	addressDetail := database.GetAddressDetailByAddress(req.Address)
 
 	invitationReward := decimal.Zero
-	if claimable := addressDetail.InvitationReward.UnlockedAmount.Sub(addressDetail.InvitationReward.ClaimedAmount); claimable.GreaterThan(decimal.Zero) {
+	if claimable := decimal.Min(addressDetail.InvitationReward.TotalAmount, addressDetail.InvitationReward.UnlockedAmount).Sub(addressDetail.InvitationReward.ClaimedAmount); claimable.GreaterThan(decimal.Zero) {
 		invitationReward = claimable
 	}
 

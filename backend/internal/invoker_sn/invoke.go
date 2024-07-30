@@ -468,15 +468,15 @@ func Summon(to string, count *big.Int) (string, error) {
 	return string(body), nil
 }
 
-func ValidSignature(address *felt.Felt, hash *felt.Felt, r *felt.Felt, s *felt.Felt) error {
+func ValidSignature(address *felt.Felt, hash *felt.Felt, signature []*felt.Felt) error {
 
 	call := rpc.FunctionCall{
 		ContractAddress:    address,
 		EntryPointSelector: utils.GetSelectorFromNameFelt("is_valid_signature"),
-		Calldata:           []*felt.Felt{hash, utils.BigIntToFelt(big.NewInt(2)), r, s},
+		Calldata:           append([]*felt.Felt{hash, utils.BigIntToFelt(big.NewInt(int64(len(signature))))}, signature...),
 	}
 
-	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTagLatest)
+	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTagPending)
 	if errRpc != nil {
 		fmt.Println(errRpc.Error())
 		return errRpc
