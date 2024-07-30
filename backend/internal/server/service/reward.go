@@ -61,7 +61,7 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 	// update related tables
 
 	database.UpdateNekoSpiritList(spiritToUpdate)
-	database.ClaimInvitationRewardStatic(addressDetail.Uid, invitationReward)
+	// database.ClaimInvitationRewardStatic(addressDetail.Uid, invitationReward)
 	database.CreateClaimRecord(addressDetail.Uid, totalReward.Mul(decimal.New(9, -1)))
 
 	// clear cache
@@ -87,7 +87,7 @@ func ClaimRewardOfInvitation(req model.AddressAndSignature) (model.ResponseCode,
 	invoker_sn.SendCoinAndNFT(addressDetail.Address, invitationReward.Mul(decimal.New(10, 18)).BigInt(), big.NewInt(0), big.NewInt(0))
 
 	database.ClaimInvitationRewardStatic(addressDetail.Uid, invitationReward)
-	database.CreateClaimRecord(addressDetail.Uid, invitationReward)
+	// database.CreateClaimRecord(addressDetail.Uid, invitationReward)
 
 	database.Cache.Delete(database.CacheTagUid + strconv.FormatUint(addressDetail.Uid, 10))
 
