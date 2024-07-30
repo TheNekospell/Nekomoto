@@ -41,7 +41,7 @@ type AddressInfo struct {
 	ToClaim             decimal.Decimal
 	ChestOpenable       bool
 	ChestEmpower        []string
-
+	InviteCount         int64
 	IsInBountyWave bool
 }
 
@@ -59,6 +59,9 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 
 	var invitation ServerInvitationRecord
 	DB.Where("uid = ?", uid).Find(&invitation)
+
+	var InviteCount int64
+	DB.Model(&ServerInvitationRecord{}).Where("second_uid = ?", uid).Count(&InviteCount)
 
 	var invitationReward ServerInvitationRewardStatic
 	DB.Where("uid = ?", uid).Find(&invitationReward)
@@ -127,8 +130,8 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		ToClaim:             ToClaim,
 		ChestOpenable:       openable,
 		ChestEmpower:        empower,
-
-		IsInBountyWave: isInBountyWave,
+		InviteCount:         InviteCount,
+		IsInBountyWave:      isInBountyWave,
 	}
 
 	//Cache.Set(CacheTagUid+strconv.FormatUint(uid, 10), result, -1)

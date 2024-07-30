@@ -154,6 +154,10 @@ export default function ClaimedCard({
 								text="Time freeze"
 								color="yellow"
 								longness="long"
+								disabled={
+									new Date().getTime() - new Date(startTime).getTime() <
+										72 * 60 * 60 * 1000 || shard <= 0
+								}
 								onClick={shard > 0 ? startTimeFreeze : null}
 							/>
 						</Col>

@@ -631,7 +631,7 @@ export default function Detail() {
 							title={addCommaInNumber(addressInfo.ToClaim) + " NKO"}
 							subTitle="Earnings"
 							subPic={true}
-							subFunc={()=>setEarningInfo(true)}
+							subFunc={() => setEarningInfo(true)}
 							buttonText="Claim"
 							onButtonClick={claimOfSpirit}
 						/>
@@ -702,7 +702,9 @@ export default function Detail() {
 						<EmptyCard>
 							<Row>
 								<Col xs={24} sm={24}>
-									<div className="card-little-title">Referral Rewards</div>
+									<div className="card-little-title">
+										Referral Rewards {"(" + addressInfo.InviteCount + ")"}
+									</div>
 								</Col>
 
 								<Col xs={24} sm={24} style={{ margin: "8px 0 18px" }}>
