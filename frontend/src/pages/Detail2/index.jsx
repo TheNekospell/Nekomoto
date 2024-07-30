@@ -48,7 +48,7 @@ import {
 	SHARD_ADDRESS,
 	shardContract,
 	sign,
-	addCommaInNumber
+	addCommaInNumber,
 } from "@/interface.js";
 import { cairo, CallData } from "starknet";
 
@@ -62,6 +62,7 @@ export default function Detail() {
 	const [isModalOpen5, setIsModalOpen5] = useState(false);
 	const [modalText1, setModalText1] = useState("");
 	const [ascendInfo, setAscendInfo] = useState(false);
+	const [earningInfo, setEarningInfo] = useState(false);
 
 	const { account, address, status, chainId, isConnected } = useAccount();
 	const [addressInfo, setAddressInfo] = useState({});
@@ -605,7 +606,7 @@ export default function Detail() {
 							totalClaimed={addressInfo.TotalClaimed}
 							totalMana={addressInfo.TotalMana}
 							shard={addressInfo.TemporalShardIdList?.length}
-							boost={addressInfo.Boost}
+							boost={addressInfo.Buff?.Boost}
 							lucky={lucky}
 							startTime={addressInfo.Buff?.StartTime}
 							bountyWave={addressInfo.IsInBountyWave}
@@ -629,6 +630,8 @@ export default function Detail() {
 							type="gem"
 							title={addCommaInNumber(addressInfo.ToClaim) + " NKO"}
 							subTitle="Earnings"
+							subPic={true}
+							subFunc={()=>setEarningInfo(true)}
 							buttonText="Claim"
 							onButtonClick={claimOfSpirit}
 						/>
@@ -1393,6 +1396,32 @@ export default function Detail() {
 							longness="long"
 						/>
 					)}
+				</div>
+			</NekoModal>
+
+			<NekoModal
+				open={earningInfo}
+				centered={true}
+				footer={null}
+				maskClosable={true}
+				onCancel={() => setEarningInfo(false)}
+				title={"Earning"}
+			>
+				<div
+					style={{
+						display: "flex",
+						alignItems: "flex",
+						flexDirection: "row",
+						justifyContent: "center",
+						color: "#90A6AF",
+						fontFamily: "BIG SHOT",
+						fontSize: "14px",
+						lineHeight: "18px",
+						fontWeight: "400",
+					}}
+				>
+					<div style={{ marginRight: "10px" }}>&#8226;</div>
+					<div>{"Include 10% tax "}</div>
 				</div>
 			</NekoModal>
 
