@@ -228,7 +228,7 @@ export function addCommaInNumber(number, b) {
     const numberString = number.toString();
 
     const parts = numberString.split(".");
-    parts[0] = parts[0].length > 3 ? parts[0].replace(/\B(?=(\d{1})+(?!\d))/g, ",") : parts[0];
+    parts[0] = parts[0].length > 3 ? parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") : parts[0];
     if (b) {
         parts[1] = parts[1] ? parts[1] : "";
     } else {
