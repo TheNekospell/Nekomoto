@@ -110,6 +110,11 @@ export default function Detail() {
 					)
 				);
 				setAddressInfo(result.data);
+				if (focus?.TokenId) {
+					setFocus(
+						result.data.NekoSpiritList.find((x) => x.TokenId === focus.TokenId)
+					);
+				}
 			});
 			prismContract.balance_of(address).then((result) => {
 				// console.log("prism: ", result)
@@ -382,7 +387,12 @@ export default function Detail() {
 		setHhh(mCall.transaction_hash);
 		const result = await account.waitForTransaction(mCall.transaction_hash);
 		console.log("result: ", result);
-		setSuccess("Success: " + mCall.transaction_hash);
+		// setSuccess("Success: " + mCall.transaction_hash);
+		if (result.execution_status === "SUCCEEDED") {
+			setWaiting(false);
+			setIsModalOpen2(false);
+			setIsModalOpen3(true);
+		}
 	};
 
 	const unstake = async (input) => {
@@ -398,7 +408,12 @@ export default function Detail() {
 		setHhh(mCall.transaction_hash);
 		const result = await account.waitForTransaction(mCall.transaction_hash);
 		console.log("result: ", result);
-		setSuccess("Success: " + mCall.transaction_hash);
+		// setSuccess("Success: " + mCall.transaction_hash);
+		if (result.execution_status === "SUCCEEDED") {
+			setWaiting(false);
+			setIsModalOpen3(false);
+			setIsModalOpen2(true);
+		}
 	};
 
 	const stakeAll = async () => {
@@ -498,10 +513,14 @@ export default function Detail() {
 		});
 		const mCall = await account.execute(arr);
 
-		setHhh(mCall.transaction_hash);
 		const result = await account.waitForTransaction(mCall.transaction_hash);
+		setHhh(mCall.transaction_hash);
 		console.log("result ", result);
-		setSuccess("Success: " + mCall.transaction_hash);
+		// setSuccess("Success: " + mCall.transaction_hash);
+		if (result.execution_status === "SUCCEEDED") {
+			setWaiting(false);
+			// setFocus(addressInfo.NekoSpiritList.find((x) => x.TokenId === tokenId));
+		}
 	};
 
 	const ascendData = [
@@ -1008,19 +1027,13 @@ export default function Detail() {
 									<Flex justify="space-between" className="margin-bottom-16">
 										<div className="modal-text2">Earning</div>
 										<div className="modal-text3">
-											{focus?.Rewards?.substring(
-												0,
-												focus?.Rewards?.indexOf(".") + 3
-											)}
+											{addCommaInNumber(focus?.Rewards)}
 										</div>
 									</Flex>
 									<Flex justify="space-between" className="margin-bottom-16">
 										<div className="modal-text2">Claimed</div>
 										<div className="modal-text3">
-											{focus?.ClaimedRewards?.substring(
-												0,
-												focus?.ClaimedRewards?.indexOf(".") + 3
-											)}
+											{addCommaInNumber(focus?.ClaimedRewards)}
 										</div>
 									</Flex>
 									{/*<Flex justify="space-between" className="margin-bottom-16">*/}
@@ -1067,7 +1080,9 @@ export default function Detail() {
 										SPI
 									</Flex>
 									<Flex>
-										<div className="modal-text6">{focus.SPI}</div>
+										<div className="modal-text6">
+											{addCommaInNumber(focus.SPI)}
+										</div>
 										{focus.Level !== 13 && focus.Level > 0 && (
 											<div className="modal-text8">&nbsp;{">"}&nbsp;</div>
 										)}
@@ -1079,7 +1094,9 @@ export default function Detail() {
 														: "modal-text8"
 												}
 											>
-												{Number(focus.SPI) + upgradeCal[focus.Level - 1].SPI}
+												{addCommaInNumber(
+													Number(focus.SPI) + upgradeCal[focus.Level - 1].SPI
+												)}
 											</div>
 										)}
 									</Flex>
@@ -1096,7 +1113,9 @@ export default function Detail() {
 										ATK
 									</Flex>
 									<Flex>
-										<div className="modal-text6">{focus.ATK}</div>
+										<div className="modal-text6">
+											{addCommaInNumber(focus.ATK)}
+										</div>
 										{focus.Level !== 13 && focus.Level > 0 && (
 											<div className="modal-text8">&nbsp;{">"}&nbsp;</div>
 										)}
@@ -1108,7 +1127,9 @@ export default function Detail() {
 														: "modal-text8"
 												}
 											>
-												{Number(focus.ATK) + upgradeCal[focus.Level - 1].ATK}
+												{addCommaInNumber(
+													Number(focus.ATK) + upgradeCal[focus.Level - 1].ATK
+												)}
 											</div>
 										)}
 									</Flex>
@@ -1125,7 +1146,9 @@ export default function Detail() {
 										DEF
 									</Flex>
 									<Flex>
-										<div className="modal-text6">{focus.DEF}</div>
+										<div className="modal-text6">
+											{addCommaInNumber(focus.DEF)}
+										</div>
 										{focus.Level !== 13 && focus.Level > 0 && (
 											<div className="modal-text8">&nbsp;{">"}&nbsp;</div>
 										)}
@@ -1137,7 +1160,9 @@ export default function Detail() {
 														: "modal-text8"
 												}
 											>
-												{Number(focus.DEF) + upgradeCal[focus.Level - 1].DEF}
+												{addCommaInNumber(
+													Number(focus.DEF) + upgradeCal[focus.Level - 1].DEF
+												)}
 											</div>
 										)}
 									</Flex>
@@ -1154,7 +1179,9 @@ export default function Detail() {
 										SPD
 									</Flex>
 									<Flex>
-										<div className="modal-text6">{focus.SPD}</div>
+										<div className="modal-text6">
+											{addCommaInNumber(focus.SPD)}
+										</div>
 										{focus.Level !== 13 && focus.Level > 0 && (
 											<div className="modal-text8">&nbsp;{">"}&nbsp;</div>
 										)}
@@ -1166,7 +1193,9 @@ export default function Detail() {
 														: "modal-text8"
 												}
 											>
-												{Number(focus.SPD) + upgradeCal[focus.Level - 1].SPD}
+												{addCommaInNumber(
+													Number(focus.SPD) + upgradeCal[focus.Level - 1].SPD
+												)}
 											</div>
 										)}
 									</Flex>
@@ -1221,9 +1250,12 @@ export default function Detail() {
 												<div className="modal-text3">Prism</div>
 											</Flex>
 											<Flex>
-												<div className="modal-text3">{prism}</div>
+												<div className="modal-text3">
+													{addCommaInNumber(prism)}
+												</div>
 												<div className="modal-text9">
-													{"/" + upgradeCal[focus.Level - 1].Prism}
+													{"/" +
+														addCommaInNumber(upgradeCal[focus.Level - 1].Prism)}
 												</div>
 											</Flex>
 										</Flex>
@@ -1246,9 +1278,12 @@ export default function Detail() {
 												<div className="modal-text3">NKO</div>
 											</Flex>
 											<Flex>
-												<div className="modal-text3">{nekocoin}</div>
+												<div className="modal-text3">
+													{addCommaInNumber(nekocoin)}
+												</div>
 												<div className="modal-text9">
-													{"/" + upgradeCal[focus.Level - 1].Neko}
+													{"/" +
+														addCommaInNumber(upgradeCal[focus.Level - 1].Neko)}
 												</div>
 											</Flex>
 										</Flex>
