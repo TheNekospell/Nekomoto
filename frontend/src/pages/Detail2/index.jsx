@@ -58,7 +58,7 @@ export default function Detail() {
 	const [isModalOpen1, setIsModalOpen1] = useState(false);
 	const [isModalOpen2, setIsModalOpen2] = useState(false);
 	const [isModalOpen3, setIsModalOpen3] = useState(false);
-	const [isModalOpen4, setIsModalOpen4] = useState(false);
+	const [isModalOpen4, setIsModalOpen4] = useState(true);
 	const [isModalOpen5, setIsModalOpen5] = useState(false);
 	const [modalText1, setModalText1] = useState("");
 	const [ascendInfo, setAscendInfo] = useState(false);
@@ -1371,7 +1371,7 @@ export default function Detail() {
 							color="yellow"
 							longness="short"
 							style={{ marginTop: "48px" }}
-							onButtonClick={() => {
+							onClick={() => {
 								setIsModalOpen4(false);
 								setSuccess("");
 							}}
