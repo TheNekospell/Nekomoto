@@ -1270,7 +1270,7 @@ export default function Detail() {
 							: "Open Adept's Chest"}
 					</div>
 					<Row justify="center" gutter={16}>
-						{chestDetail?.Token2Amount && (
+						{chestDetail?.Token2Amount && chestDetail?.Token2Amount > 0 && (
 							<Col>
 								<div className="adept-bg">
 									<img src={adept1} width={80} alt="" />
@@ -1282,11 +1282,11 @@ export default function Detail() {
 							</Col>
 						)}
 
-						{chestDetail?.Token1Amount && (
+						{chestDetail?.Token1Amount && chestDetail?.Token1Amount > 0 && (
 							<Col>
 								<div className="adept-bg">
 									<img src={adept2} width={80} alt="" />
-									<div className="modal-text1">Neko</div>
+									<div className="modal-text1">NKO</div>
 									<div className="modal-text10">
 										{"x" + chestDetail?.Token1Amount}
 									</div>
@@ -1294,11 +1294,11 @@ export default function Detail() {
 							</Col>
 						)}
 
-						{chestDetail?.NFTAmount && (
+						{chestDetail?.NFTAmount && chestDetail?.NFTAmount > 0 && (
 							<Col>
 								<div className="adept-bg">
 									<img src={adept3} width={80} alt="" />
-									<div className="modal-text1">Neko</div>
+									<div className="modal-text1">Temporal Shard</div>
 									<div className="modal-text10">
 										{"x" + chestDetail?.NFTAmount}
 									</div>
