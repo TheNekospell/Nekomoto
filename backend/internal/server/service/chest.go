@@ -3,6 +3,8 @@ package service
 import (
 	"backend/internal/database"
 	"backend/internal/invoker_sn"
+	"fmt"
+
 	// "backend/internal/invoker"
 	"backend/internal/model"
 	"math/big"
@@ -46,14 +48,17 @@ func OpenChest(req model.AddressAndSignature) (data database.ServerChest, code m
 
 	token1, err := big.NewInt(0).SetString(chest.Token1Amount.StringFixed(0), 10)
 	if !err {
+		fmt.Println("SetString error: ", err)
 		return database.ServerChest{}, model.ServerInternalError, "server internal error"
 	}
 	token2, err := big.NewInt(0).SetString(chest.Token2Amount.StringFixed(0), 10)
 	if !err {
+		fmt.Println("SetString error: ", err)
 		return database.ServerChest{}, model.ServerInternalError, "server internal error"
 	}
 	pow := new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)
 	if err := invoker_sn.SendCoinAndNFT(req.Address, new(big.Int).Mul(token1, pow), new(big.Int).Mul(token2, pow), big.NewInt(int64(chest.NFTAmount))); err != nil {
+		fmt.Println("SendCoinAndNFT error: ", err)
 		return database.ServerChest{}, model.ServerInternalError, "server internal error"
 	}
 

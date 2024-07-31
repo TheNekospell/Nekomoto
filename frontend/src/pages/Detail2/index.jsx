@@ -216,7 +216,7 @@ export default function Detail() {
 			setChestDetail(result.data);
 		} else {
 			setSuccess(
-				"Something went wrong: Please try again tomorrow at 8:00 AM (UTC)"
+				"Something went wrong: Please try again tomorrow at 00:00 AM (UTC)"
 			);
 		}
 	};
@@ -824,11 +824,21 @@ export default function Detail() {
 						<Flex>
 							<div
 								className="card-desc-title"
-								style={{
-									marginRight: "18px",
-									fontSize: "12px",
-									cursor: "pointer",
-								}}
+								style={
+									addressInfo.NekoSpiritList?.filter((item) => !item.IsStaked)
+										.length > 0
+										? {
+												marginRight: "18px",
+												fontSize: "12px",
+												cursor: "pointer",
+										  }
+										: {
+												marginRight: "18px",
+												fontSize: "12px",
+												cursor: "pointer",
+												filter: "grayscale(1)",
+										  }
+								}
 								onClick={
 									addressInfo.NekoSpiritList?.filter((item) => !item.IsStaked)
 										.length > 0
@@ -840,7 +850,16 @@ export default function Detail() {
 							</div>
 							<div
 								className="card-desc-title"
-								style={{ fontSize: "12px", cursor: "pointer" }}
+								style={
+									addressInfo.NekoSpiritList?.filter((item) => item.IsStaked)
+										.length > 0
+										? { fontSize: "12px", cursor: "pointer" }
+										: {
+												fontSize: "12px",
+												cursor: "pointer",
+												filter: "grayscale(1)",
+										  }
+								}
 								onClick={
 									addressInfo.NekoSpiritList?.filter((item) => item.IsStaked)
 										.length > 0
