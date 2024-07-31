@@ -15,7 +15,7 @@ func StartTicker() {
 
 	fmt.Println("Start ticker", time.Now().UTC().Local())
 
-	now := time.Now()
+	now := time.Now().UTC()
 	nextHour := now.Truncate(time.Hour).Add(time.Hour)
 
 	waitTime := nextHour.Sub(now)
@@ -53,8 +53,9 @@ func StartTicker() {
 			allocateTimer.Reset(waitTime)
 
 		case <-burnTimer.C:
-			service.BurnCoin()
 			
+			service.BurnCoin()
+
 		}
 	}
 
