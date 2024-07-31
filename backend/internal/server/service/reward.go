@@ -56,7 +56,7 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 
 	// invoke chain to send rewards, 10% as tax
 
-	invoker_sn.SendCoinAndNFT(addressDetail.Address, totalReward.Mul(decimal.New(9, -1)).Mul(decimal.New(10, 18)).BigInt(), big.NewInt(0), big.NewInt(0))
+	invoker_sn.SendCoinAndNFT(addressDetail.Address, totalReward.Mul(decimal.New(9, -1)).Mul(decimal.New(1, 18)).BigInt(), big.NewInt(0), big.NewInt(0))
 
 	// update related tables
 
@@ -84,7 +84,7 @@ func ClaimRewardOfInvitation(req model.AddressAndSignature) (model.ResponseCode,
 		return model.Success, "Nothing to claim"
 	}
 
-	invoker_sn.SendCoinAndNFT(addressDetail.Address, invitationReward.Mul(decimal.New(10, 18)).BigInt(), big.NewInt(0), big.NewInt(0))
+	invoker_sn.SendCoinAndNFT(addressDetail.Address, invitationReward.Mul(decimal.New(1, 18)).BigInt(), big.NewInt(0), big.NewInt(0))
 
 	database.ClaimInvitationRewardStatic(addressDetail.Uid, invitationReward)
 	// database.CreateClaimRecord(addressDetail.Uid, invitationReward)

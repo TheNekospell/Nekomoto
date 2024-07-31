@@ -133,13 +133,13 @@ func SendCoinAndNFT(to string, nekocoinAmount *big.Int, prismAmount *big.Int, nf
 
 	data["to"] = to
 	if nekocoinAmount.Cmp(big.NewInt(0)) > 0 {
-		data["nekocoin"] = nekocoinAmount
+		data["nekocoin"] = nekocoinAmount.String()
 	}
 	if prismAmount.Cmp(big.NewInt(0)) > 0 {
-		data["prism"] = prismAmount
+		data["prism"] = prismAmount.String()
 	}
 	if nftAmount.Cmp(big.NewInt(0)) > 0 {
-		data["nft"] = nftAmount
+		data["nft"] = nftAmount.String()
 	}
 
 	jsonData, err := json.Marshal(data)
