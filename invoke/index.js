@@ -38,7 +38,7 @@ app.post("/send", async function (req, res) {
                 entrypoint: "transfer",
                 calldata: CallData.compile({
                     recipient: to,
-                    amount: cairo.uint256(nekocoin),
+                    amount: cairo.uint256(BigInt(nekocoin)),
                 })
             })
         }
@@ -49,7 +49,7 @@ app.post("/send", async function (req, res) {
                 entrypoint: "mint",
                 calldata: CallData.compile({
                     recipient: to,
-                    amount: cairo.uint256(prism),
+                    amount: cairo.uint256(BigInt(prism)),
                 })
             })
         }
@@ -60,7 +60,7 @@ app.post("/send", async function (req, res) {
                 entrypoint: "mint",
                 calldata: CallData.compile({
                     recipient: to,
-                    count: cairo.uint256(nft),
+                    count: cairo.uint256(BigInt(nft)),
                 })
             })
         }
