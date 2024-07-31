@@ -729,10 +729,9 @@ export default function Detail() {
 								<div>
 									{Math.max(
 										Math.min(
-											Number(addressInfo.InvitationReward?.TotalAmount) -
-												Number(addressInfo.InvitationReward?.UnlockedAmount),
-											Number(addressInfo.InvitationReward?.ClaimedAmount)
-										),
+											Number(addressInfo.InvitationReward?.TotalAmount),
+											Number(addressInfo.InvitationReward?.UnlockedAmount)
+										) - Number(addressInfo.InvitationReward?.ClaimedAmount),
 										0
 									)}
 								</div>
@@ -941,11 +940,15 @@ export default function Detail() {
 									</div>
 									<Flex justify="space-between" className="margin-bottom-16">
 										<div className="modal-text2">Earning</div>
-										<div className="modal-text3">{addCommaInNumber(focus.Rewards)}</div>
+										<div className="modal-text3">
+											{addCommaInNumber(focus.Rewards)}
+										</div>
 									</Flex>
 									<Flex justify="space-between" className="margin-bottom-16">
 										<div className="modal-text2">Claimed</div>
-										<div className="modal-text3">{addCommaInNumber(focus.ClaimedRewards)}</div>
+										<div className="modal-text3">
+											{addCommaInNumber(focus.ClaimedRewards)}
+										</div>
 									</Flex>
 									{/*<Flex justify="space-between" className="margin-bottom-16">*/}
 									{/*    <div className="modal-text2">APR</div>*/}
