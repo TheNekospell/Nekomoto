@@ -65,6 +65,14 @@ func UpdateNekoSpiritInfo(box *ServerNekoSpiritInfo) error {
 	return nil
 }
 
+func UpdateNekoSpiritInfoWithStakeStatus(box *ServerNekoSpiritInfo, attr map[string]interface{}) error {
+	if err := DB.Model(&box).Updates(attr).Error; err != nil {
+		return err
+	}
+	Cache.Delete(CacheTagNekoSpirit + strconv.FormatUint(box.TokenId, 10))
+	return nil
+}
+
 func CreateBuffRecord(record *ServerBuffRecord) error {
 	if err := DB.Create(&record).Error; err != nil {
 		return err

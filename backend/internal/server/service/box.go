@@ -89,30 +89,28 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 			return
 		}
 
-		origin, err := database.GetNekoSpiritInfoByTokenId(tokenId)
+		toUpdate, err := database.GetNekoSpiritInfoByTokenId(tokenId)
 		// fmt.Println("GetNekoSpiritInfoByTokenId : ", tokenId, toUpdate)
 		if err != nil {
 			fmt.Println("GetNekoSpiritInfoByTokenId error: ", err)
 			return
 		}
 
-		toUpdate := database.ServerNekoSpiritInfo{
-			Model: database.Model{ID: origin.ID},
-		}
+		attr := make(map[string]interface{})
 
 		// fmt.Println("to:", to)
 		// fmt.Println("chain_sn.HostAddress:", chain_sn.HostAddress)
 		if strings.EqualFold(to[len(to)-63:], chain_sn.HostAddress[len(chain_sn.HostAddress)-63:]) {
 			// fmt.Println("to == chain_sn.HostAddress")
-			toUpdate.IsStaked = true
-			toUpdate.StakeTime = time.Now()
+			attr["is_staked"] = true
+			attr["stake_time"] = time.Now()
 		} else {
-			toUpdate.IsStaked = false
+			attr["is_staked"] = false
 		}
 
-		toUpdate.Fade = info.Fade
+		attr["fade"] = info.Fade
 
-		_ = database.UpdateNekoSpiritInfo(&toUpdate)
+		_ = database.UpdateNekoSpiritInfoWithStakeStatus(toUpdate, attr)
 
 	}
 

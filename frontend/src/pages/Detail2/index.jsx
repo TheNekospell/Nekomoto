@@ -941,11 +941,11 @@ export default function Detail() {
 									</div>
 									<Flex justify="space-between" className="margin-bottom-16">
 										<div className="modal-text2">Earning</div>
-										<div className="modal-text3">{focus.Rewards}</div>
+										<div className="modal-text3">{addCommaInNumber(focus.Rewards)}</div>
 									</Flex>
 									<Flex justify="space-between" className="margin-bottom-16">
 										<div className="modal-text2">Claimed</div>
-										<div className="modal-text3">{focus.ClaimedRewards}</div>
+										<div className="modal-text3">{addCommaInNumber(focus.ClaimedRewards)}</div>
 									</Flex>
 									{/*<Flex justify="space-between" className="margin-bottom-16">*/}
 									{/*    <div className="modal-text2">APR</div>*/}
