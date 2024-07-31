@@ -42,7 +42,21 @@ type AddressInfo struct {
 	ChestOpenable       bool
 	ChestEmpower        []string
 	InviteCount         int64
-	IsInBountyWave bool
+	IsInBountyWave      bool
+}
+
+func calUnlockedAmount(count uint64) decimal.Decimal {
+	var result float64
+	if count <= 10 {
+		result = float64(count) * 3
+	} else if count <= 50 {
+		result = float64(count-10)*5.5 + 30
+	} else if count <= 100 {
+		result = float64(count-50)*7 + 250
+	} else {
+		result = float64(count-100)*8.5 + 600
+	}
+	return decimal.NewFromFloat(result).Mul(decimal.NewFromInt(2500))
 }
 
 func GetAddressDetailByUid(uid uint64) AddressInfo {
@@ -65,6 +79,7 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 
 	var invitationReward ServerInvitationRewardStatic
 	DB.Where("uid = ?", uid).Find(&invitationReward)
+	invitationReward.UnlockedAmount = calUnlockedAmount(invitationReward.UnlockedCount)
 
 	var lastClaim time.Time
 	if err := DB.Model(&ServerClaimNekoSpiritRecord{}).Where("uid = ?", uid).Order("created_at desc").Limit(1).Select("created_at").Find(&lastClaim).Error; err != nil {

@@ -76,7 +76,7 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 		}
 
 		// unlock reward of invitation
-		database.UnlockInvitationRewardStatic(detail.Uid, decimal.NewFromInt(2500))
+		// database.UnlockInvitationRewardStatic(detail.Uid, decimal.NewFromInt(2500))
 		// burn 25% of mint cost
 		// by contract
 
@@ -348,6 +348,9 @@ func SummonBox(address string, count uint64) (hash string, code model.ResponseCo
 
 	// record
 	database.AddTreasureRevenue(address, count, hash)
+
+	// record invitation reward
+	database.UnlockInvitationRewardStatic(database.GetAddressDetailByAddress(address).Uid, count)
 
 	return hash, model.Success, "Summon success"
 

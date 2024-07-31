@@ -315,8 +315,8 @@ func AddInvitationRewardStatic(uid uint64, amount decimal.Decimal) {
 	DB.Model(&ServerInvitationRewardStatic{}).Where("uid = ?", uid).Update("total_amount", gorm.Expr("total_amount + ?", amount))
 }
 
-func UnlockInvitationRewardStatic(uid uint64, amount decimal.Decimal) {
-	DB.Model(&ServerInvitationRewardStatic{}).Where("uid = ?", uid).Update("unlocked_amount", gorm.Expr("unlocked_amount + ?", amount))
+func UnlockInvitationRewardStatic(uid uint64, count uint64) {
+	DB.Model(&ServerInvitationRewardStatic{}).Where("uid = ?", uid).Update("unlocked_count", gorm.Expr("unlocked_count + ?", count))
 }
 
 func ClaimInvitationRewardStatic(uid uint64, amount decimal.Decimal) {

@@ -320,6 +320,7 @@ type ServerInvitationRewardStatic struct {
 	Uid            uint64          `gorm:"not null index"`
 	TotalAmount    decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
 	UnlockedAmount decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
+	UnlockedCount  uint64          `gorm:"not null default:0"`
 	ClaimedAmount  decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
 }
 
