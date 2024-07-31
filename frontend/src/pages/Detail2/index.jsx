@@ -727,10 +727,13 @@ export default function Detail() {
 							<Flex justify="space-between" className="card-mini-title">
 								<div>Available</div>
 								<div>
-									{Math.min(
-										Number(addressInfo.InvitationReward?.TotalAmount) -
-											Number(addressInfo.InvitationReward?.UnlockedAmount),
-										Number(addressInfo.InvitationReward?.ClaimedAmount)
+									{Math.max(
+										Math.min(
+											Number(addressInfo.InvitationReward?.TotalAmount) -
+												Number(addressInfo.InvitationReward?.UnlockedAmount),
+											Number(addressInfo.InvitationReward?.ClaimedAmount)
+										),
+										0
 									)}
 								</div>
 							</Flex>
@@ -739,7 +742,6 @@ export default function Detail() {
 								<div>
 									{Math.max(
 										Number(addressInfo.InvitationReward?.TotalAmount) -
-											Number(addressInfo.InvitationReward?.ClaimedAmount) -
 											Number(addressInfo.InvitationReward?.UnlockedAmount),
 										0
 									)}
