@@ -729,8 +729,8 @@ export default function Detail() {
 								<div>
 									{Math.min(
 										Number(addressInfo.InvitationReward?.TotalAmount) -
-											Number(addressInfo.InvitationReward?.ClaimedAmount),
-										Number(addressInfo.InvitationReward?.UnlockedAmount)
+											Number(addressInfo.InvitationReward?.UnlockedAmount),
+										Number(addressInfo.InvitationReward?.ClaimedAmount)
 									)}
 								</div>
 							</Flex>
