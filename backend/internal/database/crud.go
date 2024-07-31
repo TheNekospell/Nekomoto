@@ -188,7 +188,7 @@ func QueryUidThatStakeGreatNeko() []uint64 {
 
 func QueryNotOpenedChest(uid uint64) ServerChest {
 	var chest ServerChest
-	todayStart := time.Now().Truncate(24 * time.Hour)
+	todayStart := time.Now().UTC().Truncate(24 * time.Hour)
 	todayEnd := todayStart.Add(24 * time.Hour)
 	DB.Where("uid = ?", uid).Where("is_open = ?", false).Where("created_at >= ? AND created_at < ?", todayStart, todayEnd).First(&chest)
 	return chest
@@ -196,7 +196,7 @@ func QueryNotOpenedChest(uid uint64) ServerChest {
 
 func QueryChest(uid uint64) ServerChest {
 	var chest ServerChest
-	todayStart := time.Now().Truncate(24 * time.Hour)
+	todayStart := time.Now().UTC().Truncate(24 * time.Hour)
 	todayEnd := todayStart.Add(24 * time.Hour)
 	DB.Where("uid = ?", uid).Where("created_at >= ? AND created_at < ?", todayStart, todayEnd).First(&chest)
 	return chest
@@ -204,7 +204,7 @@ func QueryChest(uid uint64) ServerChest {
 
 func QueryEmpowerRecord(cid uint64) []ServerChestEmpowerRecord {
 	var record []ServerChestEmpowerRecord
-	todayStart := time.Now().Truncate(24 * time.Hour)
+	todayStart := time.Now().UTC().Truncate(24 * time.Hour)
 	todayEnd := todayStart.Add(24 * time.Hour)
 	DB.Where("cid = ?", cid).Where("created_at >= ? AND created_at < ?", todayStart, todayEnd).Find(&record)
 	return record
@@ -216,7 +216,7 @@ func UpdateChest(chest *ServerChest) {
 
 func CanEmpowerChest(uid uint64) bool {
 	var record ServerChestEmpowerRecord
-	todayStart := time.Now().Truncate(24 * time.Hour)
+	todayStart := time.Now().UTC().Truncate(24 * time.Hour)
 	todayEnd := todayStart.Add(24 * time.Hour)
 	DB.Where("uid = ?", uid).Where("created_at >= ? AND created_at < ?", todayStart, todayEnd).First(&record)
 	return record.ID == 0
@@ -228,7 +228,7 @@ func CreateEmpowerChestRecord(record ServerChestEmpowerRecord) {
 
 func CountEmpower(cid uint64) uint64 {
 	var count int64
-	todayStart := time.Now().Truncate(24 * time.Hour)
+	todayStart := time.Now().UTC().Truncate(24 * time.Hour)
 	todayEnd := todayStart.Add(24 * time.Hour)
 	DB.Model(&ServerChestEmpowerRecord{}).Where("cid = ?", cid).Where("created_at >= ? AND created_at < ?", todayStart, todayEnd).Count(&count)
 	return uint64(count)
@@ -251,7 +251,7 @@ func QueryStakedSpiritList() []ServerNekoSpiritInfo {
 }
 
 func IsInBountyWave(uid uint64) bool {
-	now := time.Now()
+	now := time.Now().UTC()
 	var config ServerBountyWaveConfig
 	if err := DB.First(&config).Error; err != nil || config.StartTime.Compare(now) > 0 || config.EndTime.Compare(now) < 0 {
 		// fmt.Println("GetBountyWaveList error: ", err)
@@ -264,7 +264,7 @@ func IsInBountyWave(uid uint64) bool {
 }
 
 func GetBountyWaveList() ([]ServerWhiteListOfBountyWave, decimal.Decimal, bool) {
-	now := time.Now()
+	now := time.Now().UTC()
 	var config ServerBountyWaveConfig
 
 	if err := DB.First(&config).Error; err != nil || config.StartTime.Compare(now) > 0 || config.EndTime.Compare(now) < 0 {
@@ -352,7 +352,7 @@ func GetTreasuryRevenue() []ServerMintRecord {
 }
 
 func QueryOpenedChest(t uint) uint64 {
-	todayStart := time.Now().Truncate(24 * time.Hour)
+	todayStart := time.Now().UTC().Truncate(24 * time.Hour)
 	todayEnd := todayStart.Add(24 * time.Hour)
 
 	var count int64
