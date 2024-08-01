@@ -1,17 +1,13 @@
 package service
 
 import (
+	"backend/internal/database"
 	"backend/internal/invoker_sn"
 	"backend/internal/model"
-	"backend/starknet/curve"
-	"backend/starknet/typed"
-	"backend/starknet/utils"
-	"errors"
-	"fmt"
-	"math/big"
-	"strings"
 
-	"github.com/NethermindEth/juno/core/felt"
+	"fmt"
+
+	"strings"
 )
 
 //func ValidSignature(address, message, signature string) error {
@@ -52,11 +48,7 @@ import (
 
 func ValidSignature(address string, typedData model.TypedData, signature []string) error {
 
-	return nil
-
-	// if text := database.GetAddressSignatureContext(address); text != typedData.Message.Content {
-	// 	return fmt.Errorf("signature expired. expect: %v, actual: %v", text, typedData.Message.Content)
-	// }
+	// return nil
 
 	if len(address) > 66 {
 		address = "0x" + address[len(address)-64:]
@@ -64,43 +56,58 @@ func ValidSignature(address string, typedData model.TypedData, signature []strin
 		address = "0x" + strings.Repeat("0", 66-len(address)) + address[2:]
 	}
 
-	newTypes := make(map[string]typed.TypeDef)
-
-	var definitions []typed.Definition
-	for _, v := range typedData.Types.StarkNetDomain {
-		definitions = append(definitions, typed.Definition{
-			Name: v.Name,
-			Type: v.Type,
-		})
+	if text := database.GetAddressSignatureContext(address); text != typedData.Message.Content {
+		return fmt.Errorf("signature expired. expect: %v, actual: %v", text, typedData.Message.Content)
 	}
-	newTypes["StarkNetDomain"] = typed.TypeDef{Definitions: definitions}
-	var definitionsM []typed.Definition
-	for _, v := range typedData.Types.Message {
-		definitions = append(definitions, typed.Definition{
-			Name: v.Name,
-			Type: v.Type,
-		})
-	}
-	newTypes["Message"] = typed.TypeDef{Definitions: definitionsM}
 
-	starknetTypedData, err := typed.NewTypedData(newTypes, typedData.PrimaryType, typedData.Domain)
+	err := invoker_sn.ValidSignatureViaNode(address, typedData, signature)
 	if err != nil {
-		fmt.Println("new typedData error:", err.Error())
 		return err
 	}
-	//fmt.Println("new typedData:", starknetTypedData)
+	return nil
 
-	hash, err := starknetTypedData.GetMessageHash(utils.HexToBN(address), typedData.Message, curve.Curve)
-	if err != nil {
-		fmt.Println("get message hash error:", err.Error())
-		return err
-	}
+	// newTypes := make(map[string]typed.TypeDef)
 
-	addressFelt, err := utils.HexToFelt(address)
-	if err != nil {
-		fmt.Println("address err: ", err.Error())
-		return err
-	}
+	// var definitions []typed.Definition
+	// for _, v := range typedData.Types.StarkNetDomain {
+	// 	definitions = append(definitions, typed.Definition{
+	// 		Name: v.Name,
+	// 		Type: v.Type,
+	// 	})
+	// }
+	// newTypes["StarkNetDomain"] = typed.TypeDef{Definitions: definitions}
+	// var definitionsM []typed.Definition
+	// for _, v := range typedData.Types.Message {
+	// 	definitions = append(definitions, typed.Definition{
+	// 		Name: v.Name,
+	// 		Type: v.Type,
+	// 	})
+	// }
+	// newTypes["Message"] = typed.TypeDef{Definitions: definitionsM}
+
+	// starknetTypedData, err := typed.NewTypedData(newTypes, typedData.PrimaryType, typed.Domain{
+	// 	Name:    typedData.Domain.Name,
+	// 	Version: typedData.Domain.Version,
+	// 	ChainId: typedData.Domain.ChainId,
+	// })
+	// if err != nil {
+	// 	fmt.Println("new typedData error:", err.Error())
+	// 	return err
+	// }
+	// //fmt.Println("new typedData:", starknetTypedData)
+
+	// hash, err := starknetTypedData.GetMessageHash(utils.HexToBN(address), typedData.Message, curve.Curve)
+	// if err != nil {
+	// 	fmt.Println("get message hash error:", err.Error())
+	// 	return err
+	// }
+	// fmt.Println("get message hash:", hash)
+
+	// addressFelt, err := utils.HexToFelt(address)
+	// if err != nil {
+	// 	fmt.Println("address err: ", err.Error())
+	// 	return err
+	// }
 
 	// r, e := new(big.Int).SetString(signature[3], 10)
 	// if !e {
@@ -111,22 +118,22 @@ func ValidSignature(address string, typedData model.TypedData, signature []strin
 	// 	fmt.Println("set s error:")
 	// }
 
-	var signatureFelt []*felt.Felt
+	// var signatureFelt []*felt.Felt
 
-	for _, v := range signature {
-		res, b := new(big.Int).SetString(v, 10)
-		if !b {
-			fmt.Println("set signature error:")
-			return errors.New("set signature error")
-		}
-		signatureFelt = append(signatureFelt, utils.BigIntToFelt(res))
-	}
+	// for _, v := range signature {
+	// 	res, b := new(big.Int).SetString(v, 10)
+	// 	if !b {
+	// 		fmt.Println("set signature error:")
+	// 		return errors.New("set signature error")
+	// 	}
+	// 	signatureFelt = append(signatureFelt, utils.BigIntToFelt(res))
+	// }
 
-	err = invoker_sn.ValidSignature(addressFelt, utils.BigIntToFelt(hash), signatureFelt)
-	if err != nil {
-		fmt.Println("valid signature error:", err.Error())
-		return err
-	}
-	return nil
+	// err = invoker_sn.ValidSignature(addressFelt, utils.BigIntToFelt(hash), signatureFelt)
+	// if err != nil {
+	// 	fmt.Println("valid signature error:", err.Error())
+	// 	return err
+	// }
+	// return nil
 
 }

@@ -52,7 +52,7 @@ func StartServer() {
 	addressGroup.GET("/generateSignature", GenerateSignature)
 	addressGroup.GET("/info", AddressInfo)
 	addressGroup.POST("/invitation", AcceptInvitation)
-	//addressGroup.POST("/valid", ValidSignature)
+	addressGroup.POST("/valid", ValidSignature)
 
 	rewardGroup := apiGroup.Group("/reward")
 	rewardGroup.POST("/claim", ClaimReward)

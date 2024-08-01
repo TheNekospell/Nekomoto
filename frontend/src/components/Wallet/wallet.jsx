@@ -66,6 +66,18 @@ export default function Wallet({ isMobile = false }) {
 		await disconnect();
 	};
 
+	const valid = async () => {
+		const { typedMessage, signature } = await sign(account);
+		// console.log("typedMessage: ", typedMessage);
+		// console.log("signature: ", signature);
+		const result = await BACKEND.verifySignature(
+			address,
+			typedMessage,
+			signature
+		);
+		console.log("result: ", result);
+	};
+
 	const items = [
 		{
 			key: "1",
@@ -127,7 +139,11 @@ export default function Wallet({ isMobile = false }) {
 							<span>My Assets</span>
 						</Flex>
 					</Col>
-					<Col className="header-btn2" style={{ margin: "0px 12px" }}>
+					<Col
+						className="header-btn2"
+						style={{ margin: "0px 12px" }}
+						// onClick={valid}
+					>
 						{/*<Flex align="center" justify="space-between">*/}
 						<Flex align="center">
 							{/*<img*/}

@@ -2,7 +2,7 @@ package model
 
 import (
 	"backend/internal/database"
-	"backend/starknet/typed"
+
 	"backend/starknet/utils"
 	"math/big"
 
@@ -31,13 +31,13 @@ type Message struct {
 }
 
 type Types struct {
-	StarkNetDomain []Definition
-	Message        []Definition
+	StarkNetDomain []Definition `json:"StarkNetDomain" form:"StarkNetDomain"`
+	Message        []Definition `json:"Message" form:"Message"`
 }
 
 type Definition struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
+	Name string `json:"name" form:"name"`
+	Type string `json:"type" form:"type"`
 }
 
 type Address struct {
@@ -45,10 +45,16 @@ type Address struct {
 }
 
 type TypedData struct {
-	Types       Types
-	PrimaryType string
-	Domain      typed.Domain
-	Message     Message
+	Types       Types        `json:"types" form:"types"`
+	PrimaryType string       `json:"primaryType" form:"primaryType"`
+	Domain      Domain `json:"domain" form:"domain"`
+	Message     Message      `json:"message" form:"message"`
+}
+
+type Domain struct{
+	Name    string `json:"name" form:"name"`
+	Version string `json:"version" form:"version"`
+	ChainId string `json:"chainId" form:"chainId"`
 }
 
 type Signature struct {

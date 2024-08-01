@@ -236,6 +236,8 @@ func GetChestConfig() []ServerChestConfig {
 
 func GetAddressSignatureContext(address string) string {
 
+	// return "123456"
+
 	if result, found := Cache.Get(CacheSignature + address); found {
 		fmt.Println("SignatureContext: ", result)
 		return result.(string)

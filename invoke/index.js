@@ -15,6 +15,26 @@ const provider = new RpcProvider({
 
 const account = new Account(provider, process.env.ACCOUNT_ADDRESS, process.env.PRIVATE_KEY);
 
+app.post("/valid", async function (req, res) {
+    console.log("-----------------valid ")
+
+    try {
+        const { address, typedMessage, signature } = req.body
+
+        console.log("valid: ", address, typedMessage, signature)
+
+        acc = new Account(provider, address, "0xaaa")
+        const result = await acc.verifyMessage(typedMessage, signature)
+        console.log("result: ", result)
+        res.send(result)
+    } catch (e) {
+        console.log("valid error: ", e)
+        res.status(500).send(e)
+        return
+    }
+
+})
+
 app.post("/send", async function (req, res) {
     console.log("-----------------send ")
     try {

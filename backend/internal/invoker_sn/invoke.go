@@ -3,6 +3,7 @@ package invoker_sn
 import (
 	"backend/internal/chain_sn"
 	"backend/internal/database"
+	"backend/internal/model"
 	"backend/starknet/rpc"
 	"backend/starknet/utils"
 	"bytes"
@@ -470,21 +471,66 @@ func Summon(to string, count *big.Int) (string, error) {
 
 func ValidSignature(address *felt.Felt, hash *felt.Felt, signature []*felt.Felt) error {
 
+	calldata := []*felt.Felt{hash}
+	// calldata = append(calldata, utils.BigIntToFelt(big.NewInt(int64(len(signature)))))
+	// calldata = append(calldata, signature...)
+	calldata = append(calldata, utils.BigIntToFelt(big.NewInt(2)))
+	calldata = append(calldata, signature[1], signature[2])
+
 	call := rpc.FunctionCall{
 		ContractAddress:    address,
 		EntryPointSelector: utils.GetSelectorFromNameFelt("is_valid_signature"),
-		Calldata:           append([]*felt.Felt{hash, utils.BigIntToFelt(big.NewInt(int64(len(signature))))}, signature...),
+		Calldata:           calldata,
 	}
 
 	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTagPending)
 	if errRpc != nil {
-		fmt.Println(errRpc.Error())
+		fmt.Println("call valid signature err: ", errRpc.Error())
 		return errRpc
 	}
 
 	fmt.Println("valid signature response:", response)
+	if response[0] != utils.BigIntToFelt(big.NewInt(1)) {
+		return errors.New("invalid signature")
+	}
 	return nil
 
+}
+
+func ValidSignatureViaNode(address string, typedMessage model.TypedData, signature []string) error {
+
+	data := make(map[string]interface{})
+	data["address"] = address
+	data["typedMessage"] = typedMessage
+	data["signature"] = signature
+
+	fmt.Println("data: ", data)
+
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("json err: ", err.Error())
+		return err
+	}
+
+	res, err := http.Post("http://localhost:8973/valid", "application/json", bytes.NewReader(jsonData))
+	if err != nil {
+		fmt.Println("req err: ", err.Error())
+		return err
+	}
+	if res.StatusCode != 200 {
+		fmt.Println("response err: ", res.StatusCode)
+		return errors.New("response err: " + res.Status)
+	}
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("read err: ", err.Error())
+		return err
+	}
+	fmt.Println("response: ", string(body))
+	if string(body) != "true" {
+		return errors.New("invalid signature")
+	}
+	return nil
 }
 
 func BurnNekoCoin(amount decimal.Decimal) error {

@@ -1,4 +1,4 @@
-import { Contract, RpcProvider } from "starknet";
+import { Contract, RpcProvider, hash } from "starknet";
 import nekomotoAbi from "./abi/nekomoto.json" assert { type: "json" };
 import nekocoinAbi from "./abi/nekocoin.json" assert { type: "json" };
 import prismAbi from "./abi/prism.json" assert { type: "json" };
@@ -54,10 +54,7 @@ export const sign = async (account) => {
     const signature = await account.signMessage(typedMessage);
     // console.log("signature: ", signature);
 
-    // const messageHash = typedData.getMessageHash(
-    // 	typedMessage,
-    // 	BigInt(await account.signer.getPubKey())
-    // );
+    const messageHash = await account.hashMessage(typedMessage)
     // console.log("messageHash: ", messageHash);
 
     return { typedMessage, signature }
