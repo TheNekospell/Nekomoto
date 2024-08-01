@@ -16,9 +16,12 @@ import user from "@assets/user.png";
 import { useNavigate } from "react-router-dom";
 import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
 import { BACKEND, sign } from "@/interface.js";
-import { typedData, shortString } from "starknet";
+import { typedData, shortString, uint256, hash } from "starknet";
 import Button from "@components/Button/index.jsx";
 import NekoModal from "@components/Modal/index.jsx";
+
+const SN_MAIN = "0x534e5f4d41494e"; // encodeShortString('SN_MAIN'),
+const SN_SEPOLIA = "0x534e5f5345504f4c4941"; // encodeShortString('SN_SEPOLIA')
 
 export default function Wallet({ isMobile = false }) {
 	const navigate = useNavigate();
@@ -32,6 +35,10 @@ export default function Wallet({ isMobile = false }) {
 	const [accept, setAccept] = useState(false);
 
 	const [text, setText] = useState("");
+
+	// useEffect(() => {
+	// 	connect({connector});
+	// }, []);
 
 	useEffect(() => {
 		if (inputValue !== "" && address) {
@@ -54,7 +61,18 @@ export default function Wallet({ isMobile = false }) {
 			});
 		}
 		setInputValue("");
-	}, [address]);
+
+		const target = SN_SEPOLIA;
+		console.log("chainId: ", chainId, uint256.uint256ToBN(target));
+		if (chainId !== uint256.uint256ToBN(target)) {
+			window.starknet.request({
+				type: "wallet_switchStarknetChain",
+				params: {
+					chainId: "SN_SEPOLIA",
+				},
+			});
+		}
+	}, [address, chainId]);
 
 	const establishConnection = async (connector) => {
 		await connect({ connector });
