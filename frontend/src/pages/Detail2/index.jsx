@@ -1255,7 +1255,9 @@ export default function Detail() {
 												</div>
 												<div className="modal-text9">
 													{"/" +
-														addCommaInNumber(upgradeCal[focus?.Level - 1].Prism)}
+														addCommaInNumber(
+															upgradeCal[focus?.Level - 1].Prism
+														)}
 												</div>
 											</Flex>
 										</Flex>
@@ -1298,12 +1300,19 @@ export default function Detail() {
 							}}
 						>
 							<Button
-								text="LV UP"
+								text={focus?.Level == 13 ? "LV MAX" : "LV UP"}
 								color="orange"
 								longness="short"
-								style={{ marginTop: "24px" }}
-								onClick={() => upgrade(focus?.TokenId)}
+								style={
+									focus?.Level == 13
+										? { filter: "grayscale(1)", marginTop: "24px" }
+										: { marginTop: "24px" }
+								}
+								onClick={
+									focus?.Level == 13 ? null : () => upgrade(focus?.TokenId)
+								}
 							/>
+
 							<Button
 								text={"Unstake"}
 								color={"blue"}
