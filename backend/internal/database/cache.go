@@ -1,10 +1,11 @@
 package database
 
 import (
+	"backend/internal/util"
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
+
 	"time"
 
 	"gorm.io/gorm"
@@ -180,11 +181,7 @@ func GetAddressDetailByInviteCode(inviteCode string) AddressInfo {
 
 func CreateAddressInfo(address string) uint64 {
 
-	if len(address) > 66 {
-		address = "0x" + address[len(address)-64:]
-	} else if len(address) < 66 {
-		address = "0x" + strings.Repeat("0", 66-len(address)) + address[2:]
-	}
+	address = util.CleanAddress(address)
 
 	// uid -> address
 	uid, err := CreateAddress(&ServerAddress{

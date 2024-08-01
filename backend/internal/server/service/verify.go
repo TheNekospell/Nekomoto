@@ -4,10 +4,11 @@ import (
 	"backend/internal/database"
 	"backend/internal/invoker_sn"
 	"backend/internal/model"
+	"backend/internal/util"
 
 	"fmt"
 
-	"strings"
+
 )
 
 //func ValidSignature(address, message, signature string) error {
@@ -50,11 +51,7 @@ func ValidSignature(address string, typedData model.TypedData, signature []strin
 
 	// return nil
 
-	if len(address) > 66 {
-		address = "0x" + address[len(address)-64:]
-	} else if len(address) < 66 {
-		address = "0x" + strings.Repeat("0", 66-len(address)) + address[2:]
-	}
+	address = util.CleanAddress(address)
 
 	if text := database.GetAddressSignatureContext(address); text != typedData.Message.Content {
 		return fmt.Errorf("signature expired. expect: %v, actual: %v", text, typedData.Message.Content)

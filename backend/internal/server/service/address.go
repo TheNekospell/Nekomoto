@@ -3,7 +3,8 @@ package service
 import (
 	"backend/internal/database"
 	"backend/internal/model"
-	"strings"
+	"backend/internal/util"
+
 )
 
 func AddressInfo(address model.Address) (data database.AddressInfo, code model.ResponseCode, message string) {
@@ -18,11 +19,7 @@ func AddressInfo(address model.Address) (data database.AddressInfo, code model.R
 
 func GenerateSignature(address string) (data string, code model.ResponseCode, message string) {
 
-	if len(address) > 66 {
-		address = "0x" + address[len(address)-64:]
-	} else if len(address) < 66 {
-		address = "0x" + strings.Repeat("0", 66-len(address)) + address[2:]
-	}
+	address = util.CleanAddress(address)
 
 	return database.GetAddressSignatureContext(address), model.Success, "Success"
 }
