@@ -504,7 +504,7 @@ func ValidSignatureViaNode(address string, typedMessage model.TypedData, signatu
 	data["typedMessage"] = typedMessage
 	data["signature"] = signature
 
-	fmt.Println("data: ", data)
+	// fmt.Println("data: ", data)
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {

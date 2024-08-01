@@ -85,19 +85,19 @@ func AllocateProfit() {
 
 func calTheRewardCoefficient(mana decimal.Decimal) decimal.Decimal {
 	if mana.Cmp(decimal.New(100, 0)) < 0 {
-		return decimal.New(615, -7)
+		return decimal.New(615, -9)
 	} else if mana.Cmp(decimal.New(1000, 0)) < 0 {
-		return decimal.New(5800, -7)
+		return decimal.New(5800, -9)
 	} else if mana.Cmp(decimal.New(5000, 0)) < 0 {
-		return decimal.New(30000, -7)
+		return decimal.New(30000, -9)
 	} else if mana.Cmp(decimal.New(10000, 0)) < 0 {
-		return decimal.New(60000, -7)
+		return decimal.New(60000, -9)
 	} else if mana.Cmp(decimal.New(50000, 0)) < 0 {
-		return decimal.New(300000, -7)
+		return decimal.New(300000, -9)
 	} else if mana.Cmp(decimal.New(100000, 0)) < 0 {
-		return decimal.New(600000, -7)
+		return decimal.New(600000, -9)
 	}
-	return decimal.New(620000, -7)
+	return decimal.New(620000, -9)
 }
 
 func inList(uid uint64, list []database.ServerWhiteListOfBountyWave) bool {

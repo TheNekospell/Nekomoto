@@ -140,7 +140,7 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		NekoSpiritList:      NekoSpiritList,
 		TemporalShardIdList: shardIdList,
 		LastClaim:           lastClaim,
-		TotalClaimed:        TotalClaimed,
+		TotalClaimed:        TotalClaimed.Add(invitationReward.ClaimedAmount),
 		TotalMana:           Mana,
 		ToClaim:             ToClaim,
 		ChestOpenable:       openable,
