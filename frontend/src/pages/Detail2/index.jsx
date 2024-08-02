@@ -1333,12 +1333,12 @@ export default function Detail() {
 					}}
 				>
 					<div className="modal-title text-center margin-bottom-16">
-						{addressInfo?.ChestEmpower && addressInfo?.ChestEmpower.length >= 5
+						{addressInfo?.ChestEmpower?.length >= 5
 							? "Open Master's Box"
 							: "Open Adept's Chest"}
 					</div>
 					<Row justify="center" gutter={16}>
-						{chestDetail?.Token2Amount && chestDetail?.Token2Amount > 0 && (
+						{chestDetail?.Token2Amount > 0 && (
 							<Col>
 								<div className="adept-bg">
 									<img src={adept1} width={80} alt="" />
@@ -1350,7 +1350,7 @@ export default function Detail() {
 							</Col>
 						)}
 
-						{chestDetail?.Token1Amount && chestDetail?.Token1Amount > 0 && (
+						{chestDetail?.Token1Amount > 0 && (
 							<Col>
 								<div className="adept-bg">
 									<img src={adept2} width={80} alt="" />
@@ -1362,7 +1362,7 @@ export default function Detail() {
 							</Col>
 						)}
 
-						{chestDetail?.NFTAmount && chestDetail?.NFTAmount > 0 && (
+						{chestDetail?.NFTAmount > 0 && (
 							<Col>
 								<div className="adept-bg">
 									<img src={adept3} width={80} alt="" />
