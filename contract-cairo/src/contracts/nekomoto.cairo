@@ -481,7 +481,7 @@ pub mod Nekomoto {
                 5 => 'Legendary',
                 _ => '',
             },
-            match rarity {
+            match element {
                 0 => '',
                 1 => 'Fire',
                 2 => 'Water',

@@ -3,7 +3,9 @@ package service
 import (
 	"backend/internal/database"
 	"backend/internal/invoker_sn"
+	"backend/internal/util"
 	"fmt"
+	"strings"
 
 	// "backend/internal/invoker"
 	"backend/internal/model"
@@ -36,8 +38,10 @@ func OpenChest(req model.AddressAndSignature) (data database.ServerChest, code m
 
 	random := generateRandomNumber(0, 10000)
 
+	chance := decimal.NewFromUint64(0)
 	for _, v := range config {
-		if v.ChestType == chest.ChestType && decimal.NewFromUint64(random).LessThan(v.Chance.Mul(decimal.NewFromUint64(10000))) {
+		chance = chance.Add(v.Chance)
+		if v.ChestType == chest.ChestType && decimal.NewFromUint64(random).LessThan(chance.Mul(decimal.NewFromUint64(10000))) {
 			chest.IsOpen = 1
 			chest.Token1Amount = v.Token1Amount
 			chest.Token2Amount = v.Token2Amount
@@ -69,14 +73,25 @@ func OpenChest(req model.AddressAndSignature) (data database.ServerChest, code m
 
 func EmpowerChest(req model.TwoAddressAndSignature) (code model.ResponseCode, message string) {
 
-	chest := database.QueryNotOpenedChest(database.GetAddressDetailByAddress(req.Address2).Uid)
+	if strings.EqualFold(util.CleanAddress(req.Address1), util.CleanAddress(req.Address2)) {
+		return model.WrongParam, "can not empower yourself"
+	}
+
+	detail1 := database.GetAddressDetailByAddress(req.Address1)
+	detail2 := database.GetAddressDetailByAddress(req.Address2)
+
+	if database.QueryChest(detail1.Uid).ID == 0 {
+		return model.NotFound, "you should have chest first"
+	}
+
+	chest := database.QueryNotOpenedChest(detail2.Uid)
 	if chest.ID == 0 {
 		return model.NotFound, "chest not found"
 	}
 
-	if can := database.CanEmpowerChest(database.GetAddressDetailByAddress(req.Address1).Uid); can {
+	if can := database.CanEmpowerChest(detail1.Uid); can {
 		record := database.ServerChestEmpowerRecord{
-			Uid: database.GetAddressDetailByAddress(req.Address1).Uid,
+			Uid: detail1.Uid,
 			Cid: chest.ID,
 		}
 		database.CreateEmpowerChestRecord(record)

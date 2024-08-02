@@ -1333,7 +1333,7 @@ export default function Detail() {
 					}}
 				>
 					<div className="modal-title text-center margin-bottom-16">
-						{ascendInfo?.ChestEmpower && ascendInfo?.ChestEmpower.length >= 5
+						{addressInfo?.ChestEmpower && addressInfo?.ChestEmpower.length >= 5
 							? "Open Master's Box"
 							: "Open Adept's Chest"}
 					</div>
