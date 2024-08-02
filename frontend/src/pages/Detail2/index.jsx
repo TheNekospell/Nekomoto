@@ -150,7 +150,22 @@ export default function Detail() {
 				console.log("find empower code: ", code);
 			}
 		} else {
-			setAddressInfo({});
+			setAddressInfo({
+				InviteCode: "",
+				Buff: {
+					Level: 0,
+				},
+				TemporalShardIdList: [],
+				TotalMana: 0,
+				ToClaim: 0,
+				InviteCount: 0,
+				InvitationReward: {
+					TotalAmount: 0,
+					UnlockedAmount: 0,
+					ClaimedAmount: 0,
+				},
+				NekoSpiritList: [],
+			});
 			setPrism(0);
 			setNekocoin(0);
 			setPrismAllowance(0);
