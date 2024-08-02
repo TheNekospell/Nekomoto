@@ -3,6 +3,7 @@ package service
 import (
 	"backend/internal/database"
 	"backend/internal/invoker_sn"
+	"fmt"
 	"math/big"
 
 	// invoke "backend/internal/invoker"
@@ -39,28 +40,32 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 		}
 		// if spirit.Fade.LessThanOrEqual(decimal.Zero) {
 		spiritReward = spiritReward.Add(spirit.Rewards)
-		temp.ClaimedRewards = spirit.Rewards
+		temp.ClaimedRewards = temp.ClaimedRewards.Add(spirit.Rewards)
+		temp.Rewards = decimal.Zero
 		spiritToUpdate = append(spiritToUpdate, temp)
 		// }
 	}
 
-	invitationReward := decimal.Zero
+	// invitationReward := decimal.Zero
 	// if claimable := addressDetail.InvitationReward.UnlockedAmount.Sub(addressDetail.InvitationReward.ClaimedAmount); claimable.GreaterThan(decimal.Zero) {
 	// 	invitationReward = claimable
 	// }
 
-	totalReward := invitationReward.Add(spiritReward)
+	totalReward := spiritReward
 	if totalReward.Equal(decimal.Zero) {
 		return model.Success, "Nothing to claim"
 	}
 
 	// invoke chain to send rewards, 10% as tax
 
-	invoker_sn.SendCoinAndNFT(addressDetail.Address, totalReward.Mul(decimal.New(9, -1)).Mul(decimal.New(1, 18)).BigInt(), big.NewInt(0), big.NewInt(0))
+	if err := invoker_sn.SendCoinAndNFT(addressDetail.Address, totalReward.Mul(decimal.New(9, -1)).Mul(decimal.New(1, 18)).BigInt(), big.NewInt(0), big.NewInt(0)); err != nil {
+		fmt.Println("SendCoinAndNFT error: ", err)
+		return model.ServerInternalError, err.Error()
+	}
 
 	// update related tables
 
-	database.UpdateNekoSpiritList(spiritToUpdate)
+	database.UpdateNekoSpiritListWithMap(spiritToUpdate)
 	// database.ClaimInvitationRewardStatic(addressDetail.Uid, invitationReward)
 	database.CreateClaimRecord(addressDetail.Uid, totalReward.Mul(decimal.New(9, -1)))
 
@@ -84,7 +89,10 @@ func ClaimRewardOfInvitation(req model.AddressAndSignature) (model.ResponseCode,
 		return model.Success, "Nothing to claim"
 	}
 
-	invoker_sn.SendCoinAndNFT(addressDetail.Address, invitationReward.Mul(decimal.New(1, 18)).BigInt(), big.NewInt(0), big.NewInt(0))
+	if err := invoker_sn.SendCoinAndNFT(addressDetail.Address, invitationReward.Mul(decimal.New(1, 18)).BigInt(), big.NewInt(0), big.NewInt(0)); err != nil {
+		fmt.Println("SendCoinAndNFT error: ", err)
+		return model.ServerInternalError, err.Error()
+	}
 
 	database.ClaimInvitationRewardStatic(addressDetail.Uid, invitationReward)
 	// database.CreateClaimRecord(addressDetail.Uid, invitationReward)
