@@ -65,7 +65,7 @@ export default function Wallet({ isMobile = false }) {
 		const target = SN_SEPOLIA;
 		console.log("chainId: ", chainId, uint256.uint256ToBN(target));
 		if (chainId !== uint256.uint256ToBN(target)) {
-			window.starknet.request({
+			window?.starknet?.request({
 				type: "wallet_switchStarknetChain",
 				params: {
 					chainId: "SN_SEPOLIA",
