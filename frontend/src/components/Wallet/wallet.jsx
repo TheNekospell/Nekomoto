@@ -19,6 +19,7 @@ import { BACKEND, sign } from "@/interface.js";
 import { typedData, shortString, uint256, hash } from "starknet";
 import Button from "@components/Button/index.jsx";
 import NekoModal from "@components/Modal/index.jsx";
+import { ArgentMobileConnector } from "starknetkit/argentMobile";
 
 const SN_MAIN = "0x534e5f4d41494e"; // encodeShortString('SN_MAIN'),
 const SN_SEPOLIA = "0x534e5f5345504f4c4941"; // encodeShortString('SN_SEPOLIA')
@@ -137,7 +138,7 @@ export default function Wallet({ isMobile = false }) {
 							className="header-btn"
 							onClick={() => {
 								// setVisible(true);
-								connect(connectors.filter((item) => item.id === "argentX")[0]);
+								connect({ connector: new ArgentMobileConnector() });
 							}}
 						>
 							Connect Wallet
