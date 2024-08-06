@@ -136,7 +136,8 @@ export default function Wallet({ isMobile = false }) {
 						<div
 							className="header-btn"
 							onClick={() => {
-								setVisible(true);
+								// setVisible(true);
+								connect(connectors.filter((item) => item.id === "argentX")[0]);
 							}}
 						>
 							Connect Wallet
