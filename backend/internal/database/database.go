@@ -213,6 +213,7 @@ func initTables() {
 	if err := DB.First(&IndexerRecord{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		blockHeight, err := strconv.ParseUint(env.GetEnvValue("BLOCK_HEIGHT"), 10, 64)
 		if err != nil {
+			fmt.Println("indexer block height is not set, use default value 0", err)
 			blockHeight = 0
 		}
 		DB.Create(&IndexerRecord{BlockHeight: blockHeight})

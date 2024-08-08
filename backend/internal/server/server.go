@@ -68,8 +68,23 @@ func StartServer() {
 	testGroup.GET("/chest", func(ctx *gin.Context) {
 		service.GiveChest()
 	})
-	testGroup.POST("/summon", func(ctx *gin.Context) {
-		_ = invoker_sn.SendCoinAndNFT("", big.NewInt(100000), big.NewInt(10000), big.NewInt(10))
+	// testGroup.POST("/summon", func(ctx *gin.Context) {
+	// 	_ = invoker_sn.SendCoinAndNFT("", big.NewInt(100000), big.NewInt(10000), big.NewInt(10))
+	// })
+	testGroup.GET("/faucet", func(ctx *gin.Context) {
+		var req model.Address
+		if err := ctx.ShouldBind(&req); err != nil {
+			ErrorResponse(ctx, model.WrongParam, err.Error())
+			return
+		}
+		bigIntNumber := new(big.Int)
+		bigIntNumber.SetString("20000000000000000000000000", 10)
+		err := invoker_sn.SendCoinAndNFT(req.Address, bigIntNumber, bigIntNumber, big.NewInt(10))
+		if err != nil {
+			ErrorResponse(ctx, model.ServerInternalError, err.Error())
+			return
+		}
+		SuccessResponse(ctx, "success")
 	})
 
 	// fmt.Println("server started at:", engine)
