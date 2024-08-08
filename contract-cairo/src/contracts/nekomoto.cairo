@@ -58,6 +58,7 @@ pub mod Nekomoto {
         stake_time: LegacyMap<u256, u256>,
         stake_from: LegacyMap<u256, ContractAddress>,
         level: LegacyMap<u256, u8>,
+        level_count: LegacyMap<ContractAddress, u256>,
     }
 
 
@@ -165,6 +166,7 @@ pub mod Nekomoto {
 
             let block_time = starknet::get_block_timestamp();
             let mut i = 0;
+            let mut level_count_to_add = 0;
             loop {
                 if i == count {
                     break;
@@ -189,8 +191,12 @@ pub mod Nekomoto {
                 if is_lucky {
                     self.with_buff.write(token_id, 1);
                 }
+                level_count_to_add = level_count_to_add + 1;
                 self.emit(Summon { to: recipient, token_id });
-            }
+            };
+            self
+                .level_count
+                .write(recipient, self.level_count.read(recipient) + level_count_to_add);
         }
 
         fn stake(ref self: ContractState, token_id: Array<u256>) {
@@ -273,6 +279,7 @@ pub mod Nekomoto {
             self.erc721.mint(sender, token_id);
             self.starter.write(token_id, 1);
             self.token_id.write(token_id);
+            self.level_count.write(sender, self.level_count.read(sender) + 1);
             self.emit(Summon { to: sender, token_id: token_id });
         }
 
@@ -414,6 +421,8 @@ pub mod Nekomoto {
             }
 
             self.level.write(token_id, target_level);
+            let stake_from = self.stake_from.read(token_id);
+            self.level_count.write(stake_from, self.level_count.read(stake_from) + 1);
             self
                 .emit(
                     Upgrade {
@@ -465,6 +474,10 @@ pub mod Nekomoto {
                 mana: mana,
                 level: level.into() + 1
             }
+        }
+
+        fn get_level_count(self: @ContractState, address: ContractAddress) -> u256 {
+            self.level_count.read(address)
         }
     }
 
@@ -970,11 +983,22 @@ pub mod Nekomoto {
         ) {
             let mut state = nekomoto::contracts::nekomoto::Nekomoto::unsafe_new_contract_state();
             let host = state.host.read();
-            if self.ERC721_owners.read(token_id) != host && to != host {
+            let owner = self.ERC721_owners.read(token_id);
+            if owner != host && to != host {
+                let origin_level_in_storage = state.level.read(token_id);
+
+                state
+                    .level_count
+                    .write(
+                        owner, state.level_count.read(owner) - origin_level_in_storage.into() - 1
+                    );
+                state.level_count.write(to, state.level_count.read(to) + 1);
+
                 state.level.write(token_id, 0);
                 // state.fade_consume.write(token_id,0);
                 // state.fade_increase.write(token_id,0);
                 state.stake_time.write(token_id, 0);
+
                 state.emit(Reset { token_id });
             }
         }

@@ -47,4 +47,5 @@ pub trait NekomotoTrait<ContractState> {
     );
     fn upgrade(ref self: ContractState, token_id: u256);
     fn generate(self: @ContractState, token_id: u256, origin: bool) -> Info;
+    fn get_level_count(self: @ContractState, address: ContractAddress) -> u256;
 }

@@ -5,6 +5,7 @@ import (
 	"backend/internal/invoker_sn"
 	"fmt"
 	"math/big"
+	"sort"
 
 	// invoke "backend/internal/invoker"
 	"backend/internal/model"
@@ -28,9 +29,19 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 		return model.Success, "Every 24 hours can only claim once"
 	}
 
+	// limit the max claimable amount
+
+	maxToClaim := calMaxToClaim(req.Address)
+	if maxToClaim.Equal(decimal.Zero) {
+		return model.Success, "Exceed the limit"
+	}
+
 	// make sure that there are rewards to claim
 
 	spiritReward := decimal.Zero
+	sort.Slice(addressDetail.NekoSpiritList, func(i, j int) bool {
+		return addressDetail.NekoSpiritList[i].Rewards.LessThan(addressDetail.NekoSpiritList[j].Rewards)
+	})
 	var spiritToUpdate []database.ServerNekoSpiritInfo
 	for _, spirit := range addressDetail.NekoSpiritList {
 		temp := database.ServerNekoSpiritInfo{
@@ -38,12 +49,14 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 			TokenId:        spirit.TokenId,
 			ClaimedRewards: spirit.ClaimedRewards,
 		}
-		// if spirit.Fade.LessThanOrEqual(decimal.Zero) {
-		spiritReward = spiritReward.Add(spirit.Rewards)
-		temp.ClaimedRewards = temp.ClaimedRewards.Add(spirit.Rewards)
-		temp.Rewards = decimal.Zero
-		spiritToUpdate = append(spiritToUpdate, temp)
-		// }
+		if spiritReward.Add(spirit.Rewards).LessThan(maxToClaim) {
+			spiritReward = spiritReward.Add(spirit.Rewards)
+			temp.ClaimedRewards = temp.ClaimedRewards.Add(spirit.Rewards)
+			temp.Rewards = decimal.Zero
+			spiritToUpdate = append(spiritToUpdate, temp)
+		} else {
+			break
+		}
 	}
 
 	// invitationReward := decimal.Zero
@@ -78,6 +91,13 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 
 func ClaimRewardOfInvitation(req model.AddressAndSignature) (model.ResponseCode, string) {
 
+	// limit the max claimable amount
+
+	maxToClaim := calMaxToClaim(req.Address)
+	if maxToClaim.Equal(decimal.Zero) {
+		return model.Success, "Exceed the limit"
+	}
+
 	addressDetail := database.GetAddressDetailByAddress(req.Address)
 
 	invitationReward := decimal.Zero
@@ -87,6 +107,10 @@ func ClaimRewardOfInvitation(req model.AddressAndSignature) (model.ResponseCode,
 
 	if invitationReward.Equal(decimal.Zero) {
 		return model.Success, "Nothing to claim"
+	}
+
+	if invitationReward.GreaterThan(maxToClaim) {
+		invitationReward = maxToClaim
 	}
 
 	if err := invoker_sn.SendCoinAndNFT(addressDetail.Address, invitationReward.Mul(decimal.New(1, 18)).BigInt(), big.NewInt(0), big.NewInt(0)); err != nil {
@@ -101,4 +125,55 @@ func ClaimRewardOfInvitation(req model.AddressAndSignature) (model.ResponseCode,
 
 	return model.Success, "Success"
 
+}
+
+func calMax(levelCount uint64) decimal.Decimal {
+
+	// 	[0,10]	25000
+	// [11,20]	50000
+	// [21,40]	125000
+	// [41,80]	250000
+	// [81,100]	550000
+	// [101,150]	1200000
+	// [151,200]	1600000
+	// [201,+∞]	2000000
+
+	if levelCount <= 10 {
+		return decimal.New(25000, 0)
+	} else if levelCount <= 20 {
+		return decimal.New(50000, 0)
+	} else if levelCount <= 40 {
+		return decimal.New(125000, 0)
+	} else if levelCount <= 80 {
+		return decimal.New(250000, 0)
+	} else if levelCount <= 100 {
+		return decimal.New(550000, 0)
+	} else if levelCount <= 150 {
+		return decimal.New(1200000, 0)
+	} else if levelCount <= 200 {
+		return decimal.New(1600000, 0)
+	} else {
+		return decimal.New(2000000, 0)
+	}
+}
+
+func calMaxToClaim(address string) decimal.Decimal {
+	balance, err := invoker_sn.ReadBalance(address)
+	if err != nil {
+		fmt.Println("ReadBalance error: ", err.Error())
+		return decimal.Zero
+	}
+
+	levelCount, err := invoker_sn.ReadLevelCount(address)
+	if err != nil {
+		fmt.Println("ReadLevelCount error: ", err.Error())
+		return decimal.Zero
+	}
+
+	maxToClaim := calMax(levelCount).Sub(balance.Div(decimal.New(1, 18)))
+	if maxToClaim.LessThan(decimal.Zero) {
+		return decimal.Zero
+	}
+
+	return maxToClaim
 }

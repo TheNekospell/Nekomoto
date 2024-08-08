@@ -23,7 +23,7 @@ import (
 )
 
 var (
-	rpcTagLatest  rpc.BlockID = rpc.BlockID{Tag: "latest"}
+	// rpcTagLatest  rpc.BlockID = rpc.BlockID{Tag: "latest"}
 	rpcTagPending rpc.BlockID = rpc.BlockID{Tag: "pending"}
 )
 
@@ -120,6 +120,60 @@ func ReadTimeFreeze(address string) (time.Time, error) {
 
 	// fmt.Println("response: ", response)
 	return time.Unix(int64(response[0].Uint64()-uint64(3*24*60*60)), 0), nil
+}
+
+func ReadLevelCount(address string) (uint64, error) {
+
+	addressFelt, err := utils.HexToFelt(address)
+	if err != nil {
+		fmt.Println("address err: ", err.Error())
+		return 0, err
+	}
+
+	call := rpc.FunctionCall{
+		ContractAddress:    chain_sn.NekomotoContractAddress,
+		EntryPointSelector: utils.GetSelectorFromNameFelt("get_level_count"),
+		Calldata:           []*felt.Felt{addressFelt},
+	}
+
+	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTagPending)
+	if errRpc != nil {
+		fmt.Println(errRpc.Error())
+		return 0, errRpc
+	}
+
+	// fmt.Println("response: ", response)
+	return response[0].Uint64(), nil
+}
+
+func ReadBalance(address string) (decimal.Decimal, error) {
+
+	addressFelt, err := utils.HexToFelt(address)
+	if err != nil {
+		fmt.Println("address err: ", err.Error())
+		return decimal.Zero, err
+	}
+
+	call := rpc.FunctionCall{
+		ContractAddress:    chain_sn.NekoCoinContractAddress,
+		EntryPointSelector: utils.GetSelectorFromNameFelt("balance_of"),
+		Calldata:           []*felt.Felt{addressFelt},
+	}
+
+	response, errRpc := chain_sn.Client.Call(context.Background(), call, rpcTagPending)
+	if errRpc != nil {
+		fmt.Println(errRpc.Error())
+		return decimal.Zero, errRpc
+	}
+
+	balance, err := decimal.NewFromString(response[0].Text(10))
+	if err != nil {
+		fmt.Println("balance err: ", err.Error())
+		return decimal.Zero, err
+	}
+
+	return balance, nil
+
 }
 
 func SendCoinAndNFT(to string, nekocoinAmount *big.Int, prismAmount *big.Int, nftAmount *big.Int) error {
