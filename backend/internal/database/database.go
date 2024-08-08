@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -210,7 +211,11 @@ func initTables() {
 	// indexer block height
 	// DB.FirstOrCreate(&IndexerRecord{}, IndexerRecord{BlockHeight: 0})
 	if err := DB.First(&IndexerRecord{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-		DB.Create(&IndexerRecord{BlockHeight: 0})
+		blockHeight, err := strconv.ParseUint(env.GetEnvValue("BLOCK_HEIGHT"), 10, 64)
+		if err != nil {
+			blockHeight = 0
+		}
+		DB.Create(&IndexerRecord{BlockHeight: blockHeight})
 	}
 
 	// game reward pool

@@ -981,18 +981,24 @@ pub mod Nekomoto {
             token_id: u256,
             auth: ContractAddress
         ) {
+            let zero_address = Zero::zero();
             let mut state = nekomoto::contracts::nekomoto::Nekomoto::unsafe_new_contract_state();
             let host = state.host.read();
             let owner = self.ERC721_owners.read(token_id);
             if owner != host && to != host {
                 let origin_level_in_storage = state.level.read(token_id);
 
-                state
-                    .level_count
-                    .write(
-                        owner, state.level_count.read(owner) - origin_level_in_storage.into() - 1
-                    );
-                state.level_count.write(to, state.level_count.read(to) + 1);
+                if owner != zero_address {
+                    state
+                        .level_count
+                        .write(
+                            owner,
+                            state.level_count.read(owner) - origin_level_in_storage.into() - 1
+                        );
+                }
+                if to != zero_address {
+                    state.level_count.write(to, state.level_count.read(to) + 1);
+                }
 
                 state.level.write(token_id, 0);
                 // state.fade_consume.write(token_id,0);
