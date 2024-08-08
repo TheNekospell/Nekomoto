@@ -34,7 +34,7 @@ pub mod NekoCoin {
 
     #[external(v0)]
     fn init(ref self: ContractState, address: ContractAddress) {
-        assert_eq!(self.nekomoto.read(), Zero::zero(), "NekoCoin: NekoCoin already initialized");
+        assert!(self.nekomoto.read() == Zero::zero(), "NekoCoin: NekoCoin already initialized");
         self.nekomoto.write(address);
     }
 
