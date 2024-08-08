@@ -279,7 +279,7 @@ pub mod Nekomoto {
             self.erc721.mint(sender, token_id);
             self.starter.write(token_id, 1);
             self.token_id.write(token_id);
-            self.level_count.write(sender, self.level_count.read(sender) + 1);
+            // self.level_count.write(sender, self.level_count.read(sender) + 1);
             self.emit(Summon { to: sender, token_id: token_id });
         }
 

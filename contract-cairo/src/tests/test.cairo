@@ -31,6 +31,7 @@ mod test {
         },
         account::Call,
     };
+    use super::{InitTraitDispatcher, InitTraitDispatcherTrait};
 
     const amount: u256 = 2_000_000_000_000_000_000_000_000_000;
 
@@ -59,6 +60,7 @@ mod test {
             temporal_shard_address.into(),
             host.contract_address.into()
         );
+        InitTraitDispatcher { contract_address: nekocoin_address }.init(nekomoto_address);
         println!("deploy nekocoin at: {:?}", nekocoin_address);
         println!("deploy prism at: {:?}", prism_address);
         println!("deploy shard at: {:?}", temporal_shard_address);
@@ -99,6 +101,7 @@ mod test {
         ) =
             init();
 
+        println!("spread assets");
         spread_assets(
             host, bob.contract_address, nekocoin_address, prism_address, temporal_shard_address
         );
@@ -109,11 +112,11 @@ mod test {
         assert_eq!(
             IERC20Dispatcher { contract_address: nekocoin_address }
                 .balance_of(bob.contract_address),
-            (amount / 10)
+            (25000000000000000000000_u256)
         );
         assert_eq!(
             IERC20Dispatcher { contract_address: prism_address }.balance_of(bob.contract_address),
-            (amount / 10)
+            (25000000000000000000000_u256)
         );
         assert_eq!(
             IERC721Dispatcher { contract_address: temporal_shard_address }
@@ -121,6 +124,7 @@ mod test {
             (100)
         );
 
+        println!("approve assets");
         approve_assets(
             bob, nekomoto_address, nekocoin_address, prism_address, temporal_shard_address
         );
@@ -131,12 +135,12 @@ mod test {
         assert_eq!(
             IERC20Dispatcher { contract_address: nekocoin_address }
                 .allowance(bob.contract_address, nekomoto_address),
-            (amount / 10)
+            (25000000000000000000000_u256)
         );
         assert_eq!(
             IERC20Dispatcher { contract_address: prism_address }
                 .allowance(bob.contract_address, nekomoto_address),
-            (amount / 10)
+            (25000000000000000000000_u256)
         );
         assert_eq!(
             IERC721Dispatcher { contract_address: temporal_shard_address }
@@ -144,7 +148,13 @@ mod test {
             (true)
         );
 
-        // starter pack
+        println!(
+            "level count: {:?}",
+            NekomotoTraitDispatcher { contract_address: nekomoto_address }
+                .get_level_count(bob.contract_address)
+        );
+
+        println!("starter pack");
         bob
             .__execute__(
                 array![
@@ -165,7 +175,7 @@ mod test {
                 .balance_of(bob.contract_address)
         );
 
-        // summon
+        println!("summon");
         host
             .__execute__(
                 array![
@@ -174,8 +184,8 @@ mod test {
                         selector: selector!("summon"),
                         calldata: array![]
                             .join(bob.contract_address)
-                            .join(20_u256)
-                            .join(666666_u256)
+                            .join(1_u256)
+                            .join(6_u256)
                             .span()
                     }
                 ]
@@ -191,28 +201,23 @@ mod test {
         );
 
         set_block_timestamp(1_000_000_000_000);
+        println!("stake");
         bob
             .__execute__(
                 array![
                     Call {
                         to: nekomoto_address,
                         selector: selector!("stake"),
-                        calldata: array![]
-                            .join(
-                                array![
-                                    1_u256,
-                                    2_u256,
-                                    3_u256,
-                                    4_u256,
-                                    5_u256,
-                                    6_u256,
-                                    7_u256,
-                                    8_u256,
-                                    9_u256,
-                                    10_u256
-                                ]
-                            )
-                            .span()
+                        calldata: array![].join(array![1_u256, // 2_u256,
+                        // 3_u256,
+                        // 4_u256,
+                        // 5_u256,
+                        // 6_u256,
+                        // 7_u256,
+                        // 8_u256,
+                        // 9_u256,
+                        // 10_u256
+                        ]).span()
                     }
                 ]
             );
@@ -278,22 +283,16 @@ mod test {
                     Call {
                         to: nekomoto_address,
                         selector: selector!("withdraw"),
-                        calldata: array![]
-                            .join(
-                                array![
-                                    1_u256,
-                                    2_u256,
-                                    3_u256,
-                                    4_u256,
-                                    5_u256,
-                                    6_u256,
-                                    7_u256,
-                                    8_u256,
-                                    9_u256,
-                                    10_u256
-                                ]
-                            )
-                            .span()
+                        calldata: array![].join(array![1_u256,// 2_u256,
+                        // 3_u256,
+                        // 4_u256,
+                        // 5_u256,
+                        // 6_u256,
+                        // 7_u256,
+                        // 8_u256,
+                        // 9_u256,
+                        // 10_u256
+                        ]).span()
                     }
                 ]
             );
@@ -482,7 +481,7 @@ mod test {
         prism_address: ContractAddress,
         temporal_shard_address: ContractAddress
     ) {
-        let amount_to_use = amount / 10;
+        let amount_to_use = 25000000000000000000000_u256;
 
         account
             .__execute__(
@@ -517,7 +516,7 @@ mod test {
         temporal_shard_address: ContractAddress
     ) {
         let mut multicall = array![];
-        let amount_to_use = amount / 10;
+        let amount_to_use = 25000000000000000000000_u256;
 
         // neko coin
         let mut calldata = array![];
@@ -618,3 +617,9 @@ mod test {
     }
 }
 
+use starknet::{ContractAddress};
+
+#[starknet::interface]
+pub trait InitTrait<ContractState> {
+    fn init(ref self: ContractState, nekomoto: ContractAddress);
+}

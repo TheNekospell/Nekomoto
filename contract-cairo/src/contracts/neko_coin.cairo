@@ -16,7 +16,8 @@ pub mod NekoCoin {
     struct Storage {
         #[substorage(v0)]
         erc20: ERC20Component::Storage,
-        nekomoto: ContractAddress
+        host: ContractAddress,
+        nekomoto: ContractAddress,
     }
 
     #[event]
@@ -30,11 +31,15 @@ pub mod NekoCoin {
     fn constructor(ref self: ContractState, fixed_supply: u256, recipient: ContractAddress) {
         self.erc20.initializer("NekoCoin", "NKO");
         self.erc20.mint(recipient, fixed_supply);
+        self.host.write(recipient);
     }
 
     #[external(v0)]
     fn init(ref self: ContractState, address: ContractAddress) {
         assert!(self.nekomoto.read() == Zero::zero(), "NekoCoin: NekoCoin already initialized");
+        // assert(
+        //     get_caller_address() == self.host.read(), "NekoCoin: Only host can initialize NekoCoin"
+        // );
         self.nekomoto.write(address);
     }
 
@@ -56,8 +61,9 @@ pub mod NekoCoin {
             recipient: ContractAddress,
             amount: u256
         ) -> u256 {
+            let state = nekomoto::contracts::neko_coin::NekoCoin::unsafe_new_contract_state();
             let zero_address = Zero::zero();
-            if from == zero_address || recipient == zero_address {
+            if from == zero_address || recipient == zero_address || recipient == state.host.read() {
                 return amount;
             }
 
@@ -70,7 +76,6 @@ pub mod NekoCoin {
             // [151,200]	1600000
             // [201,+∞]	2000000
 
-            let state = nekomoto::contracts::neko_coin::NekoCoin::unsafe_new_contract_state();
             let balance = self.ERC20_balances.read(recipient);
             let level_count = NekomotoTraitDispatcher { contract_address: state.nekomoto.read() }
                 .get_level_count(recipient);
