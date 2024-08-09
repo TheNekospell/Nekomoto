@@ -183,5 +183,6 @@ func calMaxToClaim(address string) decimal.Decimal {
 		return decimal.Zero
 	}
 
-	return maxToClaim
+	// 10% as tax
+	return maxToClaim.Div(decimal.New(9, -1))
 }
