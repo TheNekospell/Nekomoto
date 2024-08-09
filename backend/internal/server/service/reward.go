@@ -30,6 +30,7 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 	// limit the max claimable amount
 
 	maxToClaim := calMaxToClaim(req.Address)
+	fmt.Println("address: ", req.Address, "maxToClaim: ", maxToClaim)
 	if maxToClaim.Equal(decimal.Zero) {
 		return model.Success, "Exceed the limit"
 	}
@@ -42,12 +43,15 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 	// })
 	var spiritToUpdate []database.ServerNekoSpiritInfo
 	for _, spirit := range addressDetail.NekoSpiritList {
+		if spirit.Rewards.Equal(decimal.Zero) {
+			continue
+		}
 		temp := database.ServerNekoSpiritInfo{
 			Model:          database.Model{ID: spirit.ID},
 			TokenId:        spirit.TokenId,
 			ClaimedRewards: spirit.ClaimedRewards,
 		}
-		if spiritReward.Add(spirit.Rewards).LessThan(maxToClaim) {
+		if spiritReward.Add(spirit.Rewards).LessThanOrEqual(maxToClaim) {
 			spiritReward = spiritReward.Add(spirit.Rewards)
 			temp.ClaimedRewards = temp.ClaimedRewards.Add(spirit.Rewards)
 			temp.Rewards = decimal.Zero
@@ -57,7 +61,7 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 			partReward := maxToClaim.Sub(spiritReward)
 			spiritReward = spiritReward.Add(partReward)
 			temp.ClaimedRewards = temp.ClaimedRewards.Add(partReward)
-			temp.Rewards = temp.Rewards.Sub(partReward)
+			temp.Rewards = spirit.Rewards.Sub(partReward)
 			spiritToUpdate = append(spiritToUpdate, temp)
 			break
 		}
