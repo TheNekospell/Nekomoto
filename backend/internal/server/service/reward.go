@@ -5,9 +5,7 @@ import (
 	"backend/internal/invoker_sn"
 	"fmt"
 	"math/big"
-	"sort"
 
-	// invoke "backend/internal/invoker"
 	"backend/internal/model"
 	"strconv"
 	"time"
@@ -39,9 +37,9 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 	// make sure that there are rewards to claim
 
 	spiritReward := decimal.Zero
-	sort.Slice(addressDetail.NekoSpiritList, func(i, j int) bool {
-		return addressDetail.NekoSpiritList[i].Rewards.LessThan(addressDetail.NekoSpiritList[j].Rewards)
-	})
+	// sort.Slice(addressDetail.NekoSpiritList, func(i, j int) bool {
+	// 	return addressDetail.NekoSpiritList[i].Rewards.LessThan(addressDetail.NekoSpiritList[j].Rewards)
+	// })
 	var spiritToUpdate []database.ServerNekoSpiritInfo
 	for _, spirit := range addressDetail.NekoSpiritList {
 		temp := database.ServerNekoSpiritInfo{
@@ -55,6 +53,12 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 			temp.Rewards = decimal.Zero
 			spiritToUpdate = append(spiritToUpdate, temp)
 		} else {
+			// part of the reward of this spirit
+			partReward := maxToClaim.Sub(spiritReward)
+			spiritReward = spiritReward.Add(partReward)
+			temp.ClaimedRewards = temp.ClaimedRewards.Add(partReward)
+			temp.Rewards = temp.Rewards.Sub(partReward)
+			spiritToUpdate = append(spiritToUpdate, temp)
 			break
 		}
 	}
