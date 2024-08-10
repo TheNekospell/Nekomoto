@@ -61,7 +61,7 @@ pub mod NekoCoin {
             recipient: ContractAddress,
             amount: u256
         ) -> u256 {
-            let state = nekomoto::contracts::neko_coin::NekoCoin::unsafe_new_contract_state();
+            let mut state = nekomoto::contracts::neko_coin::NekoCoin::unsafe_new_contract_state();
             let zero_address = Zero::zero();
             if from == zero_address || recipient == zero_address || recipient == state.host.read() {
                 return amount;

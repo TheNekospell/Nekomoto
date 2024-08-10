@@ -29,7 +29,7 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 
 	// limit the max claimable amount
 
-	maxToClaim := calMaxToClaim(req.Address)
+	maxToClaim := calMaxToClaim(req.Address).Div(decimal.New(9, -1))
 	fmt.Println("address: ", req.Address, "maxToClaim: ", maxToClaim)
 	if maxToClaim.Equal(decimal.Zero) {
 		return model.Success, "Exceed the limit"
@@ -183,6 +183,5 @@ func calMaxToClaim(address string) decimal.Decimal {
 		return decimal.Zero
 	}
 
-	// 10% as tax
-	return maxToClaim.Div(decimal.New(9, -1))
+	return maxToClaim
 }
