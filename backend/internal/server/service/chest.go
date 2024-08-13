@@ -95,6 +95,8 @@ func EmpowerChest(req model.TwoAddressAndSignature) (code model.ResponseCode, me
 			Cid: chest.ID,
 		}
 		database.CreateEmpowerChestRecord(record)
+	} else {
+		return model.ServerInternalError, "you can only empower once a day"
 	}
 
 	if count := database.CountEmpower(chest.ID); count >= 5 {

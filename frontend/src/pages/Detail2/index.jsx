@@ -115,6 +115,17 @@ export default function Detail() {
 						result.data.NekoSpiritList.find((x) => x.TokenId === focus.TokenId)
 					);
 				}
+				const urlParams = new URLSearchParams(window.location.search);
+				const code = urlParams.get("addr");
+				if (code && result?.data?.RequestToEmpower) {
+					setIsModalOpen1(true);
+					console.log("find empower code: ", code);
+					window.history.pushState(
+						{},
+						"",
+						window.location.origin + window.location.pathname
+					);
+				}
 			});
 			prismContract.balance_of(address).then((result) => {
 				// console.log("prism: ", result)
@@ -142,13 +153,6 @@ export default function Detail() {
 				// console.log("nekocoin allowance: ", result)
 				setLucky(result);
 			});
-
-			const urlParams = new URLSearchParams(window.location.search);
-			const code = urlParams.get("addr");
-			if (code) {
-				setIsModalOpen1(true);
-				console.log("find empower code: ", code);
-			}
 		} else {
 			setAddressInfo({
 				InviteCode: "",

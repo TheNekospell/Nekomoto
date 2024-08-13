@@ -42,6 +42,7 @@ type AddressInfo struct {
 	ToClaim             decimal.Decimal
 	ChestOpenable       bool
 	ChestEmpower        []string
+	RequestToEmpower    bool
 	InviteCount         int64
 	IsInBountyWave      bool
 }
@@ -146,6 +147,7 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		ToClaim:             ToClaim,
 		ChestOpenable:       openable,
 		ChestEmpower:        empower,
+		RequestToEmpower:    chest.ID > 0 && chest.ChestType == 0 && CanEmpowerChest(uid),
 		InviteCount:         InviteCount,
 		IsInBountyWave:      isInBountyWave,
 	}
