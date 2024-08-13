@@ -16,8 +16,8 @@ import Legendary from "@assets/Legendary.png";
 
 export default function CardDetail({ item }) {
 	const rarity = (item) => {
-		if (item?.Rarity === "Common") {
-			return Common;
+		if (item?.Rarity === "Uncommon") {
+			return Uncommon;
 		} else if (item?.Rarity === "Rare") {
 			return Rare;
 		} else if (item?.Rarity === "Epic") {
@@ -25,7 +25,7 @@ export default function CardDetail({ item }) {
 		} else if (item?.Rarity === "Legendary") {
 			return Legendary;
 		} else {
-			return Uncommon;
+			return Common;
 		}
 	};
 

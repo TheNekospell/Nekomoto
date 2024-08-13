@@ -85,7 +85,7 @@ export default function Assets() {
 									SPD: 1,
 									Fade: 125,
 									Mana: 0.234,
-									Element: "Fire",
+									Rarity: "Common",
 								}}
 							/>
 						</div>
