@@ -7,27 +7,32 @@ import SPI from "@assets/SPI.png";
 import Water from "@assets/Water.png";
 import Wind from "@assets/Wind.png";
 import Thunder from "@assets/Thunder.png";
-import { addCommaInNumber } from "@/interface.js";
+
+import Uncommon from "@assets/Uncommon.png";
+import Common from "@assets/Common.png";
+import Rare from "@assets/Rare.png";
+import Epic from "@assets/Epic.png";
+import Legendary from "@assets/Legendary.png";
 
 export default function CardDetail({ item }) {
-	const element = (item) => {
-		if (item?.Element === "Wind") {
-			return Wind;
-		} else if (item?.Element === "Water") {
-			return Water;
-		} else if (item?.Element === "Earth") {
-			return Earth;
-		} else if (item?.Element === "Fire") {
-			return Fire;
+	const rarity = (item) => {
+		if (item?.Rarity === "Common") {
+			return Common;
+		} else if (item?.Rarity === "Rare") {
+			return Rare;
+		} else if (item?.Rarity === "Epic") {
+			return Epic;
+		} else if (item?.Rarity === "Legendary") {
+			return Legendary;
 		} else {
-			return Thunder;
+			return Uncommon;
 		}
 	};
 
 	return (
 		<div
 			style={{
-				backgroundImage: `url(${element(item)})`,
+				backgroundImage: `url(${rarity(item)})`,
 				backgroundSize: "cover",
 				backgroundPosition: "center",
 				width: "185px",
