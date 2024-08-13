@@ -24,7 +24,7 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 	// make sure it past 24 hours from the last time claimed
 
 	if addressDetail.LastClaim.Add(24 * time.Hour).After(time.Now()) {
-		return model.Success, "Every 24 hours can only claim once"
+		return model.ServerInternalError, "Every 24 hours can only claim once"
 	}
 
 	// limit the max claimable amount
@@ -32,7 +32,7 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 	maxToClaim := calMaxToClaim(req.Address).Div(decimal.New(9, -1))
 	fmt.Println("address: ", req.Address, "maxToClaim: ", maxToClaim)
 	if maxToClaim.Equal(decimal.Zero) {
-		return model.Success, "Exceed the limit"
+		return model.ServerInternalError, "Exceed the limit"
 	}
 
 	// make sure that there are rewards to claim
@@ -74,7 +74,7 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 
 	totalReward := spiritReward
 	if totalReward.Equal(decimal.Zero) {
-		return model.Success, "Nothing to claim"
+		return model.ServerInternalError, "Nothing to claim"
 	}
 
 	// invoke chain to send rewards, 10% as tax
@@ -94,7 +94,7 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 
 	database.Cache.Delete(database.CacheTagUid + strconv.FormatUint(addressDetail.Uid, 10))
 
-	return model.Success, "Success"
+	return model.Success, "Claimed " + totalReward.Mul(decimal.New(9, -1)).String() + "NKO"
 }
 
 func ClaimRewardOfInvitation(req model.AddressAndSignature) (model.ResponseCode, string) {
@@ -103,7 +103,7 @@ func ClaimRewardOfInvitation(req model.AddressAndSignature) (model.ResponseCode,
 
 	maxToClaim := calMaxToClaim(req.Address)
 	if maxToClaim.Equal(decimal.Zero) {
-		return model.Success, "Exceed the limit"
+		return model.ServerInternalError, "Exceed the limit"
 	}
 
 	addressDetail := database.GetAddressDetailByAddress(req.Address)
@@ -114,7 +114,7 @@ func ClaimRewardOfInvitation(req model.AddressAndSignature) (model.ResponseCode,
 	}
 
 	if invitationReward.Equal(decimal.Zero) {
-		return model.Success, "Nothing to claim"
+		return model.ServerInternalError, "Nothing to claim"
 	}
 
 	if invitationReward.GreaterThan(maxToClaim) {
@@ -131,7 +131,7 @@ func ClaimRewardOfInvitation(req model.AddressAndSignature) (model.ResponseCode,
 
 	database.Cache.Delete(database.CacheTagUid + strconv.FormatUint(addressDetail.Uid, 10))
 
-	return model.Success, "Success"
+	return model.Success, "Claimed " + invitationReward.String() + "NKO"
 
 }
 
