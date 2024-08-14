@@ -40,6 +40,8 @@ export default function Wallet({ isMobile = false }) {
 	const [testCode, setTestCode] = useState("");
 	const [addressInfo, setAddressInfo] = useState({ Active: false });
 
+	const [faucetInterval, setFaucetInterval] = useState(false);
+
 	// useEffect(() => {
 	// 	connect({connector});
 	// }, []);
@@ -186,7 +188,20 @@ export default function Wallet({ isMobile = false }) {
 						{/*<Flex align="center" justify="space-between">*/}
 						<Flex
 							align="center"
-							onClick={address ? () => BACKEND.faucet(address) : null}
+							onClick={
+								address && !faucetInterval
+									? () => {
+											BACKEND.faucet(address);
+											setFaucetInterval(true);
+											setInterval(() => {
+												setFaucetInterval(false);
+											}, 5000);
+									  }
+									: () => {
+											console.log("please wait...");
+									  }
+							}
+							style={faucetInterval ? { filter: "grayscale(1)" } : {}}
 						>
 							{/*<img*/}
 							{/*    src={blue}*/}
@@ -195,7 +210,7 @@ export default function Wallet({ isMobile = false }) {
 							{/*    alt=""*/}
 							{/*/>*/}
 							<img src={t6} width={15} style={{ marginRight: "6px" }} alt="" />
-							<span>Buy NKO</span>
+							<span>{"Buy NKO"}</span>
 						</Flex>
 					</Col>
 					<Col style={{ width: "170px", textAlign: "center" }}>
