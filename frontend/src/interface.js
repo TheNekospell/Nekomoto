@@ -228,7 +228,13 @@ export const BACKEND = {
         })
         // console.log("result: ", result)
         return await result.json()
-    }
+    },
+
+    faucet: async (address) => {
+        const result = await fetch(`${BASE_URL}/nike/faucet?address=${address}`)
+        // console.log("result: ", result)
+        return await result.json()
+    },
 
 }
 

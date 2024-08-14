@@ -135,7 +135,7 @@ func ClaimRewardOfInvitation(req model.AddressAndSignature) (model.ResponseCode,
 
 }
 
-func calMax(levelCount uint64) decimal.Decimal {
+func CalMax(levelCount uint64) decimal.Decimal {
 
 	// 	[0,10]	25000
 	// [11,20]	50000
@@ -178,7 +178,7 @@ func calMaxToClaim(address string) decimal.Decimal {
 		return decimal.Zero
 	}
 
-	maxToClaim := calMax(levelCount).Sub(balance.Div(decimal.New(1, 18)))
+	maxToClaim := CalMax(levelCount).Sub(balance.Div(decimal.New(1, 18)))
 	if maxToClaim.LessThan(decimal.Zero) {
 		return decimal.Zero
 	}

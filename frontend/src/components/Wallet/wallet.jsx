@@ -184,7 +184,10 @@ export default function Wallet({ isMobile = false }) {
 						// onClick={valid}
 					>
 						{/*<Flex align="center" justify="space-between">*/}
-						<Flex align="center">
+						<Flex
+							align="center"
+							onClick={address ? () => BACKEND.faucet(address) : null}
+						>
 							{/*<img*/}
 							{/*    src={blue}*/}
 							{/*    width={20}*/}
