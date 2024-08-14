@@ -215,6 +215,21 @@ export const BACKEND = {
         return await response.json();
     },
 
+    activeAddress: async (address, code) => {
+        const result = await fetch(`${BASE_URL}/address/active`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                address,
+                code
+            })
+        })
+        // console.log("result: ", result)
+        return await result.json()
+    }
+
 }
 
 export function addCommaInNumber(number, b) {

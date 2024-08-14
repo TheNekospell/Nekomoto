@@ -420,3 +420,19 @@ func GetTempBurn() []ServerBurnTemp {
 func UpdateTempBurn(id []uint64) {
 	DB.Model(&ServerBurnTemp{}).Where("id in ?", id).Update("burn_or_not", true)
 }
+
+func QueryActiveCode(code string) ServerTestCode {
+	var record ServerTestCode
+	DB.Model(&ServerTestCode{}).Where("code = ?", code).Find(&record)
+	return record
+}
+
+func ActiveAddress(uid uint64, id uint64) error {
+	if err := DB.Model(&ServerAddress{}).Where("id = ?", uid).Update("active", true).Error; err != nil {
+		return err
+	}
+	if err := DB.Model(&ServerTestCode{}).Where("id = ?", id).Update("uid", uid).Error; err != nil {
+		return err
+	}
+	return nil
+}

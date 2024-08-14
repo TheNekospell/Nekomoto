@@ -7,8 +7,6 @@ import (
 	"backend/internal/util"
 
 	"fmt"
-
-
 )
 
 //func ValidSignature(address, message, signature string) error {
@@ -52,6 +50,11 @@ func ValidSignature(address string, typedData model.TypedData, signature []strin
 	// return nil
 
 	address = util.CleanAddress(address)
+
+	addressDetail := database.GetAddressDetailByAddress(address)
+	if !addressDetail.Active {
+		return fmt.Errorf("address not active")
+	}
 
 	if text := database.GetAddressSignatureContext(address); text != typedData.Message.Content {
 		return fmt.Errorf("signature expired. expect: %v, actual: %v", text, typedData.Message.Content)

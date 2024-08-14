@@ -69,6 +69,7 @@ func initTables() {
 		&ServerMintRecord{},
 		&ServerBurnStatic{},
 		&ServerBurnTemp{},
+		&ServerTestCode{},
 		&IndexerRecord{},
 		&IndexerTransactionRecord{},
 		&EventNekoCoinTransfer{},
@@ -260,6 +261,7 @@ type ServerAddress struct {
 	Address    string `gorm:"uniqueIndex type:char(66) not null"`
 	InviteCode string `gorm:"not null index"`
 	IsStarter  bool   `gorm:"not null default:true"`
+	Active     bool   `gorm:"not null default:false"`
 }
 
 type ServerClaimRecord struct {
@@ -409,6 +411,12 @@ type ServerBurnTemp struct {
 	TokenId   uint64          `gorm:"not null"`
 	Count     decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
 	BurnOrNot bool            `gorm:"not null default:false"`
+}
+
+type ServerTestCode struct {
+	Model
+	Code string `gorm:"not null"`
+	Uid  uint64 `gorm:"not null default:0"`
 }
 
 type IndexerRecord struct {

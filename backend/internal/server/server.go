@@ -53,6 +53,7 @@ func StartServer() {
 	addressGroup.GET("/info", AddressInfo)
 	addressGroup.POST("/invitation", AcceptInvitation)
 	addressGroup.POST("/valid", ValidSignature)
+	addressGroup.POST("/active", ActiveAddress)
 
 	rewardGroup := apiGroup.Group("/reward")
 	rewardGroup.POST("/claim", ClaimReward)
@@ -330,4 +331,20 @@ func GetStaticInfo(c *gin.Context) {
 		return
 	}
 	SuccessResponse(c, data)
+}
+
+func ActiveAddress(c *gin.Context) {
+	var req model.AddressAndCode
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ErrorResponse(c, model.WrongParam, err.Error())
+		return
+	}
+
+	code, msg := service.ActiveAddress(req.Address, req.Code)
+	if code != model.Success {
+		ErrorResponse(c, code, msg)
+		return
+	}
+	SuccessResponse(c, msg)
 }

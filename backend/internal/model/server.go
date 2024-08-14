@@ -45,13 +45,13 @@ type Address struct {
 }
 
 type TypedData struct {
-	Types       Types        `json:"types" form:"types"`
-	PrimaryType string       `json:"primaryType" form:"primaryType"`
-	Domain      Domain `json:"domain" form:"domain"`
-	Message     Message      `json:"message" form:"message"`
+	Types       Types   `json:"types" form:"types"`
+	PrimaryType string  `json:"primaryType" form:"primaryType"`
+	Domain      Domain  `json:"domain" form:"domain"`
+	Message     Message `json:"message" form:"message"`
 }
 
-type Domain struct{
+type Domain struct {
 	Name    string `json:"name" form:"name"`
 	Version string `json:"version" form:"version"`
 	ChainId string `json:"chainId" form:"chainId"`
@@ -83,6 +83,11 @@ type AddressAndCodeAndSignature struct {
 	Address   string    `json:"address" form:"address"`
 	Code      string    `json:"code" form:"code"`
 	Signature Signature `json:"signature" form:"signature"`
+}
+
+type AddressAndCode struct {
+	Address string `json:"address" form:"address"`
+	Code    string `json:"code" form:"code"`
 }
 
 func (message Message) FmtDefinitionEncoding(input string) (result []*big.Int) {

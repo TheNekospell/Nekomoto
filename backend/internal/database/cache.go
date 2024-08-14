@@ -29,6 +29,7 @@ type AddressInfo struct {
 	Address             string
 	IsStarter           bool
 	InviteCode          string
+	Active              bool
 	SecondInviter       uint64
 	ThirdInviter        uint64
 	InvitationReward    ServerInvitationRewardStatic
@@ -134,6 +135,7 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		Address:             serverAddress.Address,
 		IsStarter:           serverAddress.IsStarter,
 		InviteCode:          serverAddress.InviteCode,
+		Active:              serverAddress.Active,
 		SecondInviter:       invitation.SecondUid,
 		ThirdInviter:        invitation.ThirdUid,
 		InvitationReward:    invitationReward,

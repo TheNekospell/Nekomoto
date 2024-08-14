@@ -37,32 +37,14 @@ export default function Wallet({ isMobile = false }) {
 
 	const [text, setText] = useState("");
 
+	const [testCode, setTestCode] = useState("");
+	const [addressInfo, setAddressInfo] = useState({ Active: false });
+
 	// useEffect(() => {
 	// 	connect({connector});
 	// }, []);
 
 	useEffect(() => {
-		if (inputValue !== "" && address) {
-			console.log("accept invitation: ", inputValue, account);
-			sign(account).then(({ typedMessage, signature }) => {
-				BACKEND.acceptInvitation(
-					address,
-					inputValue,
-					typedMessage,
-					signature
-				).then((result) => {
-					console.log("accept result: ", result);
-					setAccept(true);
-					if (result.success) {
-						setText(result.data);
-					} else {
-						setText(result.message);
-					}
-				});
-			});
-		}
-		setInputValue("");
-
 		const target = SN_SEPOLIA;
 		console.log("chainId: ", chainId, uint256.uint256ToBN(target));
 		if (chainId !== uint256.uint256ToBN(target) && !isMobile) {
@@ -73,6 +55,33 @@ export default function Wallet({ isMobile = false }) {
 				},
 			});
 		}
+
+		BACKEND.addressInfo(address).then((result) => {
+			const addressInfo = result.data;
+			setAddressInfo(addressInfo);
+			if (addressInfo.Active) {
+				if (inputValue !== "" && address) {
+					console.log("accept invitation: ", inputValue, account);
+					sign(account).then(({ typedMessage, signature }) => {
+						BACKEND.acceptInvitation(
+							address,
+							inputValue,
+							typedMessage,
+							signature
+						).then((result) => {
+							console.log("accept result: ", result);
+							setAccept(true);
+							if (result.success) {
+								setText(result.data);
+							} else {
+								setText(result.message);
+							}
+						});
+					});
+				}
+				setInputValue("");
+			}
+		});
 	}, [address, chainId]);
 
 	const establishConnection = async (connector) => {
@@ -95,6 +104,16 @@ export default function Wallet({ isMobile = false }) {
 			signature
 		);
 		console.log("result: ", result);
+	};
+
+	const active = async (code) => {
+		// const { typedMessage, signature } = await sign(account);
+		const result = await BACKEND.activeAddress(address, code);
+		console.log("active result: ", result);
+		setTestCode("");
+		BACKEND.addressInfo(address).then((result) => {
+			setAddressInfo(result.data);
+		});
 	};
 
 	const items = [
@@ -293,6 +312,51 @@ export default function Wallet({ isMobile = false }) {
 								>
 									{address.slice(0, 6) + "..." + address.slice(-4)}
 								</div>
+								<div
+									style={{
+										fontSize: "16px",
+										textAlign: "center",
+										marginLeft: "10px",
+										marginTop: "10px",
+										fontFamily: "BIG SHOT",
+										color: addressInfo.Active ? "#539371" : "grey",
+										fontWeight: "bold",
+									}}
+								>
+									{addressInfo.Active ? "Active" : "Not Active"}
+								</div>
+								{!addressInfo.Active && (
+									<div
+										style={{
+											display: "flex",
+											justifyContent: "center",
+											alignItems: "center",
+											flexDirection: "row",
+											marginTop: "20px",
+											marginBottom: "10px",
+										}}
+									>
+										<Input
+											placeholder="Enter Game Test Code"
+											// type="number"
+											size="large"
+											style={{ width: "200px", marginRight: "20px" }}
+											// value={inputValue}
+											onChange={(e) => {
+												const v = e.target.value;
+												if (v) {
+													setTestCode(v);
+												}
+											}}
+										/>
+										<Button
+											text="Active"
+											color="yellow"
+											longness="short"
+											onClick={testCode !== "" ? () => active(testCode) : null}
+										/>
+									</div>
+								)}
 
 								{/*<div*/}
 								{/*    style={{*/}
