@@ -46,7 +46,7 @@ func AllocateProfit() {
 
 		detail := database.GetAddressDetailByUid(process.StakeFromUid)
 		// time freeze
-		if now.Sub(detail.Buff.StartTime.Add(time.Hour*3)) > 0 {
+		if now.Sub(detail.Buff.StartTime.Add(time.Hour*72)) > 0 {
 			temp.Fade = temp.Fade.Sub(decimal.New(1, 0))
 		}
 

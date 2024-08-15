@@ -122,9 +122,12 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 	var NekoSpiritList []ServerNekoSpiritInfo
 	var idList []uint64
 	DB.Model(&ServerNekoSpiritInfo{}).Where("stake_from_uid = ?", uid).Find(&NekoSpiritList)
-	for _, NekoSpirit := range NekoSpiritList {
-		idList = append(idList, NekoSpirit.TokenId)
+	for index := range NekoSpiritList {
+		idList = append(idList, NekoSpiritList[index].TokenId)
 		//Cache.Set(CacheTagNekoSpirit+strconv.FormatUint(NekoSpirit.TokenId, 10), NekoSpirit, -1)
+		if NekoSpiritList[index].Fade.Equal(decimal.NewFromInt(0)) {
+			NekoSpiritList[index].Mana = decimal.NewFromInt(0)
+		}
 	}
 
 	var shardIdList []uint64
