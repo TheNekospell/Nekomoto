@@ -104,5 +104,5 @@ func EmpowerChest(req model.TwoAddressAndSignature) (code model.ResponseCode, me
 		database.UpdateChest(&chest)
 	}
 
-	return model.Success, "Open success"
+	return model.Success, "Empower success"
 }
