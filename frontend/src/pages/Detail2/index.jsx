@@ -119,7 +119,7 @@ export default function Detail() {
 				}
 				const urlParams = new URLSearchParams(window.location.search);
 				const code = urlParams.get("addr");
-				if (code && result?.data?.RequestToEmpower) {
+				if (code && result?.data?.RequestToEmpower && code !== address) {
 					setIsModalOpen1(true);
 					console.log("find empower code: ", code);
 				}
