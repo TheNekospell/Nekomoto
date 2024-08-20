@@ -180,7 +180,7 @@ pub mod Nekomoto {
 
                 let is_lucky = self.lucky(recipient);
                 let rarity_number = random(seed, 0, 10000);
-                if rarity_number < 5 || (is_lucky && rarity_number < 450) {
+                if rarity_number < 5 || (!is_lucky && rarity_number < 450) {
                     // empty box
                     continue;
                 }
