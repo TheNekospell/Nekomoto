@@ -450,7 +450,7 @@ export default function Wallet({ isMobile = false }) {
 										</div>
 									))}
 								</ul>
-								<div>
+								{/* <div>
 									<Input
 										placeholder="Enter Invite Code"
 										// type="number"
@@ -464,7 +464,7 @@ export default function Wallet({ isMobile = false }) {
 											}
 										}}
 									/>
-								</div>
+								</div> */}
 							</div>
 						)}
 					</div>
