@@ -165,23 +165,26 @@ func CalMax(levelCount uint64) decimal.Decimal {
 	}
 }
 
-func calMaxToClaim(address string) decimal.Decimal {
-	balance, err := invoker_sn.ReadBalance(address)
-	if err != nil {
-		fmt.Println("ReadBalance error: ", err.Error())
-		return decimal.Zero
-	}
+func calMaxToClaim(_ string) decimal.Decimal {
 
-	levelCount, err := invoker_sn.ReadLevelCount(address)
-	if err != nil {
-		fmt.Println("ReadLevelCount error: ", err.Error())
-		return decimal.Zero
-	}
+	return decimal.New(1, 100)
 
-	maxToClaim := CalMax(levelCount).Sub(balance.Div(decimal.New(1, 18)))
-	if maxToClaim.LessThan(decimal.Zero) {
-		return decimal.Zero
-	}
+	// balance, err := invoker_sn.ReadBalance(address)
+	// if err != nil {
+	// 	fmt.Println("ReadBalance error: ", err.Error())
+	// 	return decimal.Zero
+	// }
 
-	return maxToClaim
+	// levelCount, err := invoker_sn.ReadLevelCount(address)
+	// if err != nil {
+	// 	fmt.Println("ReadLevelCount error: ", err.Error())
+	// 	return decimal.Zero
+	// }
+
+	// maxToClaim := CalMax(levelCount).Sub(balance.Div(decimal.New(1, 18)))
+	// if maxToClaim.LessThan(decimal.Zero) {
+	// 	return decimal.Zero
+	// }
+
+	// return maxToClaim
 }

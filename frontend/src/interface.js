@@ -8,10 +8,10 @@ import { useAccount } from "@starknet-react/core";
 const BASE_URL = "https://api.nekomoto.xyz/api"
 // const BASE_URL = "http://localhost:8972/api"
 
-export const NEKOMOTO_ADDRESS = "0x042b24431afebcbfbe8f23c94b68012a9526efb8cd519cd85f0453a5dba3ac2e"
-export const NEKOCOIN_ADDRESS = "0x03b11fb2ed953d3d4a1381019c93d0cd99843f1bd8588bdff1aab7d2aa099e9a"
-export const PRISM_ADDRESS = "0x06039adc3b41cd0b98a4d9410b67837b06aa88a5f1523b8463c04afba4dad35a"
-export const SHARD_ADDRESS = "0x019917c28a97fe3571497a030d17938c1f270922058a934e77b6d486e9939789"
+export const NEKOMOTO_ADDRESS = "0x032bf65bdf7fda6c87f738b94203de2e624702cc9373114ac212de2ba89acc6a"
+export const NEKOCOIN_ADDRESS = "0x00bb7546cc8fb47530464e39e8effb8ec17ebd9faef7e5a3537a4e6884f14984"
+export const PRISM_ADDRESS = "0x060f0508a0cfdb8ffa81ee07db964a3de1ce6594cbccfd679b05611b52c6c707"
+export const SHARD_ADDRESS = "0x04a7f4d8e3ebbfcb332b7ec425f0e8e41973a77aae654b5d420ca547fc268ae7"
 
 const provider = new RpcProvider({
     nodeUrl: "https://rpc-sepolia.staging.nethermind.dev",

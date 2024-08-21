@@ -79,8 +79,8 @@ func StartServer() {
 			return
 		}
 		bigIntNumber := new(big.Int)
-		bigIntNumber.SetString("20000000000000000000000000", 10)
-		err := invoker_sn.SendCoinAndNFT(req.Address, bigIntNumber, bigIntNumber, big.NewInt(10))
+		bigIntNumber.SetString("250000000000000000000000", 10)
+		err := invoker_sn.SendCoinAndNFT(req.Address, bigIntNumber, big.NewInt(1), big.NewInt(1))
 		if err != nil {
 			ErrorResponse(ctx, model.ServerInternalError, err.Error())
 			return
