@@ -125,7 +125,7 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 	for index := range NekoSpiritList {
 		idList = append(idList, NekoSpiritList[index].TokenId)
 		//Cache.Set(CacheTagNekoSpirit+strconv.FormatUint(NekoSpirit.TokenId, 10), NekoSpirit, -1)
-		if NekoSpiritList[index].Fade.Equal(decimal.NewFromInt(0)) {
+		if NekoSpiritList[index].Fade.LessThanOrEqual(decimal.NewFromInt(0)) {
 			NekoSpiritList[index].Mana = decimal.NewFromInt(0)
 		}
 	}
