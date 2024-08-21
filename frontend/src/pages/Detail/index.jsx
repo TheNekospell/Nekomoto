@@ -78,7 +78,7 @@ export default function Detail() {
         <Col xs={24}  sm={24}  lg={6} className="margin-top-16">
           <BoxCard
             type="gem"
-            title="58694 NKO"
+            title="58694 NPO"
             subTitle="Earnings"
             buttonText="Claim"
           />
@@ -124,7 +124,7 @@ export default function Detail() {
                 />
               </Col>
               <Col
-                xs={24}  sm={24} 
+                xs={24}  sm={24}
                 className="text-center"
                 style={{ alignSelf: "flex-end", marginTop: "24px" }}
               >
@@ -166,7 +166,7 @@ export default function Detail() {
             </Flex>
             <Row style={{ flex: 1 }}>
               <Col
-                xs={24}  sm={24} 
+                xs={24}  sm={24}
                 className="text-center"
                 style={{ alignSelf: "flex-end", marginTop: "24px" }}
               >
@@ -399,7 +399,7 @@ export default function Detail() {
               </div>
             </Col>
             <Col
-              xs={24}  sm={24} 
+              xs={24}  sm={24}
               lg={12}
               style={{
                 flex: 1,
@@ -456,7 +456,7 @@ export default function Detail() {
               </div>
             </Col>
             <Col
-              xs={24}  sm={24} 
+              xs={24}  sm={24}
               lg={12}
               style={{
                 flex: 1,

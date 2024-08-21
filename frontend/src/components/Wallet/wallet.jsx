@@ -138,7 +138,7 @@ export default function Wallet({ isMobile = false }) {
 			label: (
 				<Flex align="center" justify="space-between" className="header-btn2">
 					<img src={t6} width={15} style={{ marginRight: "6px" }} alt="" />
-					<span>Buy NKO</span>
+					<span>Buy NPO</span>
 				</Flex>
 			),
 		},
@@ -210,7 +210,7 @@ export default function Wallet({ isMobile = false }) {
 							{/*    alt=""*/}
 							{/*/>*/}
 							<img src={t6} width={15} style={{ marginRight: "6px" }} alt="" />
-							<span>{"Buy NKO"}</span>
+							<span>{"Buy NPO"}</span>
 						</Flex>
 					</Col>
 					<Col style={{ width: "170px", textAlign: "center" }}>

@@ -663,7 +663,7 @@ export default function Detail() {
 					<Col xs={24} sm={24} lg={6} className="margin-top-16">
 						<BoxCard
 							type="gem"
-							title={addCommaInNumber(addressInfo.ToClaim) + " NKO"}
+							title={addCommaInNumber(addressInfo.ToClaim) + " NPO"}
 							subTitle="Earnings"
 							subPic={true}
 							subFunc={() => setEarningInfo(true)}
@@ -710,7 +710,7 @@ export default function Detail() {
 								<Col xs={12} sm={12} style={{ marginTop: "24px" }}>
 									<GemItem
 										color="blue"
-										title="NKO"
+										title="NPO"
 										descLeft={nekocoin}
 										descRight={getAscendUpgradeNeko(addressInfo.Buff?.Level)}
 									/>
@@ -1296,7 +1296,7 @@ export default function Detail() {
 													style={{ marginRight: "10px" }}
 													alt=""
 												/>
-												<div className="modal-text3">NKO</div>
+												<div className="modal-text3">NPO</div>
 											</Flex>
 											<Flex>
 												<div className="modal-text3">
@@ -1373,7 +1373,7 @@ export default function Detail() {
 							<Col>
 								<div className="adept-bg">
 									<img src={adept2} width={80} alt="" />
-									<div className="modal-text1">NKO</div>
+									<div className="modal-text1">NPO</div>
 									<div className="modal-text10">
 										{"x" + chestDetail?.Token1Amount}
 									</div>
@@ -1547,7 +1547,7 @@ export default function Detail() {
 						</span>
 						<span> </span>
 						<span style={{ color: "#FBA323", display: "inline" }}>
-							{"+$NKO"}
+							{"+$NPO"}
 						</span>
 						{" to upgrade"}
 					</div>
@@ -1592,7 +1592,7 @@ export default function Detail() {
 							<tr style={{ color: "#90A6AF" }}>
 								<th style={{ padding: "8px" }}>Level</th>
 								<th style={{ padding: "8px" }}>Prism Consume</th>
-								<th style={{ padding: "8px" }}>NKO Consume</th>
+								<th style={{ padding: "8px" }}>NPO Consume</th>
 								<th style={{ padding: "8px" }}>Global Mana</th>
 							</tr>
 						</thead>

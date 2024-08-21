@@ -32,7 +32,7 @@ export default function InfoCard({ totalRewards, treasuryRevenue, totalBurn }) {
 					<div className="card-sub-title">Total Rewards</div>
 					<div className="num-60" style={{ margin: "16px 0 8px" }}>
 						{addCommaInNumber(totalRewards)}
-						<span className="card-sub-title">NKO</span>
+						<span className="card-sub-title">NPO</span>
 					</div>
 					{usd > 0 && (
 						<div className="grey-text">
@@ -47,7 +47,7 @@ export default function InfoCard({ totalRewards, treasuryRevenue, totalBurn }) {
 							<div className="info-item">
 								<div className="card-sub-title">{addCommaInNumber(usd)}</div>
 								<div className="grey-text" style={{ marginTop: "12px" }}>
-									Nko Price
+									NPO Price
 								</div>
 							</div>
 						</Col>

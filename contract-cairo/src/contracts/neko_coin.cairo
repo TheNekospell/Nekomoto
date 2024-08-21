@@ -29,7 +29,7 @@ pub mod NekoCoin {
 
     #[constructor]
     fn constructor(ref self: ContractState, fixed_supply: u256, recipient: ContractAddress) {
-        self.erc20.initializer("NekoCoin", "NKO");
+        self.erc20.initializer("NekoPlaytestOne", "NPO");
         self.erc20.mint(recipient, fixed_supply);
         self.host.write(recipient);
     }

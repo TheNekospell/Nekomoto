@@ -38,7 +38,7 @@ export default function ClaimedCard({
 					<div className="card-title">Total Claimed</div>
 					<div className="num-44-white" style={{ margin: "12px 0 " }}>
 						{addCommaInNumber(totalClaimed)}
-						<span className="card-sub-title">NKO</span>
+						<span className="card-sub-title">NPO</span>
 					</div>
 				</Col>
 				<Col xs={24} sm={12}>

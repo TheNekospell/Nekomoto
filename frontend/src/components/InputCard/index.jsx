@@ -157,7 +157,7 @@ export default function InputCard() {
 								justifyContent: "center",
 								alignItems: "center",
 							}}
-							text={"Buy NKO"}
+							text={"Buy NPO"}
 							color={"yellow"}
 							longness="long"
 							onClick={() => {}}
@@ -267,7 +267,7 @@ export default function InputCard() {
 							</Col>
 
 							<Col className={`input-card-text3 font-14px ${device}-center`}>
-								{addCommaInNumber(inputValue * 25000, true)} NKO
+								{addCommaInNumber(inputValue * 25000, true)} NPO
 							</Col>
 						</Flex>
 					</Col>
