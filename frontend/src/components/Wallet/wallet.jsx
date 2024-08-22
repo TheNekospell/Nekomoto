@@ -49,14 +49,14 @@ export default function Wallet({ isMobile = false }) {
 	useEffect(() => {
 		const target = SN_SEPOLIA;
 		console.log("chainId: ", chainId, uint256.uint256ToBN(target));
-		if (chainId !== uint256.uint256ToBN(target) && !isMobile) {
-			window?.starknet?.request({
-				type: "wallet_switchStarknetChain",
-				params: {
-					chainId: "SN_SEPOLIA",
-				},
-			});
-		}
+		// if (chainId !== uint256.uint256ToBN(target) && !isMobile) {
+		// 	window?.starknet?.request({
+		// 		type: "wallet_switchStarknetChain",
+		// 		params: {
+		// 			chainId: "SN_SEPOLIA",
+		// 		},
+		// 	});
+		// }
 
 		BACKEND.addressInfo(address).then((result) => {
 			const addressInfo = result.data;
