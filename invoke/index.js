@@ -91,7 +91,7 @@ app.post("/send", async function (req, res) {
         }
 
         const multicall = await account.execute(arr, {
-            maxFee: 10 ** 15
+            maxFee: 10 ** 16
         })
 
         const result = await account.waitForTransaction(multicall.transaction_hash)
