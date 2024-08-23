@@ -95,7 +95,8 @@ app.post("/send", async function (req, res) {
         })
 
         const result = await account.waitForTransaction(multicall.transaction_hash)
-        // console.log("result: ", result)
+        console.log("result: ", result.execution_status, result.finality_status)
+        console.log("result detail: ", result.status, result.transaction_hash, result.revert_reason, result.transaction_failure_reason)
 
         res.send(multicall.transaction_hash)
 
@@ -130,7 +131,8 @@ app.post("/summon", async function (req, res) {
             })
         }])
         const result = await account.waitForTransaction(multicall.transaction_hash)
-        // console.log("result: ", result)
+        console.log("result: ", result.execution_status, result.finality_status)
+        console.log("result detail: ", result.status, result.transaction_hash, result.revert_reason, result.transaction_failure_reason)
 
         res.send(multicall.transaction_hash)
 
@@ -164,7 +166,8 @@ app.post("/burn", async function (req, res) {
             })
         }])
         const result = await account.waitForTransaction(multicall.transaction_hash)
-        // console.log("result: ", result)
+        console.log("result: ", result.execution_status, result.finality_status)
+        console.log("result detail: ", result.status, result.transaction_hash, result.revert_reason, result.transaction_failure_reason)
 
         res.send(multicall.transaction_hash)
 

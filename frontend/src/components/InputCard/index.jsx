@@ -33,27 +33,27 @@ export default function InputCard() {
 	const [text, setText] = useState("");
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		if (!address) return;
-		const allowance = async () => {
-			return await nekocoinContract.allowance(
-				account.address,
-				NEKOMOTO_ADDRESS
-			);
-		};
-		try {
-			allowance().then((res) => {
-				console.log("allowance: ", res);
-				setAllowance(res);
-			});
-			nekocoinContract.balance_of(address).then((res) => {
-				console.log("balance: ", res);
-				setBalance(res);
-			});
-		} catch (e) {
-			console.log("allowance error: ", e);
-		}
-	}, [address]);
+	// useEffect(() => {
+	// 	if (!address) return;
+	// 	const allowance = async () => {
+	// 		return await nekocoinContract.allowance(
+	// 			account.address,
+	// 			NEKOMOTO_ADDRESS
+	// 		);
+	// 	};
+	// 	try {
+	// 		allowance().then((res) => {
+	// 			console.log("allowance: ", res);
+	// 			setAllowance(res);
+	// 		});
+	// 		nekocoinContract.balance_of(address).then((res) => {
+	// 			console.log("balance: ", res);
+	// 			setBalance(res);
+	// 		});
+	// 	} catch (e) {
+	// 		console.log("allowance error: ", e);
+	// 	}
+	// }, [address]);
 
 	const mint = async (count) => {
 		console.log("count: ", count);
@@ -63,12 +63,21 @@ export default function InputCard() {
 
 		setVisible(true);
 
+		const balance = await nekocoinContract.balance_of(address);
+		console.log("balance: ", balance);
+
+		const allowance = await nekocoinContract.allowance(
+			account.address,
+			NEKOMOTO_ADDRESS
+		);
+		console.log("allowance: ", allowance);
+
 		if (new BigNumber(balance).lt(new BigNumber(count * 25000 * 10 ** 18))) {
-			console.log(
-				"balance: ",
-				new BigNumber(balance),
-				new BigNumber(count * 25000 * 10 ** 18)
-			);
+			// console.log(
+			// 	"balance: ",
+			// 	new BigNumber(balance),
+			// 	new BigNumber(count * 25000 * 10 ** 18)
+			// );
 			setText("Insufficient balance");
 			return;
 		}
@@ -147,7 +156,7 @@ export default function InputCard() {
 						{text !== "" ? text : "Please sign in your wallet and wait..."}
 					</h2>
 
-					{text && text == "Insufficient balance" && (
+					{/* {text && text == "Insufficient balance" && (
 						<Button
 							style={{
 								marginTop: "20px",
@@ -162,7 +171,7 @@ export default function InputCard() {
 							longness="long"
 							onClick={() => {}}
 						/>
-					)}
+					)} */}
 					{text && text != "Insufficient balance" && (
 						<Button
 							style={{

@@ -41,6 +41,9 @@ export default function Wallet({ isMobile = false }) {
 	const [addressInfo, setAddressInfo] = useState({ Active: false });
 
 	const [faucetInterval, setFaucetInterval] = useState(false);
+	const [faucetResult, setFaucetResult] = useState("");
+
+	const [activeResult, setActiveResult] = useState("");
 
 	// useEffect(() => {
 	// 	connect({connector});
@@ -112,6 +115,12 @@ export default function Wallet({ isMobile = false }) {
 		// const { typedMessage, signature } = await sign(account);
 		const result = await BACKEND.activeAddress(address, code);
 		console.log("active result: ", result);
+		if (!result.success) {
+			setActiveResult(result.message + ", please try again");
+			// setInterval(() => {
+			// 	setActiveResult("");
+			// }, 10000);
+		}
 		setTestCode("");
 		BACKEND.addressInfo(address).then((result) => {
 			setAddressInfo(result.data);
@@ -190,12 +199,15 @@ export default function Wallet({ isMobile = false }) {
 							align="center"
 							onClick={
 								address && !faucetInterval
-									? () => {
-											BACKEND.faucet(address);
+									? async () => {
 											setFaucetInterval(true);
 											setInterval(() => {
 												setFaucetInterval(false);
-											}, 5000);
+											}, 30000);
+											setFaucetResult("Transferring NPO...");
+											const result = await BACKEND.faucet(address);
+											console.log("result: ", result);
+											setFaucetResult("Successful transferred 250,000 NPO");
 									  }
 									: () => {
 											console.log("please wait...");
@@ -209,8 +221,15 @@ export default function Wallet({ isMobile = false }) {
 							{/*    style={{marginRight: "6px"}}*/}
 							{/*    alt=""*/}
 							{/*/>*/}
-							<img src={t6} width={15} style={{ marginRight: "6px" }} alt="" />
-							<span>{"Buy NPO"}</span>
+							{!faucetInterval && (
+								<img
+									src={t6}
+									width={15}
+									style={{ marginRight: "6px" }}
+									alt=""
+								/>
+							)}
+							<span>{faucetInterval ? "Cooling down" : "Buy NPO"}</span>
 						</Flex>
 					</Col>
 					<Col style={{ width: "170px", textAlign: "center" }}>
@@ -234,6 +253,56 @@ export default function Wallet({ isMobile = false }) {
 				<Dropdown menu={{ items }} placement="bottomRight">
 					<img src={t7} width={18} alt="" />
 				</Dropdown>
+			)}
+
+			{faucetResult && (
+				<NekoModal
+					open={faucetResult !== ""}
+					centered={true}
+					footer={null}
+					maskClosable={true}
+					onCancel={() => setFaucetResult("")}
+				>
+					<div
+						style={{
+							alignItems: "center",
+							justifyContent: "center",
+							display: "flex",
+							flexDirection: "column",
+						}}
+					>
+						<div
+							style={{
+								fontSize: "20px",
+								textAlign: "center",
+								// marginLeft: "10px",
+								// marginTop: "15px",
+								marginBottom: "20px",
+								fontFamily: "BIG SHOT",
+								color: "#01dce4",
+								fontWeight: "bold",
+							}}
+						>
+							{faucetResult}
+						</div>
+						{faucetResult === "Successful transferred 250,000 NPO" && (
+							<Button
+								style={{
+									marginTop: "20px",
+									fontSize: "15px",
+									flexDirection: "row",
+									display: "flex",
+									justifyContent: "center",
+									alignItems: "center",
+								}}
+								text={"OK"}
+								color={"yellow"}
+								longness="long"
+								onClick={() => setFaucetResult("")}
+							/>
+						)}
+					</div>
+				</NekoModal>
 			)}
 
 			{accept && (
@@ -286,7 +355,10 @@ export default function Wallet({ isMobile = false }) {
 					centered={true}
 					footer={null}
 					maskClosable={true}
-					onCancel={() => setVisible(false)}
+					onCancel={() => {
+						setVisible(false);
+						setActiveResult("");
+					}}
 				>
 					<div>
 						<h2
@@ -344,35 +416,54 @@ export default function Wallet({ isMobile = false }) {
 									{addressInfo.Active ? "Active" : "Not Active"}
 								</div>
 								{!addressInfo.Active && (
-									<div
-										style={{
-											display: "flex",
-											justifyContent: "center",
-											alignItems: "center",
-											flexDirection: "row",
-											marginTop: "20px",
-											marginBottom: "10px",
-										}}
-									>
-										<Input
-											placeholder="Enter Game Test Code"
-											// type="number"
-											size="large"
-											style={{ width: "200px", marginRight: "20px" }}
-											// value={inputValue}
-											onChange={(e) => {
-												const v = e.target.value;
-												if (v) {
-													setTestCode(v);
-												}
+									<div>
+										<div
+											style={{
+												display: "flex",
+												justifyContent: "center",
+												alignItems: "center",
+												flexDirection: "row",
+												marginTop: "20px",
+												marginBottom: "10px",
 											}}
-										/>
-										<Button
-											text="Active"
-											color="yellow"
-											longness="short"
-											onClick={testCode !== "" ? () => active(testCode) : null}
-										/>
+										>
+											<Input
+												placeholder="Enter Game Test Code"
+												// type="number"
+												size="large"
+												style={{ width: "200px", marginRight: "20px" }}
+												// value={inputValue}
+												onChange={(e) => {
+													const v = e.target.value;
+													if (v) {
+														setTestCode(v);
+													}
+												}}
+											/>
+											<Button
+												text="Active"
+												color="yellow"
+												longness="short"
+												onClick={
+													testCode !== "" ? () => active(testCode) : null
+												}
+											/>
+										</div>
+										{activeResult !== "" && (
+											<div
+												style={{
+													fontSize: "16px",
+													textAlign: "center",
+													marginLeft: "10px",
+													marginTop: "15px",
+													fontFamily: "BIG SHOT",
+													color: "white",
+													fontWeight: "bold",
+												}}
+											>
+												{activeResult}
+											</div>
+										)}
 									</div>
 								)}
 

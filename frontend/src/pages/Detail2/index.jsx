@@ -179,7 +179,7 @@ export default function Detail() {
 	useEffect(() => {
 		const interval = setInterval(() => {
 			setHhh(new Date().getTime().toString());
-		}, 5000);
+		}, 15000);
 
 		return () => clearInterval(interval);
 	}, []);
