@@ -166,10 +166,11 @@ export default function Wallet({ isMobile = false }) {
 					) : (
 						<div
 							className="header-btn"
-							onClick={() => {
-								// setVisible(true);
-								connect({ connector: new ArgentMobileConnector() });
-							}}
+							// pause test
+							// onClick={() => {
+							// 	// setVisible(true);
+							// 	connect({ connector: new ArgentMobileConnector() });
+							// }}
 						>
 							Connect Wallet
 						</div>
@@ -240,9 +241,10 @@ export default function Wallet({ isMobile = false }) {
 						) : (
 							<div
 								className="header-btn"
-								onClick={() => {
-									setVisible(true);
-								}}
+								// pause test
+								// onClick={() => {
+								// 	setVisible(true);
+								// }}
 							>
 								Connect Wallet
 							</div>
