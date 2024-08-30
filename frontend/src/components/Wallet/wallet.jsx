@@ -41,7 +41,7 @@ export default function Wallet({ isMobile = false }) {
 	const [addressInfo, setAddressInfo] = useState({ Active: false });
 
 	const [faucetInterval, setFaucetInterval] = useState(false);
-	const [faucetResult, setFaucetResult] = useState("");
+	const [faucetResult, setFaucetResult] = useState("The current round of testing has ended. Thank you for your attention.");
 
 	const [activeResult, setActiveResult] = useState("");
 
