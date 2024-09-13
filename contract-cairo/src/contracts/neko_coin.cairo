@@ -2,7 +2,7 @@
 pub mod NekoCoin {
     use nekomoto::component::erc20::ERC20Component;
     use starknet::{ContractAddress, get_caller_address};
-    use nekomoto::interface::interface::{NekomotoTraitDispatcher, NekomotoTraitDispatcherTrait};
+    // use nekomoto::interface::interface::{NekomotoTraitDispatcher, NekomotoTraitDispatcherTrait};
     use core::num::traits::Zero;
 
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
