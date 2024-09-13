@@ -46,18 +46,18 @@ func StartServer() {
 
 	chestGroup := apiGroup.Group("/chest")
 	chestGroup.POST("/open", OpenChest)
-	chestGroup.POST("/empower", EmpowerChest)
+	// chestGroup.POST("/empower", EmpowerChest)
 
 	addressGroup := apiGroup.Group("/address")
 	addressGroup.GET("/generateSignature", GenerateSignature)
 	addressGroup.GET("/info", AddressInfo)
-	addressGroup.POST("/invitation", AcceptInvitation)
-	addressGroup.POST("/valid", ValidSignature)
+	// addressGroup.POST("/invitation", AcceptInvitation)
+	// addressGroup.POST("/valid", ValidSignature)
 	addressGroup.POST("/active", ActiveAddress)
 
 	rewardGroup := apiGroup.Group("/reward")
 	rewardGroup.POST("/claim", ClaimReward)
-	rewardGroup.POST("/claimInv", ClaimRewardOfInvitation)
+	// rewardGroup.POST("/claimInv", ClaimRewardOfInvitation)
 
 	staticGroup := apiGroup.Group("/static")
 	staticGroup.GET("/info", GetStaticInfo)
@@ -72,23 +72,23 @@ func StartServer() {
 	// testGroup.POST("/summon", func(ctx *gin.Context) {
 	// 	_ = invoker_sn.SendCoinAndNFT("", big.NewInt(100000), big.NewInt(10000), big.NewInt(10))
 	// })
-	testGroup.GET("/faucet", func(ctx *gin.Context) {
-		var req model.Address
-		if err := ctx.ShouldBind(&req); err != nil {
-			ErrorResponse(ctx, model.WrongParam, err.Error())
-			return
-		}
-		bigIntNumber := new(big.Int)
-		bigIntNumber.SetString("250000000000000000000000", 10)
-		bigIntNumber2 :=new(big.Int)
-		bigIntNumber2.SetString("1000000000000000000", 10)
-		err := invoker_sn.SendCoinAndNFT(req.Address, bigIntNumber,bigIntNumber2 , big.NewInt(1))
-		if err != nil {
-			ErrorResponse(ctx, model.ServerInternalError, err.Error())
-			return
-		}
-		SuccessResponse(ctx, "success")
-	})
+	// testGroup.GET("/faucet", func(ctx *gin.Context) {
+	// 	var req model.Address
+	// 	if err := ctx.ShouldBind(&req); err != nil {
+	// 		ErrorResponse(ctx, model.WrongParam, err.Error())
+	// 		return
+	// 	}
+	// 	bigIntNumber := new(big.Int)
+	// 	bigIntNumber.SetString("250000000000000000000000", 10)
+	// 	bigIntNumber2 :=new(big.Int)
+	// 	bigIntNumber2.SetString("1000000000000000000", 10)
+	// 	err := invoker_sn.SendCoinAndNFT(req.Address, bigIntNumber,bigIntNumber2 , big.NewInt(1))
+	// 	if err != nil {
+	// 		ErrorResponse(ctx, model.ServerInternalError, err.Error())
+	// 		return
+	// 	}
+	// 	SuccessResponse(ctx, "success")
+	// })
 
 	// fmt.Println("server started at:", engine)
 	if err := engine.Run(":8972"); err != nil {
