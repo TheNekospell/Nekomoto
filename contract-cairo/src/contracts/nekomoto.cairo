@@ -20,7 +20,9 @@ pub mod Nekomoto {
     use openzeppelin::token::erc721::ERC721Component;
     use openzeppelin::upgrades::upgradeable::UpgradeableComponent;
     use openzeppelin::upgrades::upgradeable::UpgradeableComponent::InternalTrait as upgradeableInternal;
-    use starknet::{ContractAddress, get_caller_address, get_block_timestamp, ClassHash};
+    use starknet::{
+        ContractAddress, get_caller_address, get_block_timestamp, get_contract_address, ClassHash
+    };
 
     component!(path: ERC721Component, storage: erc721, event: ERC721Event);
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
@@ -58,7 +60,9 @@ pub mod Nekomoto {
         stake_time: LegacyMap<u256, u256>,
         stake_from: LegacyMap<u256, ContractAddress>,
         level: LegacyMap<u256, u8>,
-        level_count: LegacyMap<ContractAddress, u256>,
+        // level_count: LegacyMap<ContractAddress, u256>,
+        // For summon
+        coin: LegacyMap<ContractAddress, u256>,
     }
 
 
@@ -143,6 +147,19 @@ pub mod Nekomoto {
         self.starter_pack_limit.write(20000);
     }
 
+    #[external(v0)]
+    fn faucet(ref self: ContractState) {
+        let nekocoin = self.neko.read();
+        // 25000000000000000000000*10
+        assert(
+            IERC20Dispatcher { contract_address: nekocoin }
+                .balance_of(get_contract_address()) >= 250000000000000000000000,
+            'excced limit of faucet'
+        );
+        IERC20Dispatcher { contract_address: nekocoin }
+            .transfer(get_caller_address(), 250000000000000000000000);
+    }
+
     #[abi(embed_v0)]
     impl NekomotoTraitImpl of NekomotoTrait<ContractState> {
         fn replace_classhash(ref self: ContractState, new_class_hash: ClassHash) {
@@ -150,6 +167,20 @@ pub mod Nekomoto {
             self.upgradeable.upgrade(new_class_hash);
         }
 
+        fn check_coin(self: @ContractState, address: ContractAddress) -> u256 {
+            self.coin.read(address)
+        }
+
+        fn buy_coin(ref self: ContractState, count: u256) {
+            let amount = count * 25000000000000000000000;
+            let nekocoin = self.neko.read();
+            let recipient = get_caller_address();
+            IERC20Dispatcher { contract_address: nekocoin }
+                .transfer_from(recipient, self.host.read(), amount * 75 / 100);
+            ERC20BurnTraitDispatcher { contract_address: nekocoin }
+                .burnFrom(recipient, amount * 25 / 100);
+            self.coin.write(recipient, count);
+        }
 
         fn summon(
             ref self: ContractState, recipient: ContractAddress, count: u256, mut random: u256
@@ -157,12 +188,8 @@ pub mod Nekomoto {
             let mut token_id = self.token_id.read();
             assert(get_caller_address() == self.host.read(), 'Only the host can summon');
 
-            let amount = count * 25000000000000000000000;
-            let nekocoin = self.neko.read();
-            IERC20Dispatcher { contract_address: nekocoin }
-                .transfer_from(recipient, self.host.read(), amount * 75 / 100);
-            ERC20BurnTraitDispatcher { contract_address: nekocoin }
-                .burnFrom(recipient, amount * 25 / 100);
+            let hold_coin = self.coin.read(recipient);
+            assert(hold_coin >= count, 'Not enough coin');
 
             let block_time = starknet::get_block_timestamp();
             let mut i = 0;
@@ -179,7 +206,7 @@ pub mod Nekomoto {
                 let seed = keccak::keccak_u256s_be_inputs(input.span());
 
                 let is_lucky = self.lucky(recipient);
-                let rarity_number = random(seed, 0, 10000);
+                let rarity_number = generate_random(seed, 0, 10000);
                 if rarity_number < 5 || (!is_lucky && rarity_number < 450) {
                     // empty box
                     continue;
@@ -194,9 +221,9 @@ pub mod Nekomoto {
                 level_count_to_add = level_count_to_add + 1;
                 self.emit(Summon { to: recipient, token_id });
             };
-            self
-                .level_count
-                .write(recipient, self.level_count.read(recipient) + level_count_to_add);
+            // self
+        //     .level_count
+        //     .write(recipient, self.level_count.read(recipient) + level_count_to_add);
         }
 
         fn stake(ref self: ContractState, token_id: Array<u256>) {
@@ -279,7 +306,7 @@ pub mod Nekomoto {
             self.erc721.mint(sender, token_id);
             self.starter.write(token_id, 1);
             self.token_id.write(token_id);
-            self.level_count.write(sender, self.level_count.read(sender) + 1);
+            // self.level_count.write(sender, self.level_count.read(sender) + 1);
             self.emit(Summon { to: sender, token_id: token_id });
         }
 
@@ -422,7 +449,7 @@ pub mod Nekomoto {
 
             self.level.write(token_id, target_level);
             let stake_from = self.stake_from.read(token_id);
-            self.level_count.write(stake_from, self.level_count.read(stake_from) + 1);
+            // self.level_count.write(stake_from, self.level_count.read(stake_from) + 1);
             self
                 .emit(
                     Upgrade {
@@ -448,17 +475,18 @@ pub mod Nekomoto {
             };
 
             let (rarity, element, name) = generate_basic_info(seed, is_starter);
-            let SPI = generate_SPI(rarity, seed, level, is_starter);
             let ATK = generate_ATK(rarity, seed, level, is_starter);
-            let DEF = generate_DEF(rarity, seed, level, is_starter);
-            let SPD = generate_SPD(rarity, seed, level, is_starter);
+            // let SPI = generate_SPI(rarity, seed, level, is_starter);
+            // let DEF = generate_DEF(rarity, seed, level, is_starter);
+            // let SPD = generate_SPD(rarity, seed, level, is_starter);
 
             let fade = generate_fade(self, rarity, seed, token_id, is_starter);
 
             let mut mana = 0;
-            if fade != 0 {
-                mana = ((4 * SPI + 3 * ATK + 2 * DEF + 1 * SPD) * 65) / 1000;
-            }
+            // todo mana
+            // if fade != 0 {
+            //     mana = ((4 * SPI + 3 * ATK + 2 * DEF + 1 * SPD) * 65) / 1000;
+            // }
 
             let (rarity_string, element_string) = get_rarity_and_element(rarity, element);
 
@@ -466,10 +494,10 @@ pub mod Nekomoto {
                 rarity: rarity_string,
                 element: element_string,
                 name: name,
-                SPI: SPI,
                 ATK: ATK,
-                DEF: DEF,
-                SPD: SPD,
+                // SPI: SPI,
+                // DEF: DEF,
+                // SPD: SPD,
                 fade: fade,
                 mana: mana,
                 level: level.into() + 1
@@ -477,7 +505,8 @@ pub mod Nekomoto {
         }
 
         fn get_level_count(self: @ContractState, address: ContractAddress) -> u256 {
-            self.level_count.read(address)
+            // self.level_count.read(address)
+            0
         }
     }
 
@@ -487,11 +516,11 @@ pub mod Nekomoto {
         (
             match rarity {
                 0 => '',
-                1 => 'Common',
-                2 => 'Uncommon',
-                3 => 'Rare',
-                4 => 'Epic',
-                5 => 'Legendary',
+                1 => 'N',
+                2 => 'R',
+                3 => 'SR',
+                4 => 'SSR',
+                5 => 'UR',
                 _ => '',
             },
             match element {
@@ -568,7 +597,7 @@ pub mod Nekomoto {
         (0, 0)
     }
 
-    fn random(input: u256, min: u256, max: u256) -> u256 {
+    fn generate_random(input: u256, min: u256, max: u256) -> u256 {
         if max == min {
             return min;
         }
@@ -619,15 +648,15 @@ pub mod Nekomoto {
         } else if (rarity == 0) {
             return 0;
         } else if (rarity == 1) {
-            fade = random(seed, 1000_00, 1200_00);
+            fade = generate_random(seed, 1000_00, 1200_00);
         } else if (rarity == 2) {
-            fade = random(seed, 1050_00, 1300_00);
+            fade = generate_random(seed, 1050_00, 1300_00);
         } else if (rarity == 3) {
-            fade = random(seed, 1100_00, 1400_00);
+            fade = generate_random(seed, 1100_00, 1400_00);
         } else if (rarity == 4) {
-            fade = random(seed, 1200_00, 1450_00);
+            fade = generate_random(seed, 1200_00, 1450_00);
         } else if (rarity == 5) {
-            fade = random(seed, 1350_00, 1600_00);
+            fade = generate_random(seed, 1350_00, 1600_00);
         }
         fade = fade + self.fade_increase.read(token_id) - self.fade_consume.read(token_id);
         let stake_consume = stake_consume(self, token_id);
@@ -638,52 +667,52 @@ pub mod Nekomoto {
         }
     }
 
-    fn generate_SPI(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
-        let mut SPI = 0;
-        if is_starter {
-            SPI = 500;
-        } else if (rarity == 0) {
-            return 0;
-        } else if (rarity == 1) {
-            SPI = random(seed, 5_00, 12_00);
-        } else if (rarity == 2) {
-            SPI = random(seed, 12_00, 30_00);
-        } else if (rarity == 3) {
-            SPI = random(seed, 30_00, 55_00);
-        } else if (rarity == 4) {
-            SPI = random(seed, 80_00, 100_00);
-        } else if (rarity == 5) {
-            SPI = random(seed, 180_00, 288_00);
-        }
-        if (level == 0) {
-            return SPI;
-        } else if (level == 1) {
-            SPI += 200;
-        } else if (level == 2) {
-            SPI += 400;
-        } else if (level == 3) {
-            SPI += 600;
-        } else if (level == 4) {
-            SPI += 800;
-        } else if (level == 5) {
-            SPI += 1000;
-        } else if (level == 6) {
-            SPI += 1200;
-        } else if (level == 7) {
-            SPI += 1600;
-        } else if (level == 8) {
-            SPI += 2000;
-        } else if (level == 9) {
-            SPI += 2400;
-        } else if (level == 10) {
-            SPI += 3000;
-        } else if (level == 11) {
-            SPI += 3600;
-        } else if (level == 12) {
-            SPI += 4800;
-        }
-        return SPI;
-    }
+    // fn generate_SPI(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
+    //     let mut SPI = 0;
+    //     if is_starter {
+    //         SPI = 500;
+    //     } else if (rarity == 0) {
+    //         return 0;
+    //     } else if (rarity == 1) {
+    //         SPI = generate_random(seed, 5_00, 12_00);
+    //     } else if (rarity == 2) {
+    //         SPI = generate_random(seed, 12_00, 30_00);
+    //     } else if (rarity == 3) {
+    //         SPI = generate_random(seed, 30_00, 55_00);
+    //     } else if (rarity == 4) {
+    //         SPI = generate_random(seed, 80_00, 100_00);
+    //     } else if (rarity == 5) {
+    //         SPI = generate_random(seed, 180_00, 288_00);
+    //     }
+    //     if (level == 0) {
+    //         return SPI;
+    //     } else if (level == 1) {
+    //         SPI += 200;
+    //     } else if (level == 2) {
+    //         SPI += 400;
+    //     } else if (level == 3) {
+    //         SPI += 600;
+    //     } else if (level == 4) {
+    //         SPI += 800;
+    //     } else if (level == 5) {
+    //         SPI += 1000;
+    //     } else if (level == 6) {
+    //         SPI += 1200;
+    //     } else if (level == 7) {
+    //         SPI += 1600;
+    //     } else if (level == 8) {
+    //         SPI += 2000;
+    //     } else if (level == 9) {
+    //         SPI += 2400;
+    //     } else if (level == 10) {
+    //         SPI += 3000;
+    //     } else if (level == 11) {
+    //         SPI += 3600;
+    //     } else if (level == 12) {
+    //         SPI += 4800;
+    //     }
+    //     return SPI;
+    // }
 
     fn generate_ATK(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
         let mut ATK = 0;
@@ -692,15 +721,15 @@ pub mod Nekomoto {
         } else if (rarity == 0) {
             return 0;
         } else if (rarity == 1) {
-            ATK = random(seed, 3_00, 11_00);
+            ATK = generate_random(seed, 3_00, 11_00);
         } else if (rarity == 2) {
-            ATK = random(seed, 10_00, 27_00);
+            ATK = generate_random(seed, 10_00, 27_00);
         } else if (rarity == 3) {
-            ATK = random(seed, 25_00, 35_00);
+            ATK = generate_random(seed, 25_00, 35_00);
         } else if (rarity == 4) {
-            ATK = random(seed, 45_00, 60_00);
+            ATK = generate_random(seed, 45_00, 60_00);
         } else if (rarity == 5) {
-            ATK = random(seed, 100_00, 149_00);
+            ATK = generate_random(seed, 100_00, 149_00);
         }
         if (level == 0) {
             return ATK;
@@ -732,93 +761,93 @@ pub mod Nekomoto {
         return ATK;
     }
 
-    fn generate_DEF(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
-        let mut DEF = 0;
-        if is_starter {
-            DEF = 300;
-        } else if (rarity == 0) {
-            return 0;
-        } else if (rarity == 1) {
-            DEF = random(seed, 3_00, 10_00);
-        } else if (rarity == 2) {
-            DEF = random(seed, 10_00, 20_00);
-        } else if (rarity == 3) {
-            DEF = random(seed, 20_00, 30_00);
-        } else if (rarity == 4) {
-            DEF = random(seed, 30_00, 55_00);
-        } else if (rarity == 5) {
-            DEF = random(seed, 100_00, 129_00);
-        }
-        if (level == 0) {
-            return DEF;
-        } else if (level == 1) {
-            DEF += 100;
-        } else if (level == 2) {
-            DEF += 200;
-        } else if (level == 3) {
-            DEF += 300;
-        } else if (level == 4) {
-            DEF += 400;
-        } else if (level == 5) {
-            DEF += 500;
-        } else if (level == 6) {
-            DEF += 600;
-        } else if (level == 7) {
-            DEF += 800;
-        } else if (level == 8) {
-            DEF += 1000;
-        } else if (level == 9) {
-            DEF += 1300;
-        } else if (level == 10) {
-            DEF += 1600;
-        } else if (level == 11) {
-            DEF += 1900;
-        } else if (level == 12) {
-            DEF += 2400;
-        }
-        return DEF;
-    }
+    // fn generate_DEF(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
+    //     let mut DEF = 0;
+    //     if is_starter {
+    //         DEF = 300;
+    //     } else if (rarity == 0) {
+    //         return 0;
+    //     } else if (rarity == 1) {
+    //         DEF = generate_random(seed, 3_00, 10_00);
+    //     } else if (rarity == 2) {
+    //         DEF = generate_random(seed, 10_00, 20_00);
+    //     } else if (rarity == 3) {
+    //         DEF = generate_random(seed, 20_00, 30_00);
+    //     } else if (rarity == 4) {
+    //         DEF = generate_random(seed, 30_00, 55_00);
+    //     } else if (rarity == 5) {
+    //         DEF = generate_random(seed, 100_00, 129_00);
+    //     }
+    //     if (level == 0) {
+    //         return DEF;
+    //     } else if (level == 1) {
+    //         DEF += 100;
+    //     } else if (level == 2) {
+    //         DEF += 200;
+    //     } else if (level == 3) {
+    //         DEF += 300;
+    //     } else if (level == 4) {
+    //         DEF += 400;
+    //     } else if (level == 5) {
+    //         DEF += 500;
+    //     } else if (level == 6) {
+    //         DEF += 600;
+    //     } else if (level == 7) {
+    //         DEF += 800;
+    //     } else if (level == 8) {
+    //         DEF += 1000;
+    //     } else if (level == 9) {
+    //         DEF += 1300;
+    //     } else if (level == 10) {
+    //         DEF += 1600;
+    //     } else if (level == 11) {
+    //         DEF += 1900;
+    //     } else if (level == 12) {
+    //         DEF += 2400;
+    //     }
+    //     return DEF;
+    // }
 
-    fn generate_SPD(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
-        let mut SPD = 0;
-        if is_starter {
-            SPD = 100;
-        } else if (rarity == 0) {
-            return 0;
-        } else if (rarity == 1) {
-            SPD = random(seed, 1_00, 9_00);
-        } else if (rarity == 2) {
-            SPD = random(seed, 10_00, 18_00);
-        } else if (rarity == 3) {
-            SPD = random(seed, 12_00, 20_00);
-        } else if (rarity == 4) {
-            SPD = random(seed, 12_00, 22_00);
-        } else if (rarity == 5) {
-            SPD = random(seed, 15_00, 24_00);
-        }
-        if (level == 0) {
-            return SPD;
-        } else if (level == 4) {
-            SPD += 100;
-        } else if (level == 5) {
-            SPD += 200;
-        } else if (level == 6) {
-            SPD += 300;
-        } else if (level == 7) {
-            SPD += 400;
-        } else if (level == 8) {
-            SPD += 500;
-        } else if (level == 9) {
-            SPD += 600;
-        } else if (level == 10) {
-            SPD += 700;
-        } else if (level == 11) {
-            SPD += 900;
-        } else if (level == 12) {
-            SPD += 1200;
-        }
-        return SPD;
-    }
+    // fn generate_SPD(rarity: u8, seed: u256, level: u8, is_starter: bool) -> u256 {
+    //     let mut SPD = 0;
+    //     if is_starter {
+    //         SPD = 100;
+    //     } else if (rarity == 0) {
+    //         return 0;
+    //     } else if (rarity == 1) {
+    //         SPD = generate_random(seed, 1_00, 9_00);
+    //     } else if (rarity == 2) {
+    //         SPD = generate_random(seed, 10_00, 18_00);
+    //     } else if (rarity == 3) {
+    //         SPD = generate_random(seed, 12_00, 20_00);
+    //     } else if (rarity == 4) {
+    //         SPD = generate_random(seed, 12_00, 22_00);
+    //     } else if (rarity == 5) {
+    //         SPD = generate_random(seed, 15_00, 24_00);
+    //     }
+    //     if (level == 0) {
+    //         return SPD;
+    //     } else if (level == 4) {
+    //         SPD += 100;
+    //     } else if (level == 5) {
+    //         SPD += 200;
+    //     } else if (level == 6) {
+    //         SPD += 300;
+    //     } else if (level == 7) {
+    //         SPD += 400;
+    //     } else if (level == 8) {
+    //         SPD += 500;
+    //     } else if (level == 9) {
+    //         SPD += 600;
+    //     } else if (level == 10) {
+    //         SPD += 700;
+    //     } else if (level == 11) {
+    //         SPD += 900;
+    //     } else if (level == 12) {
+    //         SPD += 1200;
+    //     }
+    //     return SPD;
+    // }
 
     fn generate_rarity(seed: u256, with_buff: u8, is_starter: bool) -> u256 {
         if is_starter {
@@ -827,7 +856,7 @@ pub mod Nekomoto {
 
         let mut rarity = 0;
 
-        let rarity_number = random(seed, 0, 10000);
+        let rarity_number = generate_random(seed, 0, 10000);
         let mut empty = 450;
         let common = 5850;
         let uncommon = 8400;
@@ -865,8 +894,8 @@ pub mod Nekomoto {
         let mut element = 0;
         let mut name = '';
 
-        let rarity_number = random(seed, 0, 10000);
-        let element_number = random(seed, 0, 5);
+        let rarity_number = generate_random(seed, 0, 10000);
+        let element_number = generate_random(seed, 0, 5);
 
         // let mut empty = 450;
         let common = 5850;
@@ -980,33 +1009,32 @@ pub mod Nekomoto {
             to: ContractAddress,
             token_id: u256,
             auth: ContractAddress
-        ) {
-            let zero_address = Zero::zero();
-            let mut state = nekomoto::contracts::nekomoto::Nekomoto::unsafe_new_contract_state();
-            let host = state.host.read();
-            let owner = self.ERC721_owners.read(token_id);
-            if owner != host && to != host {
-                let origin_level_in_storage = state.level.read(token_id);
+        ) { // let zero_address = Zero::zero();
+        // let mut state = nekomoto::contracts::nekomoto::Nekomoto::unsafe_new_contract_state();
+        // let host = state.host.read();
+        // let owner = self.ERC721_owners.read(token_id);
+        // if owner != host && to != host {
+        //     let origin_level_in_storage = state.level.read(token_id);
 
-                if owner != zero_address {
-                    state
-                        .level_count
-                        .write(
-                            owner,
-                            state.level_count.read(owner) - origin_level_in_storage.into() - 1
-                        );
-                }
-                if to != zero_address {
-                    state.level_count.write(to, state.level_count.read(to) + 1);
-                }
+        //     if owner != zero_address {
+        //         state
+        //             .level_count
+        //             .write(
+        //                 owner,
+        //                 state.level_count.read(owner) - origin_level_in_storage.into() - 1
+        //             );
+        //     }
+        //     if to != zero_address {
+        //         state.level_count.write(to, state.level_count.read(to) + 1);
+        //     }
 
-                state.level.write(token_id, 0);
-                // state.fade_consume.write(token_id,0);
-                // state.fade_increase.write(token_id,0);
-                state.stake_time.write(token_id, 0);
+        //     state.level.write(token_id, 0);
+        //     // state.fade_consume.write(token_id,0);
+        //     // state.fade_increase.write(token_id,0);
+        //     state.stake_time.write(token_id, 0);
 
-                state.emit(Reset { token_id });
-            }
+        //     state.emit(Reset { token_id });
+        // }
         }
 
         fn after_update(

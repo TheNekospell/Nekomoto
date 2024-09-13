@@ -41,7 +41,9 @@ export default function Wallet({ isMobile = false }) {
 	const [addressInfo, setAddressInfo] = useState({ Active: false });
 
 	const [faucetInterval, setFaucetInterval] = useState(false);
-	const [faucetResult, setFaucetResult] = useState("The current round of testing has ended. Thank you for your attention.");
+	const [faucetResult, setFaucetResult] = useState(
+		"The current round of testing has ended. Thank you for your attention."
+	);
 
 	const [activeResult, setActiveResult] = useState("");
 
@@ -182,80 +184,75 @@ export default function Wallet({ isMobile = false }) {
 
 	return (
 		<div>
-			{!isMobile ? (
-				<Row>
-					<Col className="header-btn2" onClick={() => navigate("/detail2")}>
-						<Flex align="center" justify="space-between">
-							<img src={t5} width={15} style={{ marginRight: "6px" }} alt="" />
-							<span>My Assets</span>
-						</Flex>
-					</Col>
-					<Col
-						className="header-btn2"
-						style={{ margin: "0px 12px" }}
-						// onClick={valid}
+			{/* {!isMobile ? ( */}
+			<Row>
+				<Col className="header-btn2" onClick={() => navigate("/detail2")}>
+					<Flex align="center" justify="space-between">
+						<img src={t5} width={15} style={{ marginRight: "6px" }} alt="" />
+						<span>My Assets</span>
+					</Flex>
+				</Col>
+				<Col
+					className="header-btn2"
+					style={{ margin: "0px 12px" }}
+					// onClick={valid}
+				>
+					{/*<Flex align="center" justify="space-between">*/}
+					<Flex
+						align="center"
+						onClick={
+							address && !faucetInterval
+								? async () => {
+										setFaucetInterval(true);
+										setInterval(() => {
+											setFaucetInterval(false);
+										}, 30000);
+										setFaucetResult("Transferring NPO...");
+										const result = await BACKEND.faucet(address);
+										console.log("result: ", result);
+										setFaucetResult("Successful transferred 250,000 NPO");
+								  }
+								: () => {
+										console.log("please wait...");
+								  }
+						}
+						style={faucetInterval ? { filter: "grayscale(1)" } : {}}
 					>
-						{/*<Flex align="center" justify="space-between">*/}
-						<Flex
-							align="center"
-							onClick={
-								address && !faucetInterval
-									? async () => {
-											setFaucetInterval(true);
-											setInterval(() => {
-												setFaucetInterval(false);
-											}, 30000);
-											setFaucetResult("Transferring NPO...");
-											const result = await BACKEND.faucet(address);
-											console.log("result: ", result);
-											setFaucetResult("Successful transferred 250,000 NPO");
-									  }
-									: () => {
-											console.log("please wait...");
-									  }
-							}
-							style={faucetInterval ? { filter: "grayscale(1)" } : {}}
-						>
-							{/*<img*/}
-							{/*    src={blue}*/}
-							{/*    width={20}*/}
-							{/*    style={{marginRight: "6px"}}*/}
-							{/*    alt=""*/}
-							{/*/>*/}
-							{!faucetInterval && (
-								<img
-									src={t6}
-									width={15}
-									style={{ marginRight: "6px" }}
-									alt=""
-								/>
-							)}
-							<span>{faucetInterval ? "Cooling down" : "Buy NPO"}</span>
-						</Flex>
-					</Col>
-					<Col style={{ width: "170px", textAlign: "center" }}>
-						{address && isConnected ? (
-							<div className="header-btn2" onClick={() => setVisible(true)}>
-								{address.slice(0, 6) + "..." + address.slice(-4)}
-							</div>
-						) : (
-							<div
-								className="header-btn"
-								// pause test
-								// onClick={() => {
-								// 	setVisible(true);
-								// }}
-							>
-								Connect Wallet
-							</div>
+						{/*<img*/}
+						{/*    src={blue}*/}
+						{/*    width={20}*/}
+						{/*    style={{marginRight: "6px"}}*/}
+						{/*    alt=""*/}
+						{/*/>*/}
+						{!faucetInterval && (
+							<img src={t6} width={15} style={{ marginRight: "6px" }} alt="" />
 						)}
-					</Col>
-				</Row>
-			) : (
+						<span>{faucetInterval ? "Cooling down" : "Buy NPO"}</span>
+					</Flex>
+				</Col>
+				<Col style={{ width: "170px", textAlign: "center" }}>
+					{address && isConnected ? (
+						<div className="header-btn2" onClick={() => setVisible(true)}>
+							{address.slice(0, 6) + "..." + address.slice(-4)}
+						</div>
+					) : (
+						<div
+							className="header-btn"
+							// pause test
+							onClick={() => {
+								setVisible(true);
+							}}
+						>
+							Connect Wallet
+						</div>
+					)}
+				</Col>
+			</Row>
+			{/* ) : (
 				<Dropdown menu={{ items }} placement="bottomRight">
 					<img src={t7} width={18} alt="" />
 				</Dropdown>
-			)}
+			)} */}
 
 			{faucetResult && (
 				<NekoModal

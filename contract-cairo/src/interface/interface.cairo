@@ -17,10 +17,10 @@ pub struct Info {
     pub rarity: felt252,
     pub element: felt252,
     pub name: felt252,
-    pub SPI: u256,
     pub ATK: u256,
-    pub DEF: u256,
-    pub SPD: u256,
+    // pub SPI: u256,
+    // pub DEF: u256,
+    // pub SPD: u256,
     pub fade: u256,
     pub mana: u256,
     pub level: u8
@@ -48,4 +48,6 @@ pub trait NekomotoTrait<ContractState> {
     fn upgrade(ref self: ContractState, token_id: u256);
     fn generate(self: @ContractState, token_id: u256, origin: bool) -> Info;
     fn get_level_count(self: @ContractState, address: ContractAddress) -> u256;
+    fn buy_coin(ref self: ContractState, count: u256);
+    fn check_coin(self: @ContractState, address: ContractAddress) -> u256;
 }

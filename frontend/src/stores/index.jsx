@@ -3,7 +3,8 @@ import { create } from "zustand";
 //   navigator.userAgent
 // );
 
-const isMobile = document.body.clientWidth < 992
+// const isMobile = document.body.clientWidth < 992
+const isMobile = false;
 
 export const useAppStore = create((set) => ({
   device: isMobile ? "mobile" : "pc",

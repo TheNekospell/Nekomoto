@@ -208,8 +208,8 @@ mod test {
                     Call {
                         to: nekomoto_address,
                         selector: selector!("stake"),
-                        calldata: array![].join(array![// 1_u256,
-                        2_u256,// 3_u256,
+                        calldata: array![].join(array![ // 1_u256,
+                        2_u256, // 3_u256,
                         // 4_u256,
                         // 5_u256,
                         // 6_u256,
@@ -221,214 +221,213 @@ mod test {
                     }
                 ]
             );
-
         // // upgrade nekomoto
-        // let mut multicall = array![];
-        // let mut calldata = array![];
-        // calldata.append_serde(2_u256);
-        // let mut i = 12;
-        // loop {
-        //     if i == 0 {
-        //         break;
-        //     }
+    // let mut multicall = array![];
+    // let mut calldata = array![];
+    // calldata.append_serde(2_u256);
+    // let mut i = 12;
+    // loop {
+    //     if i == 0 {
+    //         break;
+    //     }
 
         //     multicall
-        //         .append(
-        //             Call {
-        //                 to: nekomoto_address,
-        //                 selector: selector!("upgrade"),
-        //                 calldata: calldata.span()
-        //             }
-        //         );
-        //     // println!("upgrade level to: {}", 14 - i);
+    //         .append(
+    //             Call {
+    //                 to: nekomoto_address,
+    //                 selector: selector!("upgrade"),
+    //                 calldata: calldata.span()
+    //             }
+    //         );
+    //     // println!("upgrade level to: {}", 14 - i);
 
         //     i = i - 1;
-        // };
-        // bob.__execute__(multicall);
+    // };
+    // bob.__execute__(multicall);
 
         // // hard to deserialize
-        // // bob
-        // //     .__execute__(
-        // //         array![
-        // //             Call {
-        // //                 to: nekomoto_address,
-        // //                 selector: selector!("generate"),
-        // //                 calldata: calldata.join(2_u256).join(false).span()
-        // //             }
-        // //         ]
-        // //     );
-        // let result = NekomotoTraitDispatcher { contract_address: nekomoto_address }
-        //     .generate(2_u256, false);
-        // // result.print();
-        // PTrait::<Info>::print(result);
-        // assert_eq!(result.level, 13);
+    // // bob
+    // //     .__execute__(
+    // //         array![
+    // //             Call {
+    // //                 to: nekomoto_address,
+    // //                 selector: selector!("generate"),
+    // //                 calldata: calldata.join(2_u256).join(false).span()
+    // //             }
+    // //         ]
+    // //     );
+    // let result = NekomotoTraitDispatcher { contract_address: nekomoto_address }
+    //     .generate(2_u256, false);
+    // // result.print();
+    // PTrait::<Info>::print(result);
+    // assert_eq!(result.level, 13);
 
         // // assert_eq!(
-        // //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
-        // //         .lucky(bob.contract_address),
-        // //     true
-        // // );
+    // //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
+    // //         .lucky(bob.contract_address),
+    // //     true
+    // // );
 
         // set_block_timestamp(1_000_000_003_600);
-        // assert_eq!(
-        //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
-        //         .generate(2_u256, false)
-        //         .fade,
-        //     result.fade - 100
-        // );
+    // assert_eq!(
+    //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
+    //         .generate(2_u256, false)
+    //         .fade,
+    //     result.fade - 100
+    // );
 
         // bob
-        //     .__execute__(
-        //         array![
-        //             Call {
-        //                 to: nekomoto_address,
-        //                 selector: selector!("withdraw"),
-        //                 calldata: array![].join(array![1_u256, // 2_u256,
-        //                 // 3_u256,
-        //                 // 4_u256,
-        //                 // 5_u256,
-        //                 // 6_u256,
-        //                 // 7_u256,
-        //                 // 8_u256,
-        //                 // 9_u256,
-        //                 // 10_u256
-        //                 ]).span()
-        //             }
-        //         ]
-        //     );
+    //     .__execute__(
+    //         array![
+    //             Call {
+    //                 to: nekomoto_address,
+    //                 selector: selector!("withdraw"),
+    //                 calldata: array![].join(array![1_u256, // 2_u256,
+    //                 // 3_u256,
+    //                 // 4_u256,
+    //                 // 5_u256,
+    //                 // 6_u256,
+    //                 // 7_u256,
+    //                 // 8_u256,
+    //                 // 9_u256,
+    //                 // 10_u256
+    //                 ]).span()
+    //             }
+    //         ]
+    //     );
 
         // // assert_eq!(
-        // //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
-        // //         .lucky(bob.contract_address),
-        // //     false
-        // // );
+    // //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
+    // //         .lucky(bob.contract_address),
+    // //     false
+    // // );
 
         // // buff part
 
         // println!("block timestamp:{}", get_block_timestamp());
 
         // assert_eq!(
-        //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
-        //         .time_freeze_end(bob.contract_address),
-        //     0
-        // );
+    //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
+    //         .time_freeze_end(bob.contract_address),
+    //     0
+    // );
 
         // bob
-        //     .__execute__(
-        //         array![
-        //             Call {
-        //                 to: nekomoto_address,
-        //                 selector: selector!("start_time_freeze"),
-        //                 calldata: array![].join(1_u256).span()
-        //             }
-        //         ]
-        //     );
-        // assert_eq!(
-        //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
-        //         .time_freeze(bob.contract_address),
-        //     true
-        // );
+    //     .__execute__(
+    //         array![
+    //             Call {
+    //                 to: nekomoto_address,
+    //                 selector: selector!("start_time_freeze"),
+    //                 calldata: array![].join(1_u256).span()
+    //             }
+    //         ]
+    //     );
+    // assert_eq!(
+    //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
+    //         .time_freeze(bob.contract_address),
+    //     true
+    // );
 
         // bob
-        //     .__execute__(
-        //         {
-        //             let mut i = 9;
-        //             let mut multicall = array![];
-        //             loop {
-        //                 if i == 0 {
-        //                     break;
-        //                 }
-        //                 multicall
-        //                     .append(
-        //                         Call {
-        //                             to: nekomoto_address,
-        //                             selector: selector!("upgrade_acend"),
-        //                             calldata: array![].span()
-        //                         }
-        //                     );
-        //                 i = i - 1;
-        //             };
-        //             multicall
-        //         }
-        //     );
-        // assert_eq!(
-        //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
-        //         .ascend(bob.contract_address),
-        //     (9, 51)
-        // );
+    //     .__execute__(
+    //         {
+    //             let mut i = 9;
+    //             let mut multicall = array![];
+    //             loop {
+    //                 if i == 0 {
+    //                     break;
+    //                 }
+    //                 multicall
+    //                     .append(
+    //                         Call {
+    //                             to: nekomoto_address,
+    //                             selector: selector!("upgrade_acend"),
+    //                             calldata: array![].span()
+    //                         }
+    //                     );
+    //                 i = i - 1;
+    //             };
+    //             multicall
+    //         }
+    //     );
+    // assert_eq!(
+    //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
+    //         .ascend(bob.contract_address),
+    //     (9, 51)
+    // );
 
         // // transfer
-        // bob
-        //     .__execute__(
-        //         array![
-        //             Call {
-        //                 to: nekomoto_address,
-        //                 selector: selector!("transfer_from"),
-        //                 calldata: array![]
-        //                     .join(bob.contract_address)
-        //                     .join(alice.contract_address)
-        //                     .join(2_u256)
-        //                     .span()
-        //             }
-        //         ]
-        //     );
+    // bob
+    //     .__execute__(
+    //         array![
+    //             Call {
+    //                 to: nekomoto_address,
+    //                 selector: selector!("transfer_from"),
+    //                 calldata: array![]
+    //                     .join(bob.contract_address)
+    //                     .join(alice.contract_address)
+    //                     .join(2_u256)
+    //                     .span()
+    //             }
+    //         ]
+    //     );
 
         // assert_eq!(
-        //     IERC721Dispatcher { contract_address: nekomoto_address }.owner_of(2_u256),
-        //     alice.contract_address
-        // );
+    //     IERC721Dispatcher { contract_address: nekomoto_address }.owner_of(2_u256),
+    //     alice.contract_address
+    // );
 
         // assert_eq!(
-        //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
-        //         .generate(2_u256, false)
-        //         .level,
-        //     1
-        // );
+    //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
+    //         .generate(2_u256, false)
+    //         .level,
+    //     1
+    // );
 
         // // time freeze and fade consume
-        // set_block_timestamp(2_000_000_000_000);
+    // set_block_timestamp(2_000_000_000_000);
 
         // alice
-        //     .__execute__(
-        //         array![
-        //             Call {
-        //                 to: nekomoto_address,
-        //                 selector: selector!("stake"),
-        //                 calldata: array![].join(array![2_u256]).span()
-        //             }
-        //         ]
-        //     );
+    //     .__execute__(
+    //         array![
+    //             Call {
+    //                 to: nekomoto_address,
+    //                 selector: selector!("stake"),
+    //                 calldata: array![].join(array![2_u256]).span()
+    //             }
+    //         ]
+    //     );
 
         // let result = NekomotoTraitDispatcher { contract_address: nekomoto_address }
-        //     .generate(2_u256, false);
-        // PTrait::<Info>::print(result);
+    //     .generate(2_u256, false);
+    // PTrait::<Info>::print(result);
 
         // set_block_timestamp(2_000_000_003_600);
 
         // alice
-        //     .__execute__(
-        //         array![
-        //             Call {
-        //                 to: nekomoto_address,
-        //                 selector: selector!("start_time_freeze"),
-        //                 calldata: array![].join(101_u256).span()
-        //             }
-        //         ]
-        //     );
-        // assert_eq!(
-        //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
-        //         .time_freeze(alice.contract_address),
-        //     true
-        // );
+    //     .__execute__(
+    //         array![
+    //             Call {
+    //                 to: nekomoto_address,
+    //                 selector: selector!("start_time_freeze"),
+    //                 calldata: array![].join(101_u256).span()
+    //             }
+    //         ]
+    //     );
+    // assert_eq!(
+    //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
+    //         .time_freeze(alice.contract_address),
+    //     true
+    // );
 
         // set_block_timestamp(2_000_000_007_200);
 
         // assert_eq!(
-        //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
-        //         .generate(2_u256, false)
-        //         .fade,
-        //     result.fade - 100
-        // );
+    //     NekomotoTraitDispatcher { contract_address: nekomoto_address }
+    //         .generate(2_u256, false)
+    //         .fade,
+    //     result.fade - 100
+    // );
     }
 
     // for fun

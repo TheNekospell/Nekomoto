@@ -21,7 +21,8 @@ export default function InviteCard({
 	openChest,
 	buttonText = "open",
 }) {
-	const isMobile = useAppStore().device === "mobile";
+	// const isMobile = useAppStore().device === "mobile";
+	const isMobile = false;
 	const isMaster = chestEmpower && chestEmpower.length >= 5;
 	const [visible, setVisible] = useState(false);
 	const { address } = useAccount();

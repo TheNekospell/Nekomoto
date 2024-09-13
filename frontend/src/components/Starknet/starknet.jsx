@@ -23,6 +23,7 @@ export function StarknetProvider({ children }) {
 
 	return (
 		<StarknetConfig
+			autoConnect={true}
 			chains={[sepolia]}
 			provider={publicProvider()}
 			connectors={connectors}

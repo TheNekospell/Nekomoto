@@ -55,7 +55,8 @@ import Index from "@components/CardDetail/index.jsx";
 import CardDetail from "@components/CardDetail/index.jsx";
 
 export default function Detail() {
-	const isMobile = useAppStore().device === "mobile";
+	// const isMobile = useAppStore().device === "mobile";
+	const isMobile = false;
 	const navigate = useNavigate();
 	const [isModalOpen1, setIsModalOpen1] = useState(false);
 	const [isModalOpen2, setIsModalOpen2] = useState(false);
