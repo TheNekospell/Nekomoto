@@ -16,10 +16,11 @@
     font-weight: 400;
     word-wrap: break-word;
     cursor: pointer;
-    padding: 16px ;
+    padding: 8px 12px 8px 12px;
     background: rgba(1, 220, 228, 0.12);
     text-align: center;
     line-height: 1;
+    border-radius: 5px;
 }
 
 .header-btn2 {
@@ -29,10 +30,39 @@
     font-weight: 400;
     word-wrap: break-word;
     cursor: pointer;
-    padding: 16px;
+    padding: 8px 12px 8px 12px;
     background: rgba(0, 0, 0, 0.32);
     line-height: 1;
+    border-radius: 5px;
 }
+
+.header-btn-radius {
+    color: rgba(182, 234, 255, 1);
+    font-size: 14px;
+    font-family: BIG SHOT;
+    font-weight: 400;
+    word-wrap: break-word;
+    cursor: pointer;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.32);
+    line-height: 1;
+    border-radius: 10px;
+    width: 120px;
+}
+
+.header-btn-radius2 {
+    color: rgba(29, 51, 62, 1);
+    font-size: 14px;
+    font-family: BIG SHOT;
+    font-weight: 400;
+    word-wrap: break-word;
+    cursor: pointer;
+    padding: 12px;
+    background: rgba(182, 234, 255, 1);
+    line-height: 1;
+    border-radius: 10px;
+}
+
 
 .menu-text {
     color: #fff;

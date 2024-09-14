@@ -11,6 +11,11 @@ import t5 from "@assets/ti5.png";
 import t6 from "@assets/ti6.png";
 import t7 from "@assets/ti7.png";
 
+import prismPic from "@assets/purple.png";
+import nkoPic from "@assets/blue.png";
+import nekoPic from "@assets/page-nekomoto.png";
+import accountPic from "@assets/account.png";
+
 import blue from "@assets/blue.png";
 import user from "@assets/user.png";
 import { useNavigate } from "react-router-dom";
@@ -42,10 +47,14 @@ export default function Wallet({ isMobile = false }) {
 
 	const [faucetInterval, setFaucetInterval] = useState(false);
 	const [faucetResult, setFaucetResult] = useState(
-		"The current round of testing has ended. Thank you for your attention."
+		// "The current round of testing has ended. Thank you for your attention."
+		""
 	);
 
 	const [activeResult, setActiveResult] = useState("");
+
+	const [prismBalance, setPrismBalance] = useState(0);
+	const [nkoBalance, setNkoBalance] = useState(0);
 
 	// useEffect(() => {
 	// 	connect({connector});
@@ -186,19 +195,47 @@ export default function Wallet({ isMobile = false }) {
 		<div>
 			{/* {!isMobile ? ( */}
 			<Row>
-				<Col className="header-btn2" onClick={() => navigate("/detail2")}>
+				<Col
+					className="header-btn2"
+					style={{
+						width: "100px",
+						// margin: "0px 12px",
+						display: "flex",
+						alignItems: "center",
+					}}
+				>
 					<Flex align="center" justify="space-between">
-						<img src={t5} width={15} style={{ marginRight: "6px" }} alt="" />
-						<span>My Assets</span>
+						<img
+							src={prismPic}
+							style={{ marginRight: "10px", height: "30px" }}
+							alt=""
+						/>
+						<span style={{ color: "white" }}>{prismBalance}</span>
 					</Flex>
 				</Col>
 				<Col
 					className="header-btn2"
-					style={{ margin: "0px 12px" }}
-					// onClick={valid}
+					style={{
+						width: "130px",
+						margin: "0px 12px",
+						display: "flex",
+						alignItems: "center",
+					}}
 				>
-					{/*<Flex align="center" justify="space-between">*/}
 					<Flex
+						align="center"
+						justify="space-between"
+						style={{ width: "100px" }}
+					>
+						<img
+							src={nkoPic}
+							style={{ marginRight: "10px", height: "20px" }}
+							alt=""
+						/>
+						<span style={{ color: "white" }}>{nkoBalance}</span>
+					</Flex>
+					<img src={t6} width={15} style={{ marginLeft: "10px" }} alt="" />
+					{/* <Flex
 						align="center"
 						onClick={
 							address && !faucetInterval
@@ -219,32 +256,73 @@ export default function Wallet({ isMobile = false }) {
 						style={faucetInterval ? { filter: "grayscale(1)" } : {}}
 					>
 						{/*<img*/}
-						{/*    src={blue}*/}
-						{/*    width={20}*/}
-						{/*    style={{marginRight: "6px"}}*/}
-						{/*    alt=""*/}
-						{/*/>*/}
-						{!faucetInterval && (
+					{/*    src={blue}*/}
+					{/*    width={20}*/}
+					{/*    style={{marginRight: "6px"}}*/}
+					{/*    alt=""*/}
+					{/*/>*/}
+					{/* {!faucetInterval && (
 							<img src={t6} width={15} style={{ marginRight: "6px" }} alt="" />
 						)}
-						<span>{faucetInterval ? "Cooling down" : "Buy NPO"}</span>
+						<span>{faucetInterval ? "Cooling down" : "Buy NPO"}</span> */}
+				</Col>
+				<Col
+					className="header-btn2"
+					style={{
+						width: "100px",
+						// margin: "0px 12px",
+						display: "flex",
+						alignItems: "center",
+					}}
+				>
+					<Flex
+						align="center"
+						justify="space-between"
+						style={{ width: "100px" }}
+					>
+						<img
+							src={nekoPic}
+							style={{ marginRight: "10px", height: "25px" }}
+							alt=""
+						/>
+						<span style={{ color: "white" }}>{0}</span>
 					</Flex>
 				</Col>
-				<Col style={{ width: "170px", textAlign: "center" }}>
+				<Col
+					className={isConnected ? "header-btn2" : "header-btn"}
+					style={{
+						width: "200px",
+						textAlign: "center",
+						marginLeft: "12px",
+						display: "flex",
+						alignItems: "center",
+					}}
+				>
 					{address && isConnected ? (
-						<div className="header-btn2" onClick={() => setVisible(true)}>
-							{address.slice(0, 6) + "..." + address.slice(-4)}
+						<div
+							style={{
+								width: "100%",
+								height: "100%",
+								// textAlign: "center",
+								alignItems: "center",
+								display: "flex",
+								flexDirection: "row",
+								// justify: "space-between",
+								justifyContent: "center",
+							}}
+							onClick={() => setVisible(true)}
+						>
+							<img
+								src={accountPic}
+								style={{ marginRight: "10px", height: "20px" }}
+							/>
+
+							<span style={{ textAlign: "center", display: "flex" }}>
+								{address.slice(0, 6) + "..." + address.slice(-4)}
+							</span>
 						</div>
 					) : (
-						<div
-							className="header-btn"
-							// pause test
-							onClick={() => {
-								setVisible(true);
-							}}
-						>
-							Connect Wallet
-						</div>
+						<div style={{ width: "100%" }}>Connect Wallet</div>
 					)}
 				</Col>
 			</Row>
