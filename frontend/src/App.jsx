@@ -3,7 +3,6 @@ import PCHeader from "@components/PCHeader/index";
 import { useAppStore } from "@stores/index";
 import { useEffect } from "react";
 import { BACKEND } from "@/interface.js";
-import { useAccount } from "@starknet-react/core";
 
 function App() {
     const {device, toggleDevice} = useAppStore();

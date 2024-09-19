@@ -12,11 +12,6 @@ import CardCorner from "@components/CardCorner/index";
 
 import exclamation from "@assets/exclamation.png";
 import copy from "@assets/copy.png";
-import card1 from "@assets/card1.png";
-import card2 from "@assets/card2.png";
-import card3 from "@assets/card3.png";
-import card4 from "@assets/card4.png";
-import card5 from "@assets/card5.png";
 import m1 from "@assets/modal-icon1.png";
 import m2 from "@assets/modal-icon2.png";
 import m3 from "@assets/modal-icon3.png";
@@ -29,6 +24,8 @@ import adept2 from "@assets/adept2.png";
 import adept3 from "@assets/adept3.png";
 import icon5 from "@assets/icon5.png";
 import copySuccuess from "@assets/copy_success.png";
+
+import mintPagePic from "@assets/mint-page.png";
 
 import arrowLeft from "@assets/arrow-left.png";
 import { useAppStore } from "@stores/index";
@@ -612,19 +609,6 @@ export default function Detail() {
 			</NekoModal>
 
 			<div className="detail padding-top-80 padding-bottom-80">
-				<Flex
-					className="back-btn"
-					align="center"
-					onClick={() => navigate("/assets")}
-				>
-					<img
-						src={arrowLeft}
-						width={16}
-						alt=""
-						style={{ marginRight: "12px" }}
-					/>
-					Assets
-				</Flex>
 
 				<Row gutter={{ md: 0, lg: 16 }}>
 					<Col xs={24} sm={24} lg={12} className="margin-top-16">

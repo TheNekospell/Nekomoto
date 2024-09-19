@@ -22,38 +22,19 @@ import card3 from "@assets/card3.png";
 import { useNavigate } from "react-router-dom";
 import BigNumber from "bignumber.js";
 
+import mintPagePic from "@assets/mint-page.png";
+import mintPagePic2 from "@assets/mint-page2.png";
+import blue from "@assets/blue.png";
+import exclamation from "@assets/exclamation.png";
+
 export default function InputCard() {
 	const { device } = useAppStore();
 
 	const { account, address, status, chainId, isConnected } = useAccount();
-	const [inputValue, setInputValue] = useState(0);
-	const [allowance, setAllowance] = useState(0);
-	const [balance, setBalance] = useState(0);
+	const [inputValue, setInputValue] = useState("Enter your amount");
 	const [visible, setVisible] = useState(false);
 	const [text, setText] = useState("");
 	const navigate = useNavigate();
-
-	// useEffect(() => {
-	// 	if (!address) return;
-	// 	const allowance = async () => {
-	// 		return await nekocoinContract.allowance(
-	// 			account.address,
-	// 			NEKOMOTO_ADDRESS
-	// 		);
-	// 	};
-	// 	try {
-	// 		allowance().then((res) => {
-	// 			console.log("allowance: ", res);
-	// 			setAllowance(res);
-	// 		});
-	// 		nekocoinContract.balance_of(address).then((res) => {
-	// 			console.log("balance: ", res);
-	// 			setBalance(res);
-	// 		});
-	// 	} catch (e) {
-	// 		console.log("allowance error: ", e);
-	// 	}
-	// }, [address]);
 
 	const mint = async (count) => {
 		console.log("count: ", count);
@@ -191,18 +172,39 @@ export default function InputCard() {
 				</div>
 			</NekoModal>
 
-			<div className="input-card  ">
+			<div className="input-card">
 				<BoxBorder />
 				<Row gutter={32}>
-					<Col className="input-card-logo text-center" xs={24} sm={6}>
-						<img src={inputCardLogo} width={144} />
+					<Col className="text-center" style={{ width: "50%" }}>
+						<Row>
+							<div
+								style={{
+									fontFamily: "BIG SHOT",
+									color: "white",
+									fontSize: "20px",
+									marginLeft: "25px",
+									marginBottom: "10px",
+								}}
+							>
+								{"Summon"}
+							</div>
+							<span>
+								<img
+									src={exclamation}
+									style={{ height: "20px", marginLeft: "10px" }}
+								/>
+							</span>
+						</Row>
+						<img src={mintPagePic} width={"100%"} />
 					</Col>
-					<Col xs={24} sm={18}>
-						<Flex gap={16} vertical>
-							<Col className={`card-title ${device}-center`}>Summon</Col>
-							<Col>
-								<Row gutter={16} justify={{ xs: "center", sm: "start" }}>
-									<Col xs={24} sm={16}>
+					<Col style={{ width: "50%", paddingRight: "16px" }}>
+						<Flex gap={16} vertical style={{ width: "100%" }}>
+							<Col style={{ justifyContent: "flex-end", display: "flex" }}>
+								<img src={mintPagePic2} width={"70%"} />
+							</Col>
+							<Col style={{ width: "100%" }}>
+								<Row gutter={16}>
+									<Col style={{ width: "100%", marginTop: "16px" }}>
 										<div
 											className="flex justify-between"
 											style={{ marginBottom: "12px" }}
@@ -235,48 +237,78 @@ export default function InputCard() {
 												</div>
 											</div>
 										</div>
-										{/*<input*/}
-										{/*    className="input-card-input"*/}
-										{/*    placeholder="Enter Amount"*/}
-										{/*    type="text"*/}
-										{/*/>*/}
 										<Input
 											placeholder="Enter Amount (x20 max)"
 											// type="number"
 											size="large"
 											className="input-card-input"
-											// style={{margin: "12px 0"}}
+											style={{}}
 											value={inputValue}
 											onChange={(e) => {
 												const v = Math.ceil(Number(e.target.value));
 												if (isNaN(v)) {
-													setInputValue("0");
+													setInputValue("Enter your amount");
 												} else {
 													setInputValue(v > 20 ? "20" : v.toString());
 												}
 											}}
 										/>
 									</Col>
-									<Col
-										xs={24}
-										sm={6}
-										className="text-center"
-										style={{ marginTop: "32px" }}
-									>
-										<Button
-											text="Mint"
-											color="yellow"
-											longness="short"
-											onClick={
-												inputValue > 0 ? () => mint(Number(inputValue)) : null
-											}
-										/>
-									</Col>
 								</Row>
-							</Col>
-
-							<Col className={`input-card-text3 font-14px ${device}-center`}>
-								{addCommaInNumber(inputValue * 25000, true)} NPO
+								<Col
+									className="text-center"
+									style={{ marginTop: "16px", width: "100%" }}
+								>
+									<Button
+										text={
+											<div
+												style={{
+													display: "flex",
+													alignContent: "center",
+													textAlign: "center",
+													flexDirection: "column",
+													width: "100%",
+													height: "20px",
+												}}
+											>
+												<div
+													style={{
+														width: "100%",
+														height: "70%",
+														fontSize: "16px",
+														marginTop: "-5px",
+														marginBottom: "3px",
+													}}
+												>
+													{"Mint"}
+												</div>
+												<div style={{ height: "30%" }}>
+													<img
+														src={blue}
+														style={{
+															height: "200%",
+															marginRight: "12px",
+															transform: "translateY(15%)",
+														}}
+													/>
+													<span style={{ color: "#636363", fontSize: "12px" }}>
+														{!isNaN(inputValue) && inputValue > 0
+															? addCommaInNumber(inputValue * 25000, true)
+															: 0}
+													</span>
+												</div>
+											</div>
+										}
+										color="yellow"
+										longness="long"
+										style={{ width: "100%", height: "100%" }}
+										onClick={
+											!isNaN(inputValue) && inputValue > 0
+												? () => mint(Number(inputValue))
+												: null
+										}
+									/>
+								</Col>
 							</Col>
 						</Flex>
 					</Col>

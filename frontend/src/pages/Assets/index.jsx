@@ -101,23 +101,11 @@ export default function Assets() {
 			</NekoModal>
 
 			<div className="assets padding-top-80 padding-bottom-80">
-				<Row gutter={16}>
-					<Col
-						style={{ marginTop: "16px" }}
-						className="gutter-row"
-						xs={24}
-						sm={24}
-						lg={18}
-					>
+				<Row gutter={16} style={{ paddingTop: "16px" }}>
+					<Col style={{ width: "60%", height: "100%" }} className="gutter-row">
 						<InputCard />
 					</Col>
-					<Col
-						style={{ marginTop: "16px" }}
-						className="gutter-row"
-						xs={24}
-						sm={24}
-						lg={6}
-					>
+					<Col style={{ height: "40%", height: "100%" }} className="gutter-row">
 						<BoxCard
 							title="Starter Pack"
 							buttonText={

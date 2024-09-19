@@ -138,160 +138,82 @@ export default function Wallet({ isMobile = false }) {
 		});
 	};
 
-	const items = [
-		{
-			key: "1",
-			label: (
-				<Flex
-					align="center"
-					className="header-btn2"
-					justify="space-between"
-					onClick={() => navigate("/detail2")}
-				>
-					<img src={t5} width={15} style={{ marginRight: "6px" }} alt="" />
-					<span>My Assets</span>
-				</Flex>
-			),
-		},
-		{
-			key: "2",
-			label: (
-				<Flex align="center" justify="space-between" className="header-btn2">
-					<img src={t6} width={15} style={{ marginRight: "6px" }} alt="" />
-					<span>Buy NPO</span>
-				</Flex>
-			),
-		},
-		{
-			key: "3",
-			label: (
-				<Flex
-					align="center"
-					justify="flex-start"
-					style={{ width: "100%", textAlign: "left" }}
-				>
-					{address && isConnected ? (
-						<div className="header-btn2" onClick={() => setVisible(true)}>
-							{address.slice(0, 6) + "..." + address.slice(-4)}
-						</div>
-					) : (
-						<div
-							className="header-btn"
-							// pause test
-							// onClick={() => {
-							// 	// setVisible(true);
-							// 	connect({ connector: new ArgentMobileConnector() });
-							// }}
-						>
-							Connect Wallet
-						</div>
-					)}{" "}
-				</Flex>
-			),
-		},
-	];
-
 	return (
 		<div>
-			{/* {!isMobile ? ( */}
 			<Row>
-				<Col
-					className="header-btn2"
-					style={{
-						width: "100px",
-						// margin: "0px 12px",
-						display: "flex",
-						alignItems: "center",
-					}}
-				>
-					<Flex align="center" justify="space-between">
-						<img
-							src={prismPic}
-							style={{ marginRight: "10px", height: "30px" }}
-							alt=""
-						/>
-						<span style={{ color: "white" }}>{prismBalance}</span>
-					</Flex>
-				</Col>
-				<Col
-					className="header-btn2"
-					style={{
-						width: "130px",
-						margin: "0px 12px",
-						display: "flex",
-						alignItems: "center",
-					}}
-				>
-					<Flex
-						align="center"
-						justify="space-between"
-						style={{ width: "100px" }}
+				{address && (
+					<Col
+						className="header-btn2"
+						style={{
+							width: "100px",
+							// margin: "0px 12px",
+							display: "flex",
+							alignItems: "center",
+						}}
 					>
-						<img
-							src={nkoPic}
-							style={{ marginRight: "10px", height: "20px" }}
-							alt=""
-						/>
-						<span style={{ color: "white" }}>{nkoBalance}</span>
-					</Flex>
-					<img src={t6} width={15} style={{ marginLeft: "10px" }} alt="" />
-					{/* <Flex
-						align="center"
-						onClick={
-							address && !faucetInterval
-								? async () => {
-										setFaucetInterval(true);
-										setInterval(() => {
-											setFaucetInterval(false);
-										}, 30000);
-										setFaucetResult("Transferring NPO...");
-										const result = await BACKEND.faucet(address);
-										console.log("result: ", result);
-										setFaucetResult("Successful transferred 250,000 NPO");
-								  }
-								: () => {
-										console.log("please wait...");
-								  }
-						}
-						style={faucetInterval ? { filter: "grayscale(1)" } : {}}
+						<Flex align="center" justify="space-between">
+							<img
+								src={prismPic}
+								style={{ marginRight: "10px", height: "30px" }}
+								alt=""
+							/>
+							<span style={{ color: "white" }}>{prismBalance}</span>
+						</Flex>
+					</Col>
+				)}
+				{address && (
+					<Col
+						className="header-btn2"
+						style={{
+							width: "130px",
+							margin: "0px 12px",
+							display: "flex",
+							alignItems: "center",
+						}}
 					>
-						{/*<img*/}
-					{/*    src={blue}*/}
-					{/*    width={20}*/}
-					{/*    style={{marginRight: "6px"}}*/}
-					{/*    alt=""*/}
-					{/*/>*/}
-					{/* {!faucetInterval && (
-							<img src={t6} width={15} style={{ marginRight: "6px" }} alt="" />
-						)}
-						<span>{faucetInterval ? "Cooling down" : "Buy NPO"}</span> */}
-				</Col>
-				<Col
-					className="header-btn2"
-					style={{
-						width: "100px",
-						// margin: "0px 12px",
-						display: "flex",
-						alignItems: "center",
-					}}
-				>
-					<Flex
-						align="center"
-						justify="space-between"
-						style={{ width: "100px" }}
+						<Flex
+							align="center"
+							justify="space-between"
+							style={{ width: "100px" }}
+						>
+							<img
+								src={nkoPic}
+								style={{ marginRight: "10px", height: "20px" }}
+								alt=""
+							/>
+							<span style={{ color: "white" }}>{nkoBalance}</span>
+						</Flex>
+						<img src={t6} width={15} style={{ marginLeft: "10px" }} alt="" />
+					</Col>
+				)}
+				{address && (
+					<Col
+						className="header-btn2"
+						style={{
+							width: "100px",
+							display: "flex",
+							alignItems: "center",
+						}}
 					>
-						<img
-							src={nekoPic}
-							style={{ marginRight: "10px", height: "25px" }}
-							alt=""
-						/>
-						<span style={{ color: "white" }}>{0}</span>
-					</Flex>
-				</Col>
+						<Flex
+							align="center"
+							justify="space-between"
+							style={{ width: "100px" }}
+						>
+							<img
+								src={nekoPic}
+								style={{ marginRight: "10px", height: "25px" }}
+								alt=""
+							/>
+							<span style={{ color: "white" }}>{0}</span>
+						</Flex>
+					</Col>
+				)}
 				<Col
 					className={isConnected ? "header-btn2" : "header-btn"}
 					style={{
 						width: "200px",
+						height: "50px",
 						textAlign: "center",
 						marginLeft: "12px",
 						display: "flex",
