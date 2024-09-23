@@ -3,6 +3,7 @@ import InputCard from "@components/InputCard/index";
 import BoxCard from "@components/BoxCard/index";
 import InfoCard from "@components/InfoCard/index";
 import Table from "@components/Table/index";
+import PoolCard from "../../components/PoolCard";
 
 import PCHeader from "@components/PCHeader/index";
 import logoText from "@assets/text-logo.png";
@@ -18,6 +19,8 @@ import Button from "@components/Button/index.jsx";
 import { CallData } from "starknet";
 import { useNavigate } from "react-router-dom";
 import CardDetail from "@components/CardDetail/index.jsx";
+import LuckCard from "../../components/LuckCard";
+import CheckCard from "../../components/CheckCard";
 
 const style = { background: "#0092ff", padding: "8px 0" };
 
@@ -101,27 +104,23 @@ export default function Assets() {
 			</NekoModal>
 
 			<div className="assets padding-top-80 padding-bottom-80">
-				<Row gutter={16} style={{ paddingTop: "16px" }}>
-					<Col style={{ width: "60%", height: "100%" }} className="gutter-row">
+				<Row
+					gutter={16}
+					style={{ paddingTop: "16px", height: "100%", display: "flex" }}
+				>
+					<Col style={{ width: "55%", height: "100%" }}>
 						<InputCard />
 					</Col>
-					<Col style={{ height: "40%", height: "100%" }} className="gutter-row">
-						<BoxCard
-							title="Starter Pack"
-							buttonText={
-								addressInfo.IsStarter === true ? "open" : "already opened"
-							}
-							onButtonClick={addressInfo.IsStarter === true ? openChest : null}
-						/>
+					<Col style={{ width: "45%", height: "100%" }}>
+						<PoolCard />
 					</Col>
 				</Row>
-				<Row style={{ marginTop: "16px", marginBottom: "16px" }}>
-					<Col xs={24}>
-						<InfoCard
-							totalRewards={info.totalRewards}
-							treasuryRevenue={info.treasuryRevenue}
-							totalBurn={info.totalBurn}
-						/>
+				<Row style={{ marginTop: "16px", marginBottom: "16px" }} gutter={16}>
+					<Col style={{ width: "55%", height: "100%" }}>
+						<LuckCard />
+					</Col>
+					<Col style={{ width: "45%", height: "100%" }}>
+						<CheckCard />
 					</Col>
 				</Row>
 

@@ -2,19 +2,15 @@ import "./index.css";
 import logo from "@assets/logo.png";
 import logoText from "@assets/text-logo.png";
 import x from "@assets/x.png";
-import t1 from "@assets/ti1.png";
-import t2 from "@assets/ti2.png";
-import t3 from "@assets/ti3.png";
-import t4 from "@assets/ti4.png";
-import t5 from "@assets/ti5.png";
-import t6 from "@assets/ti6.png";
-import t7 from "@assets/ti7.png";
-
 import faucet from "@assets/faucet.png";
 import starterPack from "@assets/starter-pack.png";
 import pageMint from "@assets/page-mint.png";
+import pageMintSelected from "@assets/page-mint-selected.png";
 import pageNeko from "@assets/page-nekomoto.png";
+import pageNekoSelected from "@assets/page-nekomoto-selected.png";
 import pageExtra from "@assets/page-extra.png";
+import pageExtraSelected from "@assets/page-extra-selected.png";
+import exclamation from "@assets/exclamation.png";
 
 import blue from "@assets/blue.png";
 import user from "@assets/user.png";
@@ -28,8 +24,8 @@ export default function PCHeader() {
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
 	const homePage = pathname === "/";
-	const assetsPage = pathname === "/assets";
-	const detailPage = pathname.includes("detail");
+	const inMintPage = pathname === "/assets";
+	const inNekoPage = pathname.includes("detail");
 
 	const { account, address, status, chainId, isConnected } = useAccount();
 
@@ -42,7 +38,7 @@ export default function PCHeader() {
 			>
 				<img src={logo} width={48} alt="" />
 				<img src={logoText} width={116} alt="" style={{ marginLeft: "12px" }} />
-				{(!homePage && address) && (
+				{!homePage && address && (
 					<div style={{ display: "flex", gap: "20px", marginLeft: "12px" }}>
 						<div
 							className={"header-btn2"}
@@ -116,15 +112,18 @@ export default function PCHeader() {
 						}}
 					>
 						<div
-							className={"header-btn-radius"}
+							className={
+								inMintPage ? "header-btn-radius2" : "header-btn-radius"
+							}
 							style={{
 								display: "flex",
 								alignItems: "center",
 								justifyContent: "center",
 							}}
+							onClick={() => navigate("/assets")}
 						>
 							<img
-								src={pageMint}
+								src={inMintPage ? pageMintSelected : pageMint}
 								style={{ height: "30px", marginRight: "2px" }}
 							/>
 							<div
@@ -139,15 +138,16 @@ export default function PCHeader() {
 						</div>
 
 						<div
-							className={"header-btn-radius"}
+							className={inNekoPage ? "header-btn-radius2" : "header-btn-radius"}
 							style={{
 								display: "flex",
 								alignItems: "center",
 								justifyContent: "center",
 							}}
+							onClick={() => navigate("/detail2")}
 						>
 							<img
-								src={pageNeko}
+								src={inNekoPage ? pageNekoSelected : pageNeko}
 								style={{ height: "30px", marginRight: "2px" }}
 							/>
 							<div
@@ -180,7 +180,7 @@ export default function PCHeader() {
 									position: "relative",
 								}}
 							>
-								<div>EXTRA</div>
+								<div>Buff</div>
 							</div>
 						</div>
 					</div>
