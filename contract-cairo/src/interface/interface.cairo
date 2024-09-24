@@ -4,6 +4,7 @@ use starknet::{ContractAddress, ClassHash};
 pub trait ERC20BurnTrait<ContractState> {
     fn burn(ref self: ContractState, amount: u256);
     fn burnFrom(ref self: ContractState, account: ContractAddress, amount: u256);
+    fn mint(ref self: ContractState, recipient: ContractAddress, amount: u256);
 }
 
 #[starknet::interface]
@@ -16,13 +17,7 @@ pub trait ERC721BurnTrait<ContractState> {
 pub struct Info {
     pub rarity: felt252,
     pub element: felt252,
-    pub name: felt252,
     pub ATK: u256,
-    // pub SPI: u256,
-    // pub DEF: u256,
-    // pub SPD: u256,
-    pub fade: u256,
-    pub mana: u256,
     pub level: u8
 }
 
@@ -36,18 +31,8 @@ pub trait NekomotoTrait<ContractState> {
     fn starter_pack(ref self: ContractState);
     fn check_starter_pack(self: @ContractState, address: ContractAddress) -> bool;
     fn burn(ref self: ContractState, token_id: u256);
-    fn lucky(self: @ContractState, input: ContractAddress) -> bool;
-    fn time_freeze(self: @ContractState, input: ContractAddress) -> bool;
-    fn start_time_freeze(ref self: ContractState, token_id: u256);
-    fn time_freeze_end(self: @ContractState, input: ContractAddress) -> u256;
-    fn ascend(self: @ContractState, input: ContractAddress) -> (u8, u8);
-    fn upgrade_acend(ref self: ContractState);
-    fn increase_fade(
-        ref self: ContractState, token_id: Span<u256>, amount: Span<u256>, burn: Span<u256>
-    );
     fn upgrade(ref self: ContractState, token_id: u256);
     fn generate(self: @ContractState, token_id: u256, origin: bool) -> Info;
-    fn get_level_count(self: @ContractState, address: ContractAddress) -> u256;
     fn buy_coin(ref self: ContractState, count: u256);
     fn check_coin(self: @ContractState, address: ContractAddress) -> u256;
 }

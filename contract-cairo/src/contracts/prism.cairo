@@ -14,7 +14,9 @@ pub mod Prism {
     struct Storage {
         #[substorage(v0)]
         erc20: ERC20Component::Storage,
-        host: ContractAddress
+        host: ContractAddress,
+        nekomoto: ContractAddress,
+        init: bool,
     }
 
     #[event]
@@ -31,8 +33,19 @@ pub mod Prism {
     }
 
     #[external(v0)]
+    fn init(ref self: ContractState, nekomoto: ContractAddress) {
+        // assert(get_caller_address() == self.host.read(), 'Only the host can init');
+        assert(!self.init.read(), 'Already init');
+        self.init.write(true);
+        self.nekomoto.write(nekomoto);
+    }
+
+    #[external(v0)]
     fn mint(ref self: ContractState, recipient: ContractAddress, amount: u256) {
-        assert(get_caller_address() == self.host.read(), 'Only the host can mint');
+        let caller = get_caller_address();
+        assert(
+            caller == self.host.read() || caller == self.nekomoto.read(), 'Only the host can mint'
+        );
         self.erc20.mint(recipient, amount);
     }
 
