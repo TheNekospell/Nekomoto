@@ -48,8 +48,9 @@ import {
 	addCommaInNumber,
 } from "@/interface.js";
 import { cairo, CallData } from "starknet";
-import Index from "@components/CardDetail/index.jsx";
+
 import CardDetail from "@components/CardDetail/index.jsx";
+import UnlockRate from "../../components/UnlockRate";
 
 export default function Detail() {
 	// const isMobile = useAppStore().device === "mobile";
@@ -182,210 +183,11 @@ export default function Detail() {
 		return () => clearInterval(interval);
 	}, []);
 
-	const empower = async () => {
-		const urlParams = new URLSearchParams(window.location.search);
-		const code = urlParams.get("addr");
-		sign(account).then(({ typedMessage, signature }) => {
-			BACKEND.empowerChest(address, code, typedMessage, signature).then(
-				(result) => {
-					console.log("result: ", result);
-					setModalText1("Empower " + result.success ? "success" : "failed");
-					urlParams.delete("addr");
-					window.history.replaceState(null, null, window.location.pathname);
-				}
-			);
-		});
-	};
-
-	const timeFreeze = async () => {
-		setWaiting(true);
-
-		const multiCall = await account.execute([
-			{
-				contractAddress: SHARD_ADDRESS,
-				entrypoint: "set_approval_for_all",
-				calldata: CallData.compile({
-					operator: NEKOMOTO_ADDRESS,
-					approved: true,
-				}),
-			},
-			{
-				contractAddress: NEKOMOTO_ADDRESS,
-				entrypoint: "start_time_freeze",
-				calldata: CallData.compile({
-					token_id: cairo.uint256(addressInfo.TemporalShardIdList[0]),
-				}),
-			},
-		]);
-
-		setHhh(multiCall.transaction_hash);
-		const result = await account.waitForTransaction(multiCall.transaction_hash);
-		console.log("result: ", result);
-		setSuccess("Success: " + multiCall.transaction_hash);
-	};
-
-	const openChest = async () => {
-		setWaiting(true);
-		const { typedMessage, signature } = await sign(account);
-		const result = await BACKEND.openChest(address, typedMessage, signature);
-		console.log("result: ", result);
-		if (result.success) {
-			setSuccess("Success: " + result.data);
-			setIsModalOpen4(true);
-			setChestDetail(result.data);
-		} else {
-			setSuccess(
-				"Something went wrong: Please try again tomorrow at 00:00 AM (UTC)"
-			);
-		}
-	};
-
 	const message = (result) => {
 		return (
 			(result.success ? "Success: " : "Something went wrong: ") +
 			(result.message === "" ? result.data : result.message)
 		);
-	};
-
-	const claimOfSpirit = async () => {
-		setWaiting(true);
-		const { typedMessage, signature } = await sign(account);
-		const result = await BACKEND.claimReward(address, typedMessage, signature);
-		console.log("result: ", result);
-		setSuccess(message(result));
-	};
-
-	const claimOfInvitation = async () => {
-		setWaiting(true);
-		const { typedMessage, signature } = await sign(account);
-		const result = await BACKEND.claimRewardOfInvitation(
-			address,
-			typedMessage,
-			signature
-		);
-		console.log("result: ", result);
-		setSuccess(message(result));
-	};
-
-	const getAscendUpgradePrism = (level) => {
-		if (level === 0) {
-			return 9;
-		} else if (level === 1) {
-			return 16;
-		} else if (level === 2) {
-			return 27;
-		} else if (level === 3) {
-			return 47;
-		} else if (level === 4) {
-			return 82;
-		} else if (level === 5) {
-			return 142;
-		} else if (level === 6) {
-			return 247;
-		} else if (level === 7) {
-			return 429;
-		} else {
-			return 746;
-		}
-	};
-
-	const getAscendUpgradeNeko = (level) => {
-		if (level === 0) {
-			return 100;
-		} else if (level === 1) {
-			return 437;
-		} else if (level === 2) {
-			return 1910;
-		} else if (level === 3) {
-			return 8345;
-		} else if (level === 4) {
-			return 36469;
-		} else if (level === 5) {
-			return 159370;
-		} else if (level === 6) {
-			return 696448;
-		} else if (level === 7) {
-			return 3043477;
-		} else {
-			return 13299996;
-		}
-	};
-
-	const getAscendUpgrade = (level) => {
-		if (level === 0) {
-			return 2;
-		} else if (level === 1) {
-			return 5;
-		} else if (level === 2) {
-			return 10;
-		} else if (level === 3) {
-			return 15;
-		} else if (level === 4) {
-			return 20;
-		} else if (level === 5) {
-			return 28;
-		} else if (level === 6) {
-			return 35;
-		} else if (level === 7) {
-			return 43;
-		} else {
-			return 51;
-		}
-	};
-
-	const upgradeAscend = async () => {
-		setWaiting(true);
-		// const {typedMessage, signature} = await sign(account)
-		let arr = [];
-		const ascendUpgradePrism = getAscendUpgradePrism(addressInfo.Buff?.Level);
-		const ascendUpgradeNeko = getAscendUpgradeNeko(addressInfo.Buff?.Level);
-		if (prismAllowance < ascendUpgradePrism) {
-			arr.push({
-				contractAddress: PRISM_ADDRESS,
-				entrypoint: "approve",
-				calldata: CallData.compile({
-					spender: NEKOMOTO_ADDRESS,
-					amount: cairo.uint256(BigInt(ascendUpgradePrism) * 10n ** 18n),
-				}),
-			});
-		}
-		if (nekocoinAllowance < ascendUpgradeNeko) {
-			arr.push({
-				contractAddress: NEKOCOIN_ADDRESS,
-				entrypoint: "approve",
-				calldata: CallData.compile({
-					spender: NEKOMOTO_ADDRESS,
-					amount: cairo.uint256(BigInt(ascendUpgradeNeko) * 10n ** 18n),
-				}),
-			});
-		}
-		arr.push({
-			contractAddress: NEKOMOTO_ADDRESS,
-			entrypoint: "upgrade_acend",
-			calldata: CallData.compile({}),
-		});
-		const multiCall = await account.execute(arr);
-		setHhh(multiCall.transaction_hash);
-		const result = await account.waitForTransaction(multiCall.transaction_hash);
-		console.log("result: ", result);
-		setSuccess("Success: " + multiCall.transaction_hash);
-	};
-
-	const copyOnClick = (address) => {
-		if (navigator.clipboard) {
-			navigator.clipboard
-				.writeText(address)
-				.then(() => {
-					console.log("Address copied to clipboard:", address);
-				})
-				.catch((err) => {
-					console.error("Failed to copy: ", err);
-				});
-			setCopySuccess1(true);
-			setTimeout(() => {
-				setCopySuccess1(false);
-			}, 2000);
-		}
 	};
 
 	const stake = async (input) => {
@@ -537,17 +339,6 @@ export default function Detail() {
 		}
 	};
 
-	const ascendData = [
-		{ level: 9, prism: 746, neko: 13299996, percentage: "51%" },
-		{ level: 8, prism: 429, neko: 3043477, percentage: "43%" },
-		{ level: 7, prism: 247, neko: 696448, percentage: "35%" },
-		{ level: 6, prism: 142, neko: 159370, percentage: "28%" },
-		{ level: 5, prism: 82, neko: 36469, percentage: "20%" },
-		{ level: 4, prism: 47, neko: 8345, percentage: "15%" },
-		{ level: 3, prism: 27, neko: 1910, percentage: "10%" },
-		{ level: 2, prism: 16, neko: 437, percentage: "5%" },
-		{ level: 1, prism: 9, neko: 100, percentage: "2%" },
-	];
 
 	return (
 		<div>
@@ -612,176 +403,22 @@ export default function Detail() {
 
 				<Row gutter={{ md: 0, lg: 16 }}>
 					<Col xs={24} sm={24} lg={12} className="margin-top-16">
-						<InviteCard
-							chestEmpower={addressInfo.ChestEmpower || []}
-							chestOpenable={addressInfo.ChestOpenable}
-							openedChestCount={info?.chestCount}
-							openedMasterChestCount={info?.masterChestCount}
-							openChest={openChest}
-						/>
+						<UnlockRate/>
 					</Col>
 					<Col xs={24} sm={24} lg={12} className="margin-top-16">
-						<ClaimedCard
-							type="short"
-							totalClaimed={addressInfo.TotalClaimed}
-							totalMana={addressInfo.TotalMana}
-							shard={addressInfo.TemporalShardIdList?.length}
-							boost={addressInfo.Buff?.Boost}
-							lucky={lucky}
-							startTime={addressInfo.Buff?.StartTime}
-							bountyWave={addressInfo.IsInBountyWave}
-							startTimeFreeze={timeFreeze}
-						/>
+
 					</Col>
 				</Row>
 
-				{/* <Row gutter={{ xs: 0, sm: 16 }}>
-        <Col xs={24} sm={12}>
-          <InviteCard />
-        </Col>
-        <Col xs={24} sm={12}>
-          <ClaimedCard type="short" />
-        </Col>
-      </Row> */}
-
 				<Row gutter={{ md: 0, lg: 16 }}>
 					<Col xs={24} sm={24} lg={6} className="margin-top-16">
-						<BoxCard
-							type="gem"
-							title={addCommaInNumber(addressInfo.ToClaim) + " NPO"}
-							subTitle="Earnings"
-							subPic={true}
-							subFunc={() => setEarningInfo(true)}
-							buttonText="Claim"
-							onButtonClick={claimOfSpirit}
-						/>
-					</Col>
-					<Col xs={24} sm={24} lg={9} className="margin-top-16">
-						<EmptyCard>
-							<Row>
-								<Col xs={24} sm={24}>
-									<Flex justify="space-between">
-										<div>
-											<Flex align="center" className="card-little-title">
-												Ascend
-												<img
-													width={14}
-													style={{ marginLeft: "8px" }}
-													src={exclamation}
-													alt=""
-													onClick={() => setAscendInfo(true)}
-												/>
-											</Flex>
-										</div>
-										<div className="card-little-title">
-											{Math.round(Number(addressInfo.Buff?.Boost || 0) * 100) +
-												"%"}
-										</div>
-									</Flex>
-								</Col>
-								<Col xs={24} sm={24} style={{ marginTop: "8px" }}>
-									<div className="grey-text-little">Global mana bonus</div>
-								</Col>
-							</Row>
-							<Row style={{ flex: 1 }}>
-								<Col xs={12} sm={12} style={{ marginTop: "24px" }}>
-									<GemItem
-										color="purple"
-										title="Prism"
-										descLeft={prism}
-										descRight={getAscendUpgradePrism(addressInfo.Buff?.Level)}
-									/>
-								</Col>
-								<Col xs={12} sm={12} style={{ marginTop: "24px" }}>
-									<GemItem
-										color="blue"
-										title="NPO"
-										descLeft={nekocoin}
-										descRight={getAscendUpgradeNeko(addressInfo.Buff?.Level)}
-									/>
-								</Col>
-								<Col
-									xs={24}
-									sm={24}
-									className="text-center"
-									style={{ alignSelf: "flex-end", marginTop: "24px" }}
-								>
-									<Button
-										text={
-											"UP TO " + getAscendUpgrade(addressInfo.Buff?.Level) + "%"
-										}
-										color="yellow"
-										longness="short"
-										onClick={upgradeAscend}
-									/>
-								</Col>
-							</Row>
-						</EmptyCard>
-					</Col>
-					<Col xs={24} sm={24} lg={9} className="margin-top-16">
-						<EmptyCard>
-							<Row>
-								<Col xs={24} sm={24}>
-									<div className="card-little-title">
-										Referral Rewards {"(" + addressInfo.InviteCount + ")"}
-									</div>
-								</Col>
 
-								<Col xs={24} sm={24} style={{ margin: "8px 0 18px" }}>
-									<Flex align="center" className="blue-text">
-										{addressInfo.InviteCode}
-										<img
-											width={14}
-											style={{ marginLeft: "8px" }}
-											src={copySuccess1 ? copySuccuess : copy}
-											alt=""
-											onClick={() => copyOnClick(addressInfo.InviteCode)}
-										/>
-									</Flex>
-								</Col>
-							</Row>
-							<Flex justify="space-between" className="card-mini-title">
-								<div>Claimed</div>
-								<div>{addressInfo.InvitationReward?.ClaimedAmount}</div>
-							</Flex>
-							<Flex justify="space-between" className="card-mini-title">
-								<div>Available</div>
-								<div>
-									{Math.max(
-										Math.min(
-											Number(addressInfo.InvitationReward?.TotalAmount),
-											Number(addressInfo.InvitationReward?.UnlockedAmount)
-										) - Number(addressInfo.InvitationReward?.ClaimedAmount),
-										0
-									)}
-								</div>
-							</Flex>
-							<Flex justify="space-between" className="card-mini-title">
-								<div>Locked</div>
-								<div>
-									{Math.max(
-										Number(addressInfo.InvitationReward?.TotalAmount) -
-											Number(addressInfo.InvitationReward?.UnlockedAmount),
-										0
-									)}
-								</div>
-							</Flex>
-							<Row style={{ flex: 1 }}>
-								<Col
-									xs={24}
-									sm={24}
-									className="text-center"
-									style={{ alignSelf: "flex-end", marginTop: "24px" }}
-								>
-									<Button
-										text="Claim"
-										color="yellow"
-										longness="short"
-										onClick={claimOfInvitation}
-									/>
-								</Col>
-							</Row>
-						</EmptyCard>
+					</Col>
+					<Col xs={24} sm={24} lg={9} className="margin-top-16">
+
+					</Col>
+					<Col xs={24} sm={24} lg={9} className="margin-top-16">
+
 					</Col>
 				</Row>
 
@@ -1455,7 +1092,7 @@ export default function Detail() {
 					{modalText1 === "" ? (
 						<Button
 							style={{ marginTop: "20px", textAlign: "center" }}
-							onClick={empower}
+							// onClick={empower}
 							text={"EMPOWER"}
 							color={"yellow"}
 							longness="long"
@@ -1582,7 +1219,7 @@ export default function Detail() {
 							</tr>
 						</thead>
 						<tbody>
-							{ascendData.map((item, index) => {
+							{/* {ascendData?.map((item, index) => {
 								return (
 									<tr key={index} style={{ color: "white" }}>
 										<td
@@ -1627,7 +1264,7 @@ export default function Detail() {
 										</td>
 									</tr>
 								);
-							})}
+							})} */}
 						</tbody>
 					</table>
 				</div>

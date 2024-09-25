@@ -1,7 +1,6 @@
 import App from "./App.jsx";
 import Home from "@pages/Home/index";
 import Assets from "@pages/Assets/index";
-import Detail from "@pages/Detail/index";
 import Detail2 from "@pages/Detail2/index";
 
 import { createBrowserRouter } from "react-router-dom";

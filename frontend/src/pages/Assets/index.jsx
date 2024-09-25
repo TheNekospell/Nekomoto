@@ -3,7 +3,7 @@ import InputCard from "@components/InputCard/index";
 import BoxCard from "@components/BoxCard/index";
 import InfoCard from "@components/InfoCard/index";
 import Table from "@components/Table/index";
-import PoolCard from "../../components/PoolCard";
+
 
 import PCHeader from "@components/PCHeader/index";
 import logoText from "@assets/text-logo.png";
@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import CardDetail from "@components/CardDetail/index.jsx";
 import LuckCard from "../../components/LuckCard";
 import CheckCard from "../../components/CheckCard";
+import MintPoolCard from "../../components/MintPoolCard";
 
 const style = { background: "#0092ff", padding: "8px 0" };
 
@@ -112,7 +113,7 @@ export default function Assets() {
 						<InputCard />
 					</Col>
 					<Col style={{ width: "45%", height: "100%" }}>
-						<PoolCard />
+						<MintPoolCard />
 					</Col>
 				</Row>
 				<Row style={{ marginTop: "16px", marginBottom: "16px" }} gutter={16}>

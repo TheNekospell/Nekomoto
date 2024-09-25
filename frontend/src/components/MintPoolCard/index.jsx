@@ -8,7 +8,7 @@ import lineV from "@assets/line-ver.png";
 import lineH from "@assets/line-hor.png";
 import Button from "@components/Button/index";
 
-export default function PoolCard() {
+export default function MintPoolCard() {
 	return (
 		<>
 			<div className="pool-card">
