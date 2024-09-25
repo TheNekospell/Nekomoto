@@ -51,6 +51,8 @@ import { cairo, CallData } from "starknet";
 
 import CardDetail from "@components/CardDetail/index.jsx";
 import UnlockRate from "../../components/UnlockRate";
+import PowerCard from "../../components/PowerCard";
+import MintPoolCard from "../../components/MintPoolCard";
 
 export default function Detail() {
 	// const isMobile = useAppStore().device === "mobile";
@@ -339,7 +341,6 @@ export default function Detail() {
 		}
 	};
 
-
 	return (
 		<div>
 			<NekoModal
@@ -399,27 +400,32 @@ export default function Detail() {
 				</div>
 			</NekoModal>
 
-			<div className="detail padding-top-80 padding-bottom-80">
-
-				<Row gutter={{ md: 0, lg: 16 }}>
-					<Col xs={24} sm={24} lg={12} className="margin-top-16">
-						<UnlockRate/>
+			<div
+				className="detail padding-top-80 padding-bottom-80"
+				style={{ width: "100%" }}
+			>
+				<Row gutter={16}>
+					<Col
+						style={{ width: "55%", height: "100%" }}
+						className="margin-top-16"
+						gutter={16}
+					>
+						<UnlockRate />
+						<div style={{ marginBottom: "16px" }} />
+						<PowerCard />
 					</Col>
-					<Col xs={24} sm={24} lg={12} className="margin-top-16">
-
+					<Col
+						style={{ width: "45%", height: "100%" }}
+						className="margin-top-16"
+					>
+						<MintPoolCard />
 					</Col>
 				</Row>
 
 				<Row gutter={{ md: 0, lg: 16 }}>
-					<Col xs={24} sm={24} lg={6} className="margin-top-16">
-
-					</Col>
-					<Col xs={24} sm={24} lg={9} className="margin-top-16">
-
-					</Col>
-					<Col xs={24} sm={24} lg={9} className="margin-top-16">
-
-					</Col>
+					<Col xs={24} sm={24} lg={6} className="margin-top-16"></Col>
+					<Col xs={24} sm={24} lg={9} className="margin-top-16"></Col>
+					<Col xs={24} sm={24} lg={9} className="margin-top-16"></Col>
 				</Row>
 
 				<div className="cards-wrapper margin-top-16">
