@@ -52,7 +52,9 @@ import { cairo, CallData } from "starknet";
 import CardDetail from "@components/CardDetail/index.jsx";
 import UnlockRate from "../../components/UnlockRate";
 import PowerCard from "../../components/PowerCard";
-import MintPoolCard from "../../components/MintPoolCard";
+import StakePoolCard from "../../components/StakePoolCard";
+import NekomotoPreview from "../../components/NekomotoPreview";
+import NekomotoDetail from "../../components/NekomotoDetail";
 
 export default function Detail() {
 	// const isMobile = useAppStore().device === "mobile";
@@ -402,178 +404,46 @@ export default function Detail() {
 
 			<div
 				className="detail padding-top-80 padding-bottom-80"
-				style={{ width: "100%" }}
+				style={{ width: "100%", height: "100%" }}
 			>
-				<Row gutter={16}>
+				<Row gutter={16} style={{ height: "100%" }}>
 					<Col
 						style={{ width: "55%", height: "100%" }}
 						className="margin-top-16"
 						gutter={16}
 					>
-						<UnlockRate />
+						<UnlockRate style={{ height: "50%" }} />
 						<div style={{ marginBottom: "16px" }} />
-						<PowerCard />
+						<PowerCard style={{ height: "50%" }} />
 					</Col>
 					<Col
 						style={{ width: "45%", height: "100%" }}
 						className="margin-top-16"
 					>
-						<MintPoolCard />
+						<StakePoolCard />
 					</Col>
 				</Row>
 
 				<Row gutter={{ md: 0, lg: 16 }}>
-					<Col xs={24} sm={24} lg={6} className="margin-top-16"></Col>
-					<Col xs={24} sm={24} lg={9} className="margin-top-16"></Col>
-					<Col xs={24} sm={24} lg={9} className="margin-top-16"></Col>
-				</Row>
-
-				<div className="cards-wrapper margin-top-16">
-					<BoxBorder color="#0E222F" />
-					<div className="card-title">
-						{"My Neko (" +
-							addressInfo.NekoSpiritList?.filter(
-								(item) => item.IsStaked === true
-							).length +
-							"/" +
-							addressInfo.NekoSpiritList?.length +
-							")"}
-					</div>
-					<Flex
-						style={{ margin: "24px 0" }}
-						justify="space-between"
-						align="center"
+					<Col
+						style={{ width: "55%", height: "100%" }}
+						className="margin-top-16"
+						gutter={16}
 					>
-						{isMobile ? (
-							<Select
-								defaultValue="ALL"
-								style={{ width: 100 }}
-								options={options}
-							></Select>
-						) : (
-							<div>
-								<RadioButton
-									text="all"
-									active={nekoButton === "all"}
-									onClick={() => setNekoButton("all")}
-								/>
-								<RadioButton
-									text="LEGENDARY"
-									active={nekoButton === "LEGENDARY"}
-									onClick={() => setNekoButton("LEGENDARY")}
-								/>
-								<RadioButton
-									text="EPIC"
-									active={nekoButton === "EPIC"}
-									onClick={() => setNekoButton("EPIC")}
-								/>
-								<RadioButton
-									text="RARE"
-									active={nekoButton === "RARE"}
-									onClick={() => setNekoButton("RARE")}
-								/>
-								<RadioButton
-									text="UNCOMMON"
-									active={nekoButton === "UNCOMMON"}
-									onClick={() => setNekoButton("UNCOMMON")}
-								/>
-								<RadioButton
-									text="COMMON"
-									active={nekoButton === "COMMON"}
-									onClick={() => setNekoButton("COMMON")}
-								/>
-							</div>
-						)}
-
-						<Flex>
-							<div
-								className="card-desc-title"
-								style={
-									addressInfo.NekoSpiritList?.filter((item) => !item.IsStaked)
-										.length > 0
-										? {
-												marginRight: "18px",
-												fontSize: "12px",
-												cursor: "pointer",
-										  }
-										: {
-												marginRight: "18px",
-												fontSize: "12px",
-												cursor: "pointer",
-												filter: "grayscale(1)",
-										  }
-								}
-								onClick={
-									addressInfo.NekoSpiritList?.filter((item) => !item.IsStaked)
-										.length > 0
-										? stakeAll
-										: null
-								}
-							>
-								Stake All
-							</div>
-							<div
-								className="card-desc-title"
-								style={
-									addressInfo.NekoSpiritList?.filter((item) => item.IsStaked)
-										.length > 0
-										? { fontSize: "12px", cursor: "pointer" }
-										: {
-												fontSize: "12px",
-												cursor: "pointer",
-												filter: "grayscale(1)",
-										  }
-								}
-								onClick={
-									addressInfo.NekoSpiritList?.filter((item) => item.IsStaked)
-										.length > 0
-										? unStakeAll
-										: null
-								}
-							>
-								UnStake All
-							</div>
-						</Flex>
-					</Flex>
-
-					<Row gutter={16}>
-						{addressInfo.NekoSpiritList?.filter((item) =>
-							nekoButton === "all"
-								? true
-								: item.Rarity?.toLowerCase() === nekoButton.toLowerCase()
-						).map((item, index) => {
-							// console.log("index: ", item, index)
-							return (
-								<Col xs={12} sm={12} lg={4} key={index}>
-									<Flex
-										className="card-item"
-										justify="center"
-										vertical="column"
-									>
-										<CardDetail item={item} />
-										<Button
-											style={{ marginTop: "10px" }}
-											onClick={
-												item.IsStaked
-													? () => {
-															setIsModalOpen3(true);
-															setFocus(item);
-													  }
-													: () => {
-															setIsModalOpen2(true);
-															setFocus(item);
-													  }
-											}
-											text={item.IsStaked ? "level up" : "staking"}
-											color={item.IsStaked ? "orange" : "yellow"}
-											longness="short"
-										/>
-									</Flex>
-								</Col>
-							);
-						})}
-					</Row>
-				</div>
+						<NekomotoPreview
+							addressInfo={addressInfo}
+							nekoButton={nekoButton}
+							setNekoButton={setNekoButton}
+							setIsModalOpen3={setIsModalOpen3}
+							setFocus={setFocus}
+						/>
+					</Col>
+					<Col
+						style={{ width: "55%", height: "100%" }}
+						className="margin-top-16"
+						gutter={16}
+					></Col>
+				</Row>
 
 				<NekoModal
 					title="Details"

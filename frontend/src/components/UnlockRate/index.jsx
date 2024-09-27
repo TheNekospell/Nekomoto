@@ -42,7 +42,7 @@ export default function UnlockRate({ rate = 60 }) {
 			<div
 				style={{
 					backgroundColor: "#1d3344",
-					padding: "10px 20px",
+					padding: "20px 20px",
 					fontFamily: "BIG SHOT",
 					position: "relative",
 					color: "white",

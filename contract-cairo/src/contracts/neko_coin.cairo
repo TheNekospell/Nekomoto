@@ -63,55 +63,6 @@ pub mod NekoCoin {
             amount: u256
         ) -> u256 {
             amount
-            // let mut state =
-        // nekomoto::contracts::neko_coin::NekoCoin::unsafe_new_contract_state();
-        // let zero_address = Zero::zero();
-        // if from == zero_address || recipient == zero_address || recipient ==
-        // state.host.read() {
-        //     return amount;
-        // }
-
-            // // [0,10]	25000
-        // // [11,20]	50000
-        // // [21,40]	125000
-        // // [41,80]	250000
-        // // [81,100]	550000
-        // // [101,150]    1200000
-        // // [151,200]	1600000
-        // // [201,+∞]	2000000
-
-            // let balance = self.ERC20_balances.read(recipient);
-        // let level_count = NekomotoTraitDispatcher { contract_address: state.nekomoto.read() }
-        //     .get_level_count(recipient);
-
-            // let max = if level_count <= 10 {
-        //     25000000000000000000000
-        // } else if level_count <= 20 {
-        //     50000000000000000000000
-        // } else if level_count <= 40 {
-        //     125000000000000000000000
-        // } else if level_count <= 80 {
-        //     250000000000000000000000
-        // } else if level_count <= 100 {
-        //     550000000000000000000000
-        // } else if level_count <= 150 {
-        //     1200000000000000000000000
-        // } else if level_count <= 200 {
-        //     1600000000000000000000000
-        // } else {
-        //     2000000000000000000000000
-        // };
-
-            // if balance >= max {
-        //     0
-        // } else {
-        //     let diff = max - balance;
-        //     if diff > amount {
-        //         amount
-        //     } else {
-        //         diff
-        //     }
-        // }
         }
 
         fn after_update(

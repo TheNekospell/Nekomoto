@@ -1,0 +1,13 @@
+.pool-card {
+	background: #1d3344;
+    padding: 32px 28px;
+	font-family: BIG SHOT;
+	color: rgba(255, 255, 255, 1);
+    position: relative;
+    /* height: 100%; */
+    /* width: 100%; */
+}
+
+.grey-text {
+	color: #8998a0;
+}

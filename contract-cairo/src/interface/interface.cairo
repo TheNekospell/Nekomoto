@@ -5,6 +5,7 @@ pub trait ERC20BurnTrait<ContractState> {
     fn burn(ref self: ContractState, amount: u256);
     fn burnFrom(ref self: ContractState, account: ContractAddress, amount: u256);
     fn mint(ref self: ContractState, recipient: ContractAddress, amount: u256);
+    fn check_in(ref self: ContractState, address: ContractAddress) -> bool;
 }
 
 #[starknet::interface]
@@ -35,4 +36,5 @@ pub trait NekomotoTrait<ContractState> {
     fn generate(self: @ContractState, token_id: u256, origin: bool) -> Info;
     fn buy_coin(ref self: ContractState, count: u256);
     fn check_coin(self: @ContractState, address: ContractAddress) -> u256;
+    fn check_in(ref self: ContractState, address: ContractAddress) -> bool;
 }

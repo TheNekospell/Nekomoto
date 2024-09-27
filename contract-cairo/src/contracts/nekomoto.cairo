@@ -138,10 +138,14 @@ pub mod Nekomoto {
             let nekocoin = self.neko.read();
             let recipient = get_caller_address();
             IERC20Dispatcher { contract_address: nekocoin }
-                .transfer_from(recipient, self.host.read(), amount * 75 / 100);
+                .transfer_from(recipient, self.host.read(), amount * 30 / 100);
             ERC20BurnTraitDispatcher { contract_address: nekocoin }
-                .burnFrom(recipient, amount * 25 / 100);
+                .burnFrom(recipient, amount * 70 / 100);
             self.coin.write(recipient, count);
+        }
+
+        fn check_in(ref self: ContractState, address: ContractAddress) -> bool {
+            ERC20BurnTraitDispatcher { contract_address: self.prism.read() }.check_in(address)
         }
 
         fn summon(
@@ -300,7 +304,7 @@ pub mod Nekomoto {
                 check_max_level(current_level, self.seed.read(token_id), is_starter),
                 'Exceed max level'
             );
-            let (nko_consume, prism_consume, new_atk) = upgrade_once_consume(
+            let (nko_consume, prism_consume, new_atk) = upgrade_once(
                 self.atk.read(token_id), current_level
             );
 
@@ -458,7 +462,7 @@ pub mod Nekomoto {
         }
     }
 
-    fn upgrade_once_consume(current_atk: u256, current_level: u8) -> (u256, u256, u256) {
+    fn upgrade_once(current_atk: u256, current_level: u8) -> (u256, u256, u256) {
         let (atk_growth, nko_coeficcient, prism_consume) = match current_level {
             0 => (0, 0, 0),
             1 => (15, 15, 0),

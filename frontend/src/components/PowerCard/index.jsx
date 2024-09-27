@@ -8,7 +8,7 @@ export default function PowerCard({}) {
 			<div
 				style={{
 					backgroundColor: "#1d3344",
-					padding: "10px 20px",
+					padding: "15px 20px",
 					fontFamily: "BIG SHOT",
 					position: "relative",
 					color: "white",
@@ -43,7 +43,7 @@ export default function PowerCard({}) {
 						className="grey-text"
 						style={{
 							borderRadius: "10px",
-							padding: "10px 40px",
+							padding: "20px 40px",
 							backgroundColor: "rgba(14, 39, 54, 1)",
 							alignContent: "center",
 							alignItems: "center",
@@ -57,7 +57,7 @@ export default function PowerCard({}) {
 							style={{
 								display: "flex",
 								alignItems: "center",
-								marginTop: "5px",
+								marginTop: "10px",
 							}}
 						>
 							<div style={{ fontSize: "30px", color: "white" }}>
@@ -72,7 +72,7 @@ export default function PowerCard({}) {
 							flexDirection: "row",
 							justifyContent: "space-between",
 							borderRadius: "10px",
-							padding: "10px 40px",
+							padding: "20px 40px",
 							backgroundColor: "rgba(14, 39, 54, 1)",
 						}}
 					>
@@ -90,7 +90,7 @@ export default function PowerCard({}) {
 								style={{
 									display: "flex",
 									alignItems: "center",
-									marginTop: "5px",
+									marginTop: "10px",
 								}}
 							>
 								<div style={{ fontSize: "30px", color: "white" }}>
@@ -116,7 +116,7 @@ export default function PowerCard({}) {
 								style={{
 									display: "flex",
 									alignItems: "center",
-									marginTop: "5px",
+									marginTop: "10px",
 								}}
 							>
 								<div style={{ fontSize: "30px", color: "white" }}>
