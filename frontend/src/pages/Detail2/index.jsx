@@ -1095,52 +1095,7 @@ export default function Detail() {
 							</tr>
 						</thead>
 						<tbody>
-							{/* {ascendData?.map((item, index) => {
-								return (
-									<tr key={index} style={{ color: "white" }}>
-										<td
-											style={{
-												padding: "10px",
-												paddingLeft: "15px",
-												verticalAlign: "top",
-												marginLeft: "8px",
-											}}
-										>
-											{item.level}
-										</td>
-										<td
-											style={{
-												padding: "10px",
-												paddingLeft: "20px",
-												verticalAlign: "top",
-												marginLeft: "8px",
-											}}
-										>
-											{item.prism}
-										</td>
-										<td
-											style={{
-												padding: "10px",
-												paddingLeft: "20px",
-												verticalAlign: "top",
-												marginLeft: "8px",
-											}}
-										>
-											{item.neko}
-										</td>
-										<td
-											style={{
-												padding: "10px",
-												paddingLeft: "20px",
-												verticalAlign: "top",
-												marginLeft: "8px",
-											}}
-										>
-											{item.percentage}
-										</td>
-									</tr>
-								);
-							})} */}
+			
 						</tbody>
 					</table>
 				</div>

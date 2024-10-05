@@ -8,10 +8,6 @@ pub mod interface {
     pub mod interface;
 }
 
-pub mod component {
-    pub mod erc20;
-}
-
 mod tests {
     mod test;
     mod account;

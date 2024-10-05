@@ -1,13 +1,11 @@
 #[starknet::contract]
 pub mod NekoCoin {
-    use nekomoto::component::erc20::ERC20Component;
+    use openzeppelin::token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use starknet::{ContractAddress, get_caller_address};
-    // use nekomoto::interface::interface::{NekomotoTraitDispatcher, NekomotoTraitDispatcherTrait};
     use core::num::traits::Zero;
 
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
 
-    // ERC20 Mixin
     #[abi(embed_v0)]
     impl ERC20MixinImpl = ERC20Component::ERC20MixinImpl<ContractState>;
     impl ERC20InternalImpl = ERC20Component::InternalImpl<ContractState>;
@@ -55,21 +53,4 @@ pub mod NekoCoin {
         self.erc20.burn(account, amount);
     }
 
-    impl ERC20HooksImpl<ContractState> of ERC20Component::ERC20HooksTrait<ContractState> {
-        fn before_update(
-            ref self: ERC20Component::ComponentState<ContractState>,
-            from: ContractAddress,
-            recipient: ContractAddress,
-            amount: u256
-        ) -> u256 {
-            amount
-        }
-
-        fn after_update(
-            ref self: ERC20Component::ComponentState<ContractState>,
-            from: ContractAddress,
-            recipient: ContractAddress,
-            amount: u256
-        ) {}
-    }
 }
