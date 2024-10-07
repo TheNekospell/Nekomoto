@@ -25,27 +25,20 @@ var (
 )
 
 type AddressInfo struct {
-	Uid                 uint64
-	Address             string
-	IsStarter           bool
-	InviteCode          string
-	Active              bool
-	SecondInviter       uint64
-	ThirdInviter        uint64
-	InvitationReward    ServerInvitationRewardStatic
-	Buff                ServerBuffRecord
-	NekoSpiritIdList    []uint64
-	NekoSpiritList      []ServerNekoSpiritInfo
-	TemporalShardIdList []uint64
-	LastClaim           time.Time
-	TotalClaimed        decimal.Decimal
-	TotalMana           decimal.Decimal
-	ToClaim             decimal.Decimal
-	ChestOpenable       bool
-	ChestEmpower        []string
-	RequestToEmpower    bool
-	InviteCount         int64
-	IsInBountyWave      bool
+	Uid                    uint64
+	Address                string
+	IsStarter              bool
+	Active                 bool
+	NekoSpiritIdList       []uint64
+	NekoSpiritList         []ServerNekoSpiritInfo
+	MintPoolToClaim        decimal.Decimal
+	MintPoolCurrentReward  decimal.Decimal
+	StakePoolToClaim       decimal.Decimal
+	StakePoolCurrentReward decimal.Decimal
+	StaticMintPool         decimal.Decimal
+	StaticTotalLuck        uint64
+	StaticStakePool        decimal.Decimal
+	StaticTotalPower       uint64
 }
 
 // func calUnlockedAmount(count uint64) decimal.Decimal {
@@ -72,52 +65,15 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 	var serverAddress ServerAddress
 	DB.Where("id = ?", uid).Find(&serverAddress)
 
-	//fmt.Println("[Server] Rebuild cache for uid:", uid, " address:", serverAddress.Address)
-
-	// var invitation ServerInvitationRecord
-	// DB.Where("uid = ?", uid).Find(&invitation)
-
-	// var InviteCount int64
-	// DB.Model(&ServerInvitationRecord{}).Where("second_uid = ?", uid).Count(&InviteCount)
-
-	// var invitationReward ServerInvitationRewardStatic
-	// DB.Where("uid = ?", uid).Find(&invitationReward)
-	// invitationReward.UnlockedAmount = calUnlockedAmount(invitationReward.UnlockedCount)
-
-	var lastClaim time.Time
-	if err := DB.Model(&ServerClaimNekoSpiritRecord{}).Where("uid = ?", uid).Order("created_at desc").Limit(1).Select("created_at").Find(&lastClaim).Error; err != nil {
-		lastClaim = time.Time{}
-	}
 	var TotalClaimed decimal.Decimal
 	if err := DB.Model(&ServerClaimNekoSpiritRecord{}).Where("uid = ?", uid).Select("ifnull(sum(amount),0) as total_claimed").Scan(&TotalClaimed).Error; err != nil {
 		TotalClaimed = decimal.NewFromInt(0)
 	}
 
-	var Mana decimal.Decimal
-	if err := DB.Model(&ServerNekoSpiritInfo{}).Where("stake_from_uid = ?", uid).Where("is_staked = ?", true).Where("fade > ?", 0).Select("ifnull(sum(mana),0) as mana").Scan(&Mana).Error; err != nil {
-		Mana = decimal.NewFromInt(0)
-	}
 	var ToClaim decimal.Decimal
 	if err := DB.Model(&ServerNekoSpiritInfo{}).Where("stake_from_uid = ?", uid).Select("ifnull(sum(rewards),0) as to_claim").Scan(&ToClaim).Error; err != nil {
 		ToClaim = decimal.NewFromInt(0)
 	}
-
-	// chest := QueryChest(uid)
-	// openable := false
-	// var empower []string
-	// if chest.ID != 0 {
-	// 	openable = chest.IsOpen == 0
-	// 	records := QueryEmpowerRecord(chest.ID)
-	// 	for _, record := range records {
-	// 		add, _ := GetAddressByUid(record.Uid)
-	// 		empower = append(empower, add.Address)
-	// 	}
-	// }
-
-	// var buff ServerBuffRecord
-	// DB.Where("uid = ?", uid).Find(&buff)
-
-	// isInBountyWave := IsInBountyWave(uid)
 
 	var NekoSpiritList []ServerNekoSpiritInfo
 	var idList []uint64
@@ -130,21 +86,13 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		// }
 	}
 
-	// var shardIdList []uint64
-	// DB.Model(&ServerTemporalShardRecord{}).Where("uid = ?", uid).Select("token_id").Find(&shardIdList)
-
 	result := AddressInfo{
-		Uid:                 uid,
-		Address:             serverAddress.Address,
-		IsStarter:           serverAddress.IsStarter,
-		InviteCode:          serverAddress.InviteCode,
-		Active:              serverAddress.Active,
-		NekoSpiritIdList:    idList,
-		NekoSpiritList:      NekoSpiritList,
-		LastClaim:           lastClaim,
-		TotalClaimed:        TotalClaimed,
-		TotalMana:           Mana,
-		ToClaim:             ToClaim,
+		Uid:              uid,
+		Address:          serverAddress.Address,
+		IsStarter:        serverAddress.IsStarter,
+		Active:           serverAddress.Active,
+		NekoSpiritIdList: idList,
+		NekoSpiritList:   NekoSpiritList,
 	}
 
 	//Cache.Set(CacheTagUid+strconv.FormatUint(uid, 10), result, -1)

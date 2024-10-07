@@ -44,23 +44,15 @@ func StartServer() {
 	boxGroup := apiGroup.Group("/box")
 	boxGroup.POST("/summon", SummonBox)
 
-	// chestGroup := apiGroup.Group("/chest")
-	// chestGroup.POST("/open", OpenChest)
-	// chestGroup.POST("/empower", EmpowerChest)
-
 	addressGroup := apiGroup.Group("/address")
 	addressGroup.GET("/generateSignature", GenerateSignature)
 	addressGroup.GET("/info", AddressInfo)
-	// addressGroup.POST("/invitation", AcceptInvitation)
 	// addressGroup.POST("/valid", ValidSignature)
 	addressGroup.POST("/active", ActiveAddress)
 
-	rewardGroup := apiGroup.Group("/reward")
-	rewardGroup.POST("/claim", ClaimReward)
+	// rewardGroup := apiGroup.Group("/reward")
+	// rewardGroup.POST("/claim", ClaimReward)
 	// rewardGroup.POST("/claimInv", ClaimRewardOfInvitation)
-
-	staticGroup := apiGroup.Group("/static")
-	staticGroup.GET("/info", GetStaticInfo)
 
 	testGroup := apiGroup.Group("/nike")
 	testGroup.GET("/allocate", func(ctx *gin.Context) {
@@ -97,16 +89,6 @@ func StartServer() {
 
 }
 
-// func aaa() gin.HandlerFunc {
-// 	cfg := cors.Config{
-// 		AllowMethods:     []string{"*"},
-// 		AllowHeaders:     []string{"*"},
-// 		AllowCredentials: false,
-// 		MaxAge:           12 * time.Hour,
-// 	}
-// 	cfg.AllowAllOrigins = true
-// 	return cors.New(cfg)
-// }
 
 func SuccessResponse(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, model.ResponseData{
@@ -246,45 +228,6 @@ func AddressInfo(c *gin.Context) {
 	SuccessResponse(c, data)
 }
 
-func ClaimReward(c *gin.Context) {
-	var req model.AddressAndSignature
-	if err := c.ShouldBindJSON(&req); err != nil {
-		ErrorResponse(c, model.WrongParam, err.Error())
-		return
-	}
-	// if !common.IsHexAddress(req.Address) {
-	// 	ErrorResponse(c, model.WrongParam, "invalid address")
-	// 	return
-	// }
-	if err := service.ValidSignature(req.Address, req.Signature.TypedData, req.Signature.Signature); err != nil {
-		ErrorResponse(c, model.InvalidSignature, err.Error())
-		return
-	}
-	code, msg := service.ClaimReward(req)
-	if code != model.Success {
-		ErrorResponse(c, code, msg)
-		return
-	}
-	SuccessResponse(c, msg)
-}
-
-func ClaimRewardOfInvitation(c *gin.Context) {
-	var req model.AddressAndSignature
-	if err := c.ShouldBindJSON(&req); err != nil {
-		ErrorResponse(c, model.WrongParam, err.Error())
-		return
-	}
-	if err := service.ValidSignature(req.Address, req.Signature.TypedData, req.Signature.Signature); err != nil {
-		ErrorResponse(c, model.InvalidSignature, err.Error())
-		return
-	}
-	code, msg := service.ClaimRewardOfInvitation(req)
-	if code != model.Success {
-		ErrorResponse(c, code, msg)
-		return
-	}
-	SuccessResponse(c, msg)
-}
 
 func ValidSignature(c *gin.Context) {
 	var req model.AddressAndSignature
@@ -302,37 +245,6 @@ func ValidSignature(c *gin.Context) {
 	}
 	fmt.Println("signature valid")
 	SuccessResponse(c, true)
-}
-
-// func OpenStarterChest(c *gin.Context) {
-// 	var req model.AddressAndSignature
-// 	if err := c.ShouldBindJSON(&req); err != nil {
-// 		ErrorResponse(c, model.WrongParam, err.Error())
-// 		return
-// 	}
-// 	if !common.IsHexAddress(req.Address) {
-// 		ErrorResponse(c, model.WrongParam, "invalid address")
-// 		return
-// 	}
-// 	if err := service.ValidSignature(req.Address,  req.Signature.TypedData, req.Signature.Signature); err != nil {
-// 		ErrorResponse(c, model.InvalidSignature, err.Error())
-// 		return
-// 	}
-// 	code, msg := service.OpenStarterChest(req)
-// 	if code != model.Success {
-// 		ErrorResponse(c, code, msg)
-// 		return
-// 	}
-// 	SuccessResponse(c, msg)
-// }
-
-func GetStaticInfo(c *gin.Context) {
-	data, code, msg := service.GetStaticInfo()
-	if code != model.Success {
-		ErrorResponse(c, code, msg)
-		return
-	}
-	SuccessResponse(c, data)
 }
 
 func ActiveAddress(c *gin.Context) {

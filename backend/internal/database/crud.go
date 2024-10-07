@@ -280,10 +280,10 @@ func GetBountyWaveList() ([]ServerWhiteListOfBountyWave, decimal.Decimal, bool) 
 	return list, config.Boost, true
 }
 
-func GetRewardPool() decimal.Decimal {
+func GetRewardPool() ServerRewardPool {
 	var result ServerRewardPool
 	DB.First(&result)
-	return result.TotalAmount
+	return result
 }
 
 func UpdateNekoSpiritList(toUpdate []ServerNekoSpiritInfo) {
@@ -335,12 +335,12 @@ func CreateClaimRecord(uid uint64, amount decimal.Decimal) {
 	DB.Create(&ServerClaimNekoSpiritRecord{Uid: uid, Amount: amount})
 }
 
-func AddRewardsPool(amount decimal.Decimal) {
-	DB.Model(&ServerRewardPool{}).Where("id = 1").Update("total_amount", gorm.Expr("total_amount + ?", amount))
+func AddRewardsPool(amountOfMint decimal.Decimal, amountOfStake decimal.Decimal) {
+	DB.Model(&ServerRewardPool{}).Where("id = 1").Update("mint_pool", gorm.Expr("mint_pool + ?", amountOfMint)).Update("stake_pool", gorm.Expr("stake_pool + ?", amountOfStake))
 }
 
-func SubRewardPool(amount decimal.Decimal) {
-	DB.Model(&ServerRewardPool{}).Where("id = 1").Update("total_amount", gorm.Expr("total_amount - ?", amount))
+func SubRewardPool(amountOfMint decimal.Decimal, amountOfStake decimal.Decimal) {
+	DB.Model(&ServerRewardPool{}).Where("id = 1").Update("mint_pool", gorm.Expr("mint_pool - ?", amountOfMint)).Update("stake_pool", gorm.Expr("stake_pool - ?", amountOfStake))
 }
 
 func QueryStarterChestConfig() ServerStarterChestConfig {

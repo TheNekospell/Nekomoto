@@ -21,6 +21,8 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 
 	if from == "0x0" {
 
+		// mint
+
 		toSave, err := invoker_sn.ReadNekoSpiritInfo(tokenId, true)
 		if err != nil {
 			fmt.Println("ReadNekoSpiritInfo error: ", err)
@@ -30,13 +32,12 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 		toSave.TokenId = tokenId
 		toSave.StakeFromUid = database.GetAddressDetailByAddress(to).Uid
 		toSave.StakeTime = time.Now()
+		toSave.Epoch = database.GetEpoch()
 		if err := database.CreateNekoSpiritInfo(&toSave); err != nil {
 			fmt.Println("CreateNekoSpiritInfo error: ", err)
 			return
 		}
 		fmt.Println("CreateNekoSpiritInfo: ", toSave)
-
-		detail := database.GetAddressDetailByAddress(to)
 
 		// starter pack
 		// TODO process starter pack
@@ -46,49 +47,12 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 		// 	return
 		// }
 
-		// reward to inviter
-		var second = database.ServerInvitationRewardRecord{
-			Uid:     detail.SecondInviter,
-			FromUid: detail.Uid,
-			Amount:  decimal.NewFromInt(2500),
-		}
-		var third = database.ServerInvitationRewardRecord{
-			Uid:     detail.ThirdInviter,
-			FromUid: detail.Uid,
-			Amount:  decimal.NewFromInt(1250),
-		}
-		if err := database.CreateInvitationRewardRecords([]database.ServerInvitationRewardRecord{second, third}); err != nil {
-			fmt.Println("CreateInvitationRewardRecords error: ", err)
-			return
-		}
-		var toBurn uint64
-		if detail.SecondInviter != 0 {
-			database.AddInvitationRewardStatic(detail.SecondInviter, decimal.NewFromInt(2500))
-		} else {
-			toBurn += 2500
-		}
-		if detail.ThirdInviter != 0 {
-			database.AddInvitationRewardStatic(detail.ThirdInviter, decimal.NewFromInt(1250))
-		} else {
-			toBurn += 1250
-		}
-		if toBurn != 0 {
-			database.TempBurn(tokenId, decimal.NewFromUint64(toBurn).Mul(decimal.NewFromBigInt(big.NewInt(10), 18)))
-		}
-
-		// unlock reward of invitation
-		// database.UnlockInvitationRewardStatic(detail.Uid, decimal.NewFromInt(2500))
-		// burn 25% of mint cost
-		// by contract
+		// add 30% of mint cost into MINT reward pool
+		database.AddRewardsPool(decimal.New(int64(7500), 18), decimal.NewFromInt(0))
 
 	} else {
 
-		// info, err := invoker_sn.ReadNekoSpiritInfo(tokenId, false)
-		// fmt.Println("ReadNekoSpiritInfo : ", tokenId, info)
-		// if err != nil {
-		// 	fmt.Println("ReadNekoSpiritInfo error: ", err)
-		// 	return
-		// }
+		// stake
 
 		toUpdate, err := database.GetNekoSpiritInfoByTokenId(tokenId)
 		// fmt.Println("GetNekoSpiritInfoByTokenId : ", tokenId, toUpdate)
@@ -115,7 +79,7 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 
 }
 
-func UpdateNekoSpiritByUpgrade(tokenId uint64) {
+func UpdateNekoSpiritByUpgrade(tokenId uint64, nekocoin uint64) {
 
 	// TODO game reward pool update
 
@@ -137,197 +101,17 @@ func UpdateNekoSpiritByUpgrade(tokenId uint64) {
 	if err := database.UpdateNekoSpiritInfo(&database.ServerNekoSpiritInfo{
 		Model:   database.Model{ID: origin.ID},
 		TokenId: info.TokenId,
-		ATK: info.ATK,
-		Level: info.Level,
+		ATK:     info.ATK,
+		Level:   info.Level,
 	}); err != nil {
 		fmt.Println("UpdateNekoSpiritInfo error: ", err)
 		return
 	}
 
+	// add 30% of upgrade cost into MINT reward pool
+	database.AddRewardsPool(decimal.NewFromUint64(nekocoin).Mul(decimal.New(3, -1)), decimal.NewFromInt(0))
+
 	database.Cache.Delete(database.CacheTagNekoSpirit + strconv.Itoa(int(tokenId)))
-
-}
-
-// func UpdateNekoSpiritByTransfer(tokenId *big.Int, to common.Address) {
-
-// 	fmt.Println("UpdateNekoSpiritByTransfer: ", tokenId, to)
-
-// 	info, err := invoke.ReadNekoSpiritInfo(tokenId, false)
-// 	fmt.Println("ReadNekoSpiritInfo : ", tokenId, info)
-// 	if err != nil {
-// 		fmt.Println("ReadNekoSpiritInfo error: ", err)
-// 		return
-// 	}
-
-// 	origin, err := database.GetNekoSpiritInfoByTokenId(tokenId.Uint64())
-// 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-// 		// new record
-
-// 		uid := database.GetAddressDetailByAddress(to.Hex()).Uid
-// 		// if err != nil {
-// 		// 	fmt.Println("GetUidByAddress error: ", err)
-// 		// 	return
-// 		// }
-
-// 		origin := database.ServerNekoSpiritInfo{
-// 			TokenId:      tokenId.Uint64(),
-// 			Rarity:       info.Rarity,
-// 			Element:      info.Element,
-// 			Name:         info.Name,
-// 			SPI:          decimal.NewFromUint64(info.SPI.Uint64()).Div(decimal.NewFromUint64(100)),
-// 			ATK:          decimal.NewFromUint64(info.ATK.Uint64()).Div(decimal.NewFromUint64(100)),
-// 			DEF:          decimal.NewFromUint64(info.DEF.Uint64()).Div(decimal.NewFromUint64(100)),
-// 			SPD:          decimal.NewFromUint64(info.SPD.Uint64()).Div(decimal.NewFromUint64(100)),
-// 			Fade:         decimal.NewFromUint64(info.Fade.Uint64()).Div(decimal.NewFromUint64(100)),
-// 			Level:        info.Level.Uint64(),
-// 			StakeFromUid: uid,
-// 			StakeTime:    time.Now(),
-// 		}
-
-// 		_ = database.CreateNekoSpiritInfo(&origin)
-
-// 		// starter pack
-// 		if origin.Fade.Equal(decimal.New(125, 0)) {
-// 			fmt.Println("This spirit is a starter pack")
-// 			return
-// 		}
-
-// 		// reward to inviter
-// 		detail := database.GetAddressDetailByAddress(to.Hex())
-// 		var second = database.ServerInvitationRewardRecord{
-// 			Uid:     detail.SecondInviter,
-// 			FromUid: detail.Uid,
-// 			Amount:  decimal.NewFromInt(2500),
-// 		}
-// 		var third = database.ServerInvitationRewardRecord{
-// 			Uid:     detail.ThirdInviter,
-// 			FromUid: detail.Uid,
-// 			Amount:  decimal.NewFromInt(1250),
-// 		}
-// 		database.CreateInvitationRewardRecords([]database.ServerInvitationRewardRecord{second, third})
-// 		if detail.SecondInviter != 0 {
-// 			database.AddInvitationRewardStatic(detail.SecondInviter, decimal.NewFromInt(2500))
-// 		}
-// 		if detail.ThirdInviter != 0 {
-// 			database.AddInvitationRewardStatic(detail.ThirdInviter, decimal.NewFromInt(1250))
-// 		}
-// 		// unlock reward of invitation
-// 		database.UnlockInvitationRewardStatic(detail.Uid, decimal.NewFromInt(2500))
-// 		// burn 25% of mint cost
-// 		// by contract
-
-// 	} else if err == nil {
-// 		// update
-
-// 		var toUpdate = database.ServerNekoSpiritInfo{
-// 			Model:   database.Model{ID: origin.Model.ID},
-// 			TokenId: origin.TokenId,
-// 		}
-
-// 		// only transfer change
-// 		toUpdate.Fade.Equal(decimal.NewFromUint64(info.Fade.Uint64()).Div(decimal.NewFromUint64(100)))
-// 		// if to == chain.OwnerAddress {
-// 		// 	toUpdate.IsStaked = true
-// 		// 	toUpdate.StakeTime = time.Now()
-// 		// } else {
-// 		// 	toUpdate.IsStaked = false
-// 		// }
-
-// 		if err := database.UpdateNekoSpiritInfo(&toUpdate); err != nil {
-// 			fmt.Println("UpdateNekoSpiritInfo error: ", err)
-// 			return
-// 		}
-// 	}
-
-// }
-
-// func UpdateNekoSpiritByUpgrade(tokenId *big.Int) {
-
-// 	fmt.Println("UpdateNekoSpiritFromChain: ", tokenId)
-
-// 	info, err := invoke.ReadNekoSpiritInfo(tokenId, false)
-// 	fmt.Println("ReadNekoSpiritInfo : ", tokenId, info)
-// 	if err != nil {
-// 		fmt.Println("ReadNekoSpiritInfo error: ", err)
-// 		return
-// 	}
-
-// 	owner, err := invoke.ReadOwnerOfNekoSpirit(tokenId)
-// 	fmt.Println("ReadOwnerOfNekoSpirit : ", tokenId, owner)
-// 	if err != nil {
-// 		fmt.Println("ReadOwnerOfNekoSpirit error: ", err)
-// 		return
-// 	}
-
-// 	origin, err := database.GetNekoSpiritInfoByTokenId(tokenId.Uint64())
-// 	if err != nil {
-// 		fmt.Println("GetNekoSpiritInfoByTokenId error: ", err)
-// 	}
-
-// 	// update
-// 	var toUpdate = database.ServerNekoSpiritInfo{
-// 		Model: database.Model{ID: origin.Model.ID},
-// 	}
-
-// 	// only upgrade level
-// 	toUpdate.TokenId = tokenId.Uint64()
-// 	toUpdate.SPI = decimal.NewFromUint64(info.SPI.Uint64()).Div(decimal.NewFromUint64(100))
-// 	toUpdate.ATK = decimal.NewFromUint64(info.ATK.Uint64()).Div(decimal.NewFromUint64(100))
-// 	toUpdate.DEF = decimal.NewFromUint64(info.DEF.Uint64()).Div(decimal.NewFromUint64(100))
-// 	toUpdate.SPD = decimal.NewFromUint64(info.SPD.Uint64()).Div(decimal.NewFromUint64(100))
-// 	toUpdate.Level = info.Level.Uint64()
-
-// 	_ = database.UpdateNekoSpiritInfo(&toUpdate)
-
-// }
-
-// func UpdateAscendFromChain(sender common.Address, level *big.Int) {
-func UpdateAscendFromChain(sender string, level uint64) {
-
-	fmt.Println("UpdateAscendFromChain: ", sender, level)
-
-	//等级 Prism消耗	Neko消耗	全局Mana加成
-	//9	746	13299996	51%
-	//8	429	3043477	43%
-	//7	247	696448	35%
-	//6	142	159370	28%
-	//5	82	36469	20%
-	//4	47	8345	15%
-	//3	27	1910	10%
-	//2	16	437	5%
-	//1	9	100	2%
-
-	targetLevel := level
-	boost := decimal.New(0, 0)
-	switch targetLevel {
-	case 1:
-		boost = decimal.New(2, -2)
-	case 2:
-		boost = decimal.New(5, -2)
-	case 3:
-		boost = decimal.New(10, -2)
-	case 4:
-		boost = decimal.New(15, -2)
-	case 5:
-		boost = decimal.New(20, -2)
-	case 6:
-		boost = decimal.New(28, -2)
-	case 7:
-		boost = decimal.New(35, -2)
-	case 8:
-		boost = decimal.New(43, -2)
-	case 9:
-		boost = decimal.New(51, -2)
-	}
-
-	detail := database.GetAddressDetailByAddress(sender)
-
-	_ = database.UpdateBuffRecord(&database.ServerBuffRecord{
-		Model: database.Model{ID: detail.Buff.ID},
-		Uid:   detail.Uid,
-		Level: targetLevel,
-		Boost: boost,
-	})
 
 }
 
@@ -339,14 +123,8 @@ func SummonBox(address string, count uint64) (hash string, code model.ResponseCo
 		return "", model.ServerInternalError, err.Error()
 	}
 
-	// half of mint cost
-	database.AddRewardsPool(decimal.New(int64(count*12500), 0))
-
 	// record
 	database.AddTreasureRevenue(address, count, hash)
-
-	// record invitation reward
-	database.UnlockInvitationRewardStatic(database.GetAddressDetailByAddress(address).Uid, count)
 
 	return hash, model.Success, "Summon success"
 

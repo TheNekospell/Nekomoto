@@ -8,9 +8,9 @@ import (
 func AcceptInvitation(req model.AddressAndCodeAndSignature) (code model.ResponseCode, message string) {
 
 	detail := database.GetAddressDetailByAddress(req.Address)
-	if detail.InviteCode == req.Code {
-		return model.Success, "Can't invite yourself"
-	}
+	// if detail.InviteCode == req.Code {
+	// 	return model.Success, "Can't invite yourself"
+	// }
 
 	var record database.ServerInvitationRecord
 	if database.DB.Where("uid = ?", detail.Uid).Find(&record); record.ID != 0 {

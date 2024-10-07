@@ -51,19 +51,9 @@ func initTables() {
 		&ServerAddress{},
 		&ServerClaimRecord{},
 		&ServerNekoSpiritInfo{},
-		// &ServerBuffRecord{},
 		&ServerClaimNekoSpiritRecord{},
-		// &ServerInvitationRecord{},
-		// &ServerInvitationRewardRecord{},
-		// &ServerInvitationRewardStatic{},
-		// &ServerChestConfig{},
-		// &ServerChest{},
-		// &ServerChestEmpowerRecord{},
 		&ServerStarterPack{},
 		&ServerRewardPool{},
-		// &ServerWhiteListOfBountyWave{},
-		// &ServerBountyWaveConfig{},
-		// &ServerTemporalShardRecord{},
 		&ServerStarterChestConfig{},
 		&ServerMintRecord{},
 		&ServerBurnStatic{},
@@ -75,10 +65,7 @@ func initTables() {
 		&EventNekoCoinTransfer{},
 		&EventPrismTransfer{},
 		&EventNekoSpiritTransfer{},
-		// &EventTemporalShardTransfer{},
 		&EventNekoSpiritUpgrade{},
-		// &EventTimeFreeze{},
-		// &EventAscendUpgrade{},
 	}
 	err := DB.AutoMigrate(list...)
 	if err != nil {
@@ -91,7 +78,6 @@ func initTables() {
 	}
 
 	// indexer block height
-	// DB.FirstOrCreate(&IndexerRecord{}, IndexerRecord{BlockHeight: 0})
 	if err := DB.First(&IndexerRecord{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		blockHeight, err := strconv.ParseUint(env.GetEnvValue("BLOCK_HEIGHT"), 10, 64)
 		if err != nil {
@@ -102,9 +88,11 @@ func initTables() {
 	}
 
 	// game reward pool
-	// DB.FirstOrCreate(&ServerRewardPool{}, ServerRewardPool{TotalAmount: decimal.New(20, 8).Mul(decimal.New(6667, -4)).Sub(decimal.New(1, 8))})
+	// 2000000000 nekocoin limit
+	// 60% of nekocoin into two pools in 90 days (180 epochs)
 	if err := DB.First(&ServerRewardPool{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-		DB.Create(&ServerRewardPool{TotalAmount: decimal.New(20, 8).Mul(decimal.New(6667, -4)).Sub(decimal.New(1, 8))})
+		amountOfFirstEpoch := decimal.New(2000000000, 18).Div(decimal.New(180, 0))
+		DB.Create(&ServerRewardPool{MintPool: amountOfFirstEpoch.Mul(decimal.New(30, -2)), StakePool: amountOfFirstEpoch.Mul(decimal.New(70, -2))})
 	}
 
 	// starter chest
@@ -154,16 +142,11 @@ type ServerClaimRecord struct {
 
 type ServerNekoSpiritInfo struct {
 	Model
-	TokenId uint64 `gorm:"uniqueIndex"`
-	Rarity  string `gorm:"not null"`
-	Element string `gorm:"not null"`
-	// Name           string          `gorm:"not null"`
-	// SPI            decimal.Decimal `gorm:"not null type:decimal(36,18)"`
-	ATK decimal.Decimal `gorm:"not null type:decimal(36,18)"`
-	// DEF            decimal.Decimal `gorm:"not null type:decimal(36,18)"`
-	// SPD            decimal.Decimal `gorm:"not null type:decimal(36,18)"`
-	// Fade           decimal.Decimal `gorm:"not null type:decimal(36,18)"`
-	// Mana           decimal.Decimal `gorm:"not null type:decimal(36,18)"`
+	Epoch          uint64          `gorm:"not null index"`
+	TokenId        uint64          `gorm:"uniqueIndex"`
+	Rarity         string          `gorm:"not null"`
+	Element        string          `gorm:"not null"`
+	ATK            decimal.Decimal `gorm:"not null type:decimal(36,18)"`
 	Level          uint64          `gorm:"not null default:1 index"`
 	StakeFromUid   uint64          `gorm:"index"`
 	IsStaked       bool            `gorm:"not null default:false"`
@@ -247,7 +230,8 @@ type ServerStarterPack struct {
 
 type ServerRewardPool struct {
 	Model
-	TotalAmount decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
+	MintPool  decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
+	StakePool decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
 }
 
 type ServerWhiteListOfBountyWave struct {

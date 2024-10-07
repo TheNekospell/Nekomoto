@@ -28,20 +28,20 @@ func StartTicker() {
 
 		case <-allocateTimer.C:
 
+			nextEpoch = nextEpoch.Add(time.Hour * 12)
+			waitTime = time.Until(nextEpoch)
+
+			allocateTimer.Reset(waitTime)
+
 			isFirst := service.AddEpoch()
 			if isFirst {
 				return
 			}
 			service.AllocateProfit()
 
-			nextEpoch = nextEpoch.Add(time.Hour * 12)
-			waitTime = time.Until(nextEpoch)
-
-			allocateTimer.Reset(waitTime)
-
 		case <-burnTimer.C:
 
-			service.BurnCoin()
+			// service.BurnCoin()
 
 		}
 	}

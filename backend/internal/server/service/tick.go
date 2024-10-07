@@ -13,6 +13,7 @@ func AllocateProfit() {
 
 	// 1. Linear regression of last epoch
 	// 2. Allocate profit of last epoch
+	// 3. Two pools
 
 	// database.Cache.Set(database.CacheAllocate, true, -1)
 
@@ -69,7 +70,7 @@ func AllocateProfit() {
 	}
 
 	// Reward calculation
-	toAllocate := rewardPool.Mul(calTheRewardCoefficient(totalMana))
+	toAllocate := rewardPool.StakePool.Mul(calTheRewardCoefficient(totalMana))
 	fmt.Println("rewardPool: ", rewardPool, "toAllocate: ", toAllocate)
 	// for i := range toUpdate {
 	// coefficient := manaMap[toUpdate[i].ID].Div(totalMana)
@@ -79,7 +80,7 @@ func AllocateProfit() {
 	database.UpdateNekoSpiritList(toUpdate)
 
 	// sub the reward pool
-	database.SubRewardPool(toAllocate)
+	database.SubRewardPool(decimal.Zero, toAllocate)
 }
 
 func calTheRewardCoefficient(mana decimal.Decimal) decimal.Decimal {
@@ -99,39 +100,7 @@ func calTheRewardCoefficient(mana decimal.Decimal) decimal.Decimal {
 	return decimal.New(620000, -9)
 }
 
-// func inList(uid uint64, list []database.ServerWhiteListOfBountyWave) bool {
-// 	for _, v := range list {
-// 		if database.GetAddressDetailByAddress(v.Address).Uid == uid {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
 
-// func getBoostOfAscend(level uint64) decimal.Decimal {
-// 	switch level {
-// 	case 1:
-// 		return decimal.New(102, -2)
-// 	case 2:
-// 		return decimal.New(105, -2)
-// 	case 3:
-// 		return decimal.New(110, -2)
-// 	case 4:
-// 		return decimal.New(115, -2)
-// 	case 5:
-// 		return decimal.New(120, -2)
-// 	case 6:
-// 		return decimal.New(128, -2)
-// 	case 7:
-// 		return decimal.New(135, -2)
-// 	case 8:
-// 		return decimal.New(143, -2)
-// 	case 9:
-// 		return decimal.New(151, -2)
-// 	default:
-// 		return decimal.New(0, 0)
-// 	}
-// }
 
 func GiveChest() {
 
