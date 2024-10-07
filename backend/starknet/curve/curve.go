@@ -683,7 +683,6 @@ func (sc StarkCurve) GenerateSecret(msgHash, privKey, seed *big.Int) (secret *bi
 		}
 
 		secret = bits2int(new(big.Int).SetBytes(t), sc.BitSize)
-		// TODO: implement seed here, final gating function
 		if secret.Cmp(big.NewInt(0)) == 1 && secret.Cmp(sc.N) == -1 {
 			return secret
 		}

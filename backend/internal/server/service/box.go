@@ -39,11 +39,12 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 		detail := database.GetAddressDetailByAddress(to)
 
 		// starter pack
-		if toSave.Fade.Equal(decimal.New(125, 0)) {
-			fmt.Println("This spirit is a starter pack")
-			database.UpdateAddressStarter(detail.Uid)
-			return
-		}
+		// TODO process starter pack
+		// if toSave.Fade.Equal(decimal.New(125, 0)) {
+		// 	fmt.Println("This spirit is a starter pack")
+		// 	database.UpdateAddressStarter(detail.Uid)
+		// 	return
+		// }
 
 		// reward to inviter
 		var second = database.ServerInvitationRewardRecord{
@@ -82,12 +83,12 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 
 	} else {
 
-		info, err := invoker_sn.ReadNekoSpiritInfo(tokenId, false)
+		// info, err := invoker_sn.ReadNekoSpiritInfo(tokenId, false)
 		// fmt.Println("ReadNekoSpiritInfo : ", tokenId, info)
-		if err != nil {
-			fmt.Println("ReadNekoSpiritInfo error: ", err)
-			return
-		}
+		// if err != nil {
+		// 	fmt.Println("ReadNekoSpiritInfo error: ", err)
+		// 	return
+		// }
 
 		toUpdate, err := database.GetNekoSpiritInfoByTokenId(tokenId)
 		// fmt.Println("GetNekoSpiritInfoByTokenId : ", tokenId, toUpdate)
@@ -108,8 +109,6 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 			attr["is_staked"] = false
 		}
 
-		attr["fade"] = info.Fade
-
 		_ = database.UpdateNekoSpiritInfoWithStakeStatus(toUpdate, attr)
 
 	}
@@ -117,6 +116,8 @@ func UpdateNekoSpiritByTransfer(from string, to string, tokenId uint64) {
 }
 
 func UpdateNekoSpiritByUpgrade(tokenId uint64) {
+
+	// TODO game reward pool update
 
 	fmt.Println("UpdateNekoSpiritFromChain: ", tokenId)
 
@@ -136,13 +137,8 @@ func UpdateNekoSpiritByUpgrade(tokenId uint64) {
 	if err := database.UpdateNekoSpiritInfo(&database.ServerNekoSpiritInfo{
 		Model:   database.Model{ID: origin.ID},
 		TokenId: info.TokenId,
-		Name:    info.Name,
-		SPI:     info.SPI,
-		ATK:     info.ATK,
-		DEF:     info.DEF,
-		SPD:     info.SPD,
-		Mana:    info.Mana,
-		Level:   info.Level,
+		ATK: info.ATK,
+		Level: info.Level,
 	}); err != nil {
 		fmt.Println("UpdateNekoSpiritInfo error: ", err)
 		return

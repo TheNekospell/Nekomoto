@@ -48,19 +48,19 @@ type AddressInfo struct {
 	IsInBountyWave      bool
 }
 
-func calUnlockedAmount(count uint64) decimal.Decimal {
-	var result float64
-	if count <= 10 {
-		result = float64(count) * 3
-	} else if count <= 50 {
-		result = float64(count-10)*5.5 + 30
-	} else if count <= 100 {
-		result = float64(count-50)*7 + 250
-	} else {
-		result = float64(count-100)*8.5 + 600
-	}
-	return decimal.NewFromFloat(result).Mul(decimal.NewFromInt(2500))
-}
+// func calUnlockedAmount(count uint64) decimal.Decimal {
+// 	var result float64
+// 	if count <= 10 {
+// 		result = float64(count) * 3
+// 	} else if count <= 50 {
+// 		result = float64(count-10)*5.5 + 30
+// 	} else if count <= 100 {
+// 		result = float64(count-50)*7 + 250
+// 	} else {
+// 		result = float64(count-100)*8.5 + 600
+// 	}
+// 	return decimal.NewFromFloat(result).Mul(decimal.NewFromInt(2500))
+// }
 
 func GetAddressDetailByUid(uid uint64) AddressInfo {
 	if detail, found := Cache.Get(CacheTagUid + strconv.FormatUint(uid, 10)); found {
@@ -74,15 +74,15 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 
 	//fmt.Println("[Server] Rebuild cache for uid:", uid, " address:", serverAddress.Address)
 
-	var invitation ServerInvitationRecord
-	DB.Where("uid = ?", uid).Find(&invitation)
+	// var invitation ServerInvitationRecord
+	// DB.Where("uid = ?", uid).Find(&invitation)
 
-	var InviteCount int64
-	DB.Model(&ServerInvitationRecord{}).Where("second_uid = ?", uid).Count(&InviteCount)
+	// var InviteCount int64
+	// DB.Model(&ServerInvitationRecord{}).Where("second_uid = ?", uid).Count(&InviteCount)
 
-	var invitationReward ServerInvitationRewardStatic
-	DB.Where("uid = ?", uid).Find(&invitationReward)
-	invitationReward.UnlockedAmount = calUnlockedAmount(invitationReward.UnlockedCount)
+	// var invitationReward ServerInvitationRewardStatic
+	// DB.Where("uid = ?", uid).Find(&invitationReward)
+	// invitationReward.UnlockedAmount = calUnlockedAmount(invitationReward.UnlockedCount)
 
 	var lastClaim time.Time
 	if err := DB.Model(&ServerClaimNekoSpiritRecord{}).Where("uid = ?", uid).Order("created_at desc").Limit(1).Select("created_at").Find(&lastClaim).Error; err != nil {
@@ -102,22 +102,22 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		ToClaim = decimal.NewFromInt(0)
 	}
 
-	chest := QueryChest(uid)
-	openable := false
-	var empower []string
-	if chest.ID != 0 {
-		openable = chest.IsOpen == 0
-		records := QueryEmpowerRecord(chest.ID)
-		for _, record := range records {
-			add, _ := GetAddressByUid(record.Uid)
-			empower = append(empower, add.Address)
-		}
-	}
+	// chest := QueryChest(uid)
+	// openable := false
+	// var empower []string
+	// if chest.ID != 0 {
+	// 	openable = chest.IsOpen == 0
+	// 	records := QueryEmpowerRecord(chest.ID)
+	// 	for _, record := range records {
+	// 		add, _ := GetAddressByUid(record.Uid)
+	// 		empower = append(empower, add.Address)
+	// 	}
+	// }
 
-	var buff ServerBuffRecord
-	DB.Where("uid = ?", uid).Find(&buff)
+	// var buff ServerBuffRecord
+	// DB.Where("uid = ?", uid).Find(&buff)
 
-	isInBountyWave := IsInBountyWave(uid)
+	// isInBountyWave := IsInBountyWave(uid)
 
 	var NekoSpiritList []ServerNekoSpiritInfo
 	var idList []uint64
@@ -125,13 +125,13 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 	for index := range NekoSpiritList {
 		idList = append(idList, NekoSpiritList[index].TokenId)
 		//Cache.Set(CacheTagNekoSpirit+strconv.FormatUint(NekoSpirit.TokenId, 10), NekoSpirit, -1)
-		if NekoSpiritList[index].Fade.LessThanOrEqual(decimal.NewFromInt(0)) {
-			NekoSpiritList[index].Mana = decimal.NewFromInt(0)
-		}
+		// if NekoSpiritList[index].Fade.LessThanOrEqual(decimal.NewFromInt(0)) {
+		// 	NekoSpiritList[index].Mana = decimal.NewFromInt(0)
+		// }
 	}
 
-	var shardIdList []uint64
-	DB.Model(&ServerTemporalShardRecord{}).Where("uid = ?", uid).Select("token_id").Find(&shardIdList)
+	// var shardIdList []uint64
+	// DB.Model(&ServerTemporalShardRecord{}).Where("uid = ?", uid).Select("token_id").Find(&shardIdList)
 
 	result := AddressInfo{
 		Uid:                 uid,
@@ -139,22 +139,12 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		IsStarter:           serverAddress.IsStarter,
 		InviteCode:          serverAddress.InviteCode,
 		Active:              serverAddress.Active,
-		SecondInviter:       invitation.SecondUid,
-		ThirdInviter:        invitation.ThirdUid,
-		InvitationReward:    invitationReward,
-		Buff:                buff,
 		NekoSpiritIdList:    idList,
 		NekoSpiritList:      NekoSpiritList,
-		TemporalShardIdList: shardIdList,
 		LastClaim:           lastClaim,
-		TotalClaimed:        TotalClaimed.Add(invitationReward.ClaimedAmount),
+		TotalClaimed:        TotalClaimed,
 		TotalMana:           Mana,
 		ToClaim:             ToClaim,
-		ChestOpenable:       openable,
-		ChestEmpower:        empower,
-		RequestToEmpower:    chest.ID > 0 && chest.ChestType == 0 && CanEmpowerChest(uid),
-		InviteCount:         InviteCount,
-		IsInBountyWave:      isInBountyWave,
 	}
 
 	//Cache.Set(CacheTagUid+strconv.FormatUint(uid, 10), result, -1)

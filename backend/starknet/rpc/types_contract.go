@@ -202,7 +202,6 @@ type StructABIEntry struct {
 	// The event name
 	Name string `json:"name"`
 
-	// todo(minumum size should be 1)
 	Size uint64 `json:"size"`
 
 	Members []Member `json:"members"`

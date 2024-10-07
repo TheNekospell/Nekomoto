@@ -84,7 +84,6 @@ func adaptTransaction(t TXN) (Transaction, error) {
 // - Transaction: The retrieved Transaction
 // - error: An error if any
 func (provider *Provider) TransactionByHash(ctx context.Context, hash *felt.Felt) (Transaction, error) {
-	// todo: update to return a custom Transaction type, then use adapt function
 	var tx TXN
 	if err := do(ctx, provider.c, "starknet_getTransactionByHash", &tx, hash); err != nil {
 		return nil, tryUnwrapToRPCErr(err, ErrHashNotFound)

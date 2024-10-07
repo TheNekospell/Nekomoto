@@ -44,8 +44,8 @@ func StartServer() {
 	boxGroup := apiGroup.Group("/box")
 	boxGroup.POST("/summon", SummonBox)
 
-	chestGroup := apiGroup.Group("/chest")
-	chestGroup.POST("/open", OpenChest)
+	// chestGroup := apiGroup.Group("/chest")
+	// chestGroup.POST("/open", OpenChest)
 	// chestGroup.POST("/empower", EmpowerChest)
 
 	addressGroup := apiGroup.Group("/address")

@@ -173,7 +173,6 @@ func (e *EventHandlerNekoSpirit) Handle(eventLog types.Log) {
 	// 	}
 	// 	service.UpdateAscendFromChain(event.Sender, event.NewLevel)
 
-	// 	// todo case
 
 	// }
 }

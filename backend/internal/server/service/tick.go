@@ -11,6 +11,9 @@ import (
 
 func AllocateProfit() {
 
+	// 1. Linear regression of last epoch
+	// 2. Allocate profit of last epoch
+
 	// database.Cache.Set(database.CacheAllocate, true, -1)
 
 	now := time.Now()
@@ -27,55 +30,51 @@ func AllocateProfit() {
 	var toUpdate []database.ServerNekoSpiritInfo
 
 	// white list bounty wave
-	whiteList, boost, open := database.GetBountyWaveList()
+	// whiteList, boost, open := database.GetBountyWaveList()
 
 	// basic calculation
-	manaMap := make(map[uint64]decimal.Decimal)
+	// manaMap := make(map[uint64]decimal.Decimal)
 	for _, process := range processList {
 
 		temp := database.ServerNekoSpiritInfo{
 			Model:          database.Model{ID: process.ID},
 			TokenId:        process.TokenId,
-			Fade:           process.Fade,
 			Rewards:        process.Rewards,
 			ClaimedRewards: process.ClaimedRewards,
 		}
 
 		// calculate the fade, and add mana into the map
-		fmt.Println("process spirit ID: ", process.ID)
+		fmt.Println("process spirit ID: ", process.ID, temp)
 
-		detail := database.GetAddressDetailByUid(process.StakeFromUid)
-		// time freeze
-		if now.Sub(detail.Buff.StartTime.Add(time.Hour*72)) > 0 {
-			temp.Fade = decimal.Max(temp.Fade.Sub(decimal.New(1, 0)), decimal.New(0, 0))
-		}
+		// TODO epoch profit
+		// detail := database.GetAddressDetailByUid(process.StakeFromUid)
 
-		if process.Fade.GreaterThan(decimal.New(0, 0)) {
-			// Mana=0.065*（0.4*SPI+0.3*ATK+0.2*DEF+0.1*SPD
-			manaOfSpirit := process.Mana
-			if detail.Buff.Level > 0 {
-				manaOfSpirit = manaOfSpirit.Mul(getBoostOfAscend(detail.Buff.Level))
-			}
-			// Bounty wave
-			if open && inList(process.StakeFromUid, whiteList) {
-				manaOfSpirit = manaOfSpirit.Mul(boost.Add(decimal.New(1, 0)))
-			}
-			// update mana
-			totalMana = totalMana.Add(manaOfSpirit)
-			// record them
+		// if process.Fade.GreaterThan(decimal.New(0, 0)) {
+		// 	// Mana=0.065*（0.4*SPI+0.3*ATK+0.2*DEF+0.1*SPD
+		// manaOfSpirit := process.Mana
+		// 	if detail.Buff.Level > 0 {
+		// 		manaOfSpirit = manaOfSpirit.Mul(getBoostOfAscend(detail.Buff.Level))
+		// 	}
+		// 	// Bounty wave
+		// 	if open && inList(process.StakeFromUid, whiteList) {
+		// 		manaOfSpirit = manaOfSpirit.Mul(boost.Add(decimal.New(1, 0)))
+		// 	}
+		// 	// update mana
+		// 	totalMana = totalMana.Add(manaOfSpirit)
+		// 	// record them
 
-			toUpdate = append(toUpdate, temp)
-			manaMap[process.ID] = manaOfSpirit
-		}
+		// toUpdate = append(toUpdate, temp)
+		// manaMap[process.ID] = manaOfSpirit
+		// }
 	}
 
 	// Reward calculation
 	toAllocate := rewardPool.Mul(calTheRewardCoefficient(totalMana))
 	fmt.Println("rewardPool: ", rewardPool, "toAllocate: ", toAllocate)
-	for i := range toUpdate {
-		coefficient := manaMap[toUpdate[i].ID].Div(totalMana)
-		toUpdate[i].Rewards = toUpdate[i].Rewards.Add(toAllocate.Mul(coefficient))
-	}
+	// for i := range toUpdate {
+	// coefficient := manaMap[toUpdate[i].ID].Div(totalMana)
+	// toUpdate[i].Rewards = toUpdate[i].Rewards.Add(toAllocate.Mul(coefficient))
+	// }
 	// fmt.Println("toUpdate: ", toUpdate)
 	database.UpdateNekoSpiritList(toUpdate)
 
@@ -100,39 +99,39 @@ func calTheRewardCoefficient(mana decimal.Decimal) decimal.Decimal {
 	return decimal.New(620000, -9)
 }
 
-func inList(uid uint64, list []database.ServerWhiteListOfBountyWave) bool {
-	for _, v := range list {
-		if database.GetAddressDetailByAddress(v.Address).Uid == uid {
-			return true
-		}
-	}
-	return false
-}
+// func inList(uid uint64, list []database.ServerWhiteListOfBountyWave) bool {
+// 	for _, v := range list {
+// 		if database.GetAddressDetailByAddress(v.Address).Uid == uid {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }
 
-func getBoostOfAscend(level uint64) decimal.Decimal {
-	switch level {
-	case 1:
-		return decimal.New(102, -2)
-	case 2:
-		return decimal.New(105, -2)
-	case 3:
-		return decimal.New(110, -2)
-	case 4:
-		return decimal.New(115, -2)
-	case 5:
-		return decimal.New(120, -2)
-	case 6:
-		return decimal.New(128, -2)
-	case 7:
-		return decimal.New(135, -2)
-	case 8:
-		return decimal.New(143, -2)
-	case 9:
-		return decimal.New(151, -2)
-	default:
-		return decimal.New(0, 0)
-	}
-}
+// func getBoostOfAscend(level uint64) decimal.Decimal {
+// 	switch level {
+// 	case 1:
+// 		return decimal.New(102, -2)
+// 	case 2:
+// 		return decimal.New(105, -2)
+// 	case 3:
+// 		return decimal.New(110, -2)
+// 	case 4:
+// 		return decimal.New(115, -2)
+// 	case 5:
+// 		return decimal.New(120, -2)
+// 	case 6:
+// 		return decimal.New(128, -2)
+// 	case 7:
+// 		return decimal.New(135, -2)
+// 	case 8:
+// 		return decimal.New(143, -2)
+// 	case 9:
+// 		return decimal.New(151, -2)
+// 	default:
+// 		return decimal.New(0, 0)
+// 	}
+// }
 
 func GiveChest() {
 
@@ -170,4 +169,14 @@ func BurnCoin() {
 			database.UpdateTempBurn(id)
 		}
 	}
+}
+
+func AddEpoch() bool {
+	epochNow := database.GetEpoch()
+	if epochNow == 1 {
+		return true
+	}
+	database.AddEpoch()
+	return false
+
 }

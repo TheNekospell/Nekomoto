@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"math/big"
 	"os"
 	"strconv"
 	"time"
@@ -52,33 +51,34 @@ func initTables() {
 		&ServerAddress{},
 		&ServerClaimRecord{},
 		&ServerNekoSpiritInfo{},
-		&ServerBuffRecord{},
+		// &ServerBuffRecord{},
 		&ServerClaimNekoSpiritRecord{},
-		&ServerInvitationRecord{},
-		&ServerInvitationRewardRecord{},
-		&ServerInvitationRewardStatic{},
-		&ServerChestConfig{},
-		&ServerChest{},
-		&ServerChestEmpowerRecord{},
+		// &ServerInvitationRecord{},
+		// &ServerInvitationRewardRecord{},
+		// &ServerInvitationRewardStatic{},
+		// &ServerChestConfig{},
+		// &ServerChest{},
+		// &ServerChestEmpowerRecord{},
 		&ServerStarterPack{},
 		&ServerRewardPool{},
-		&ServerWhiteListOfBountyWave{},
-		&ServerBountyWaveConfig{},
-		&ServerTemporalShardRecord{},
+		// &ServerWhiteListOfBountyWave{},
+		// &ServerBountyWaveConfig{},
+		// &ServerTemporalShardRecord{},
 		&ServerStarterChestConfig{},
 		&ServerMintRecord{},
 		&ServerBurnStatic{},
 		&ServerBurnTemp{},
 		&ServerTestCode{},
+		&ServerEpoch{},
 		&IndexerRecord{},
 		&IndexerTransactionRecord{},
 		&EventNekoCoinTransfer{},
 		&EventPrismTransfer{},
 		&EventNekoSpiritTransfer{},
-		&EventTemporalShardTransfer{},
+		// &EventTemporalShardTransfer{},
 		&EventNekoSpiritUpgrade{},
-		&EventTimeFreeze{},
-		&EventAscendUpgrade{},
+		// &EventTimeFreeze{},
+		// &EventAscendUpgrade{},
 	}
 	err := DB.AutoMigrate(list...)
 	if err != nil {
@@ -86,127 +86,8 @@ func initTables() {
 	}
 	fmt.Println("AutoMigrated database:", len(list), "tables")
 
-	// chest config
-	if (errors.Is(DB.First(&ServerChestConfig{}).Error, gorm.ErrRecordNotFound)) {
-		DB.Create([]*ServerChestConfig{
-			{
-				Version:      0,
-				ChestType:    AdeptChest,
-				TotalLimit:   10000,
-				Chance:       decimal.NewFromBigRat(big.NewRat(5800, 10000), 4),
-				Token1Amount: decimal.NewFromUint64(15),
-				Token2Amount: decimal.NewFromUint64(0),
-				NFTAmount:    0,
-			},
-			{
-				Version:      0,
-				ChestType:    AdeptChest,
-				TotalLimit:   10000,
-				Chance:       decimal.NewFromBigRat(big.NewRat(1750, 10000), 4),
-				Token1Amount: decimal.NewFromUint64(30),
-				Token2Amount: decimal.NewFromUint64(0),
-				NFTAmount:    0,
-			},
-			{
-				Version:      0,
-				ChestType:    AdeptChest,
-				TotalLimit:   10000,
-				Chance:       decimal.NewFromBigRat(big.NewRat(1100, 10000), 4),
-				Token1Amount: decimal.NewFromUint64(40),
-				Token2Amount: decimal.NewFromUint64(0),
-				NFTAmount:    0,
-			},
-			{
-				Version:      0,
-				ChestType:    AdeptChest,
-				TotalLimit:   10000,
-				Chance:       decimal.NewFromBigRat(big.NewRat(750, 10000), 4),
-				Token1Amount: decimal.NewFromUint64(0),
-				Token2Amount: decimal.NewFromUint64(1),
-				NFTAmount:    0,
-			},
-			{
-				Version:      0,
-				ChestType:    AdeptChest,
-				TotalLimit:   10000,
-				Chance:       decimal.NewFromBigRat(big.NewRat(450, 10000), 4),
-				Token1Amount: decimal.NewFromUint64(0),
-				Token2Amount: decimal.NewFromUint64(2),
-				NFTAmount:    0,
-			},
-			{
-				Version:      0,
-				ChestType:    AdeptChest,
-				TotalLimit:   10000,
-				Chance:       decimal.NewFromBigRat(big.NewRat(150, 10000), 4),
-				Token1Amount: decimal.NewFromUint64(0),
-				Token2Amount: decimal.NewFromUint64(3),
-				NFTAmount:    0,
-			},
-			{
-				Version:      0,
-				ChestType:    MasterChest,
-				TotalLimit:   5000,
-				Chance:       decimal.NewFromBigRat(big.NewRat(5600, 10000), 4),
-				Token1Amount: decimal.NewFromUint64(40),
-				Token2Amount: decimal.NewFromUint64(0),
-				NFTAmount:    0,
-			},
-			{
-				Version:      0,
-				ChestType:    MasterChest,
-				TotalLimit:   5000,
-				Chance:       decimal.NewFromBigRat(big.NewRat(1500, 10000), 4),
-				Token1Amount: decimal.NewFromUint64(60),
-				Token2Amount: decimal.NewFromUint64(0),
-				NFTAmount:    0,
-			},
-			{
-				Version:      0,
-				ChestType:    MasterChest,
-				TotalLimit:   5000,
-				Chance:       decimal.NewFromBigRat(big.NewRat(1000, 10000), 4),
-				Token1Amount: decimal.NewFromUint64(100),
-				Token2Amount: decimal.NewFromUint64(0),
-				NFTAmount:    0,
-			},
-			{
-				Version:      0,
-				ChestType:    MasterChest,
-				TotalLimit:   5000,
-				Chance:       decimal.NewFromBigRat(big.NewRat(1100, 10000), 4),
-				Token1Amount: decimal.NewFromUint64(0),
-				Token2Amount: decimal.NewFromUint64(2),
-				NFTAmount:    0,
-			},
-			{
-				Version:      0,
-				ChestType:    MasterChest,
-				TotalLimit:   5000,
-				Chance:       decimal.NewFromBigRat(big.NewRat(500, 10000), 4),
-				Token1Amount: decimal.NewFromUint64(0),
-				Token2Amount: decimal.NewFromUint64(3),
-				NFTAmount:    0,
-			},
-			{
-				Version:      0,
-				ChestType:    MasterChest,
-				TotalLimit:   5000,
-				Chance:       decimal.NewFromBigRat(big.NewRat(200, 10000), 4),
-				Token1Amount: decimal.NewFromUint64(0),
-				Token2Amount: decimal.NewFromUint64(4),
-				NFTAmount:    0,
-			},
-			{
-				Version:      0,
-				ChestType:    MasterChest,
-				TotalLimit:   5000,
-				Chance:       decimal.NewFromBigRat(big.NewRat(100, 10000), 4),
-				Token1Amount: decimal.NewFromUint64(0),
-				Token2Amount: decimal.NewFromUint64(0),
-				NFTAmount:    1,
-			},
-		})
+	if err := DB.First(&ServerEpoch{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		DB.Create(&ServerEpoch{Epoch: 1})
 	}
 
 	// indexer block height
@@ -273,16 +154,16 @@ type ServerClaimRecord struct {
 
 type ServerNekoSpiritInfo struct {
 	Model
-	TokenId        uint64          `gorm:"uniqueIndex"`
-	Rarity         string          `gorm:"not null"`
-	Element        string          `gorm:"not null"`
-	Name           string          `gorm:"not null"`
-	SPI            decimal.Decimal `gorm:"not null type:decimal(36,18)"`
-	ATK            decimal.Decimal `gorm:"not null type:decimal(36,18)"`
-	DEF            decimal.Decimal `gorm:"not null type:decimal(36,18)"`
-	SPD            decimal.Decimal `gorm:"not null type:decimal(36,18)"`
-	Fade           decimal.Decimal `gorm:"not null type:decimal(36,18)"`
-	Mana           decimal.Decimal `gorm:"not null type:decimal(36,18)"`
+	TokenId uint64 `gorm:"uniqueIndex"`
+	Rarity  string `gorm:"not null"`
+	Element string `gorm:"not null"`
+	// Name           string          `gorm:"not null"`
+	// SPI            decimal.Decimal `gorm:"not null type:decimal(36,18)"`
+	ATK decimal.Decimal `gorm:"not null type:decimal(36,18)"`
+	// DEF            decimal.Decimal `gorm:"not null type:decimal(36,18)"`
+	// SPD            decimal.Decimal `gorm:"not null type:decimal(36,18)"`
+	// Fade           decimal.Decimal `gorm:"not null type:decimal(36,18)"`
+	// Mana           decimal.Decimal `gorm:"not null type:decimal(36,18)"`
 	Level          uint64          `gorm:"not null default:1 index"`
 	StakeFromUid   uint64          `gorm:"index"`
 	IsStaked       bool            `gorm:"not null default:false"`
@@ -417,6 +298,11 @@ type ServerTestCode struct {
 	Model
 	Code string `gorm:"not null"`
 	Uid  uint64 `gorm:"not null default:0"`
+}
+
+type ServerEpoch struct {
+	Model
+	Epoch uint64 `gorm:"not null"`
 }
 
 type IndexerRecord struct {

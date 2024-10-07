@@ -436,3 +436,13 @@ func ActiveAddress(uid uint64, id uint64) error {
 	}
 	return nil
 }
+
+func GetEpoch() uint64 {
+	var epoch ServerEpoch
+	DB.First(&epoch)
+	return epoch.Epoch
+}
+
+func AddEpoch() {
+	DB.Model(&ServerEpoch{}).Where("id = 1").Update("epoch", gorm.Expr("epoch + ?", 1))
+}

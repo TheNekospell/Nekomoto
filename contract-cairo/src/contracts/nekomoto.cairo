@@ -178,22 +178,22 @@ pub mod Nekomoto {
                         to_mint_prism = to_mint_prism + 5;
                         continue;
                     },
-                    1 => self.atk.write(token_id, generate_random(seed, 5_00, 15_00)),
+                    1 => self.atk.write(token_id, generate_random(seed, 5, 15) * 100),
                     2 => {
                         to_mint_prism = to_mint_prism + 1;
-                        self.atk.write(token_id, generate_random(seed, 11_00, 21_00));
+                        self.atk.write(token_id, generate_random(seed, 11, 21) * 100);
                     },
                     3 => {
                         to_mint_prism = to_mint_prism + 1;
-                        self.atk.write(token_id, generate_random(seed, 17_00, 27_00));
+                        self.atk.write(token_id, generate_random(seed, 17, 27) * 100);
                     },
                     4 => {
                         to_mint_prism = to_mint_prism + 2;
-                        self.atk.write(token_id, generate_random(seed, 26_00, 36_00));
+                        self.atk.write(token_id, generate_random(seed, 26, 36) * 100);
                     },
                     5 => {
                         to_mint_prism = to_mint_prism + 3;
-                        self.atk.write(token_id, generate_random(seed, 40_00, 50_00));
+                        self.atk.write(token_id, generate_random(seed, 40, 50) * 100);
                     },
                     _ => (),
                 }
@@ -273,6 +273,7 @@ pub mod Nekomoto {
             self.erc721.mint(sender, token_id);
             self.starter.write(token_id, 1);
             self.token_id.write(token_id);
+            self.atk.write(token_id, 500);
             self.emit(Summon { to: sender, token_id: token_id });
         }
 
@@ -360,6 +361,17 @@ pub mod Nekomoto {
                 prism_count = prism_count + prism_consume;
                 atk_final = atk_final + new_atk;
 
+                self
+                    .emit(
+                        Upgrade {
+                            sender: get_caller_address(),
+                            token_id: token_id,
+                            new_level: current_level.into(),
+                            neko_coin_count: nko_consume,
+                            prism_count: prism_consume,
+                        }
+                    );
+
                 current_level = current_level + 1;
                 if current_level == max_level {
                     break;
@@ -378,17 +390,6 @@ pub mod Nekomoto {
 
             self.level.write(token_id, max_level - 1);
             self.atk.write(token_id, atk_final);
-
-            self
-                .emit(
-                    Upgrade {
-                        sender: get_caller_address(),
-                        token_id: token_id,
-                        new_level: max_level.into(),
-                        neko_coin_count: nko_count,
-                        prism_count: prism_count,
-                    }
-                )
         }
 
         fn generate(self: @ContractState, token_id: u256, origin: bool) -> Info {
