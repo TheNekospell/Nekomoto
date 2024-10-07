@@ -295,13 +295,13 @@ pub mod Nekomoto {
         fn upgrade(ref self: ContractState, token_id: u256) {
             assert(self.token_id.read() >= token_id, 'Invalid token_id');
             let host_address = self.host.read();
-            assert(self.erc721.ERC721_owners.read(token_id) == host_address, 'Only staked');
+            // assert(self.erc721.ERC721_owners.read(token_id) == host_address, 'Only staked');
 
             let sender = get_caller_address();
             let current_level = self.level.read(token_id) + 1;
             let is_starter = self.starter.read(token_id) == 1;
             assert(
-                check_max_level(current_level, self.seed.read(token_id), is_starter),
+                cal_max_level(self.seed.read(token_id), is_starter) > current_level,
                 'Exceed max level'
             );
             let (nko_consume, prism_consume, new_atk) = upgrade_once(
@@ -313,13 +313,13 @@ pub mod Nekomoto {
             ERC20BurnTraitDispatcher { contract_address: neko_coin }
                 .burnFrom(sender, nko_consume * 700000000000000000);
             IERC20Dispatcher { contract_address: neko_coin }
-                .transfer_from(sender, host_address, prism_consume * 300000000000000000);
+                .transfer_from(sender, host_address, nko_consume * 300000000000000000);
             if prism_consume > 0 {
                 ERC20BurnTraitDispatcher { contract_address: self.prism.read() }
                     .burnFrom(sender, prism_consume * 1000000000000000000);
             }
 
-            let target_level = current_level + 1;
+            let target_level = current_level;
             self.level.write(token_id, target_level);
             self.atk.write(token_id, new_atk);
 
@@ -328,9 +328,65 @@ pub mod Nekomoto {
                     Upgrade {
                         sender: get_caller_address(),
                         token_id: token_id,
-                        new_level: target_level.into(),
+                        new_level: target_level.into() + 1,
                         neko_coin_count: nko_consume,
                         prism_count: prism_consume
+                    }
+                )
+        }
+
+
+        fn upgrade_to_max(ref self: ContractState, token_id: u256) {
+            assert(self.token_id.read() >= token_id, 'Invalid token_id');
+            let host_address = self.host.read();
+            // assert(self.erc721.ERC721_owners.read(token_id) == host_address, 'Only staked');
+
+            let sender = get_caller_address();
+            let mut current_level = self.level.read(token_id) + 1;
+            let is_starter = self.starter.read(token_id) == 1;
+            let max_level = cal_max_level(self.seed.read(token_id), is_starter);
+            assert(max_level > current_level, 'Exceed max level');
+
+            let mut nko_count = 0;
+            let mut prism_count = 0;
+            let mut atk_final = 0;
+
+            loop {
+                let (nko_consume, prism_consume, new_atk) = upgrade_once(
+                    self.atk.read(token_id), current_level
+                );
+                assert(nko_consume != 0, 'Wrong level');
+                nko_count = nko_count + nko_consume;
+                prism_count = prism_count + prism_consume;
+                atk_final = atk_final + new_atk;
+
+                current_level = current_level + 1;
+                if current_level == max_level {
+                    break;
+                }
+            };
+
+            let neko_coin = self.neko.read();
+            ERC20BurnTraitDispatcher { contract_address: neko_coin }
+                .burnFrom(sender, nko_count * 700000000000000000);
+            IERC20Dispatcher { contract_address: neko_coin }
+                .transfer_from(sender, host_address, nko_count * 300000000000000000);
+            if prism_count > 0 {
+                ERC20BurnTraitDispatcher { contract_address: self.prism.read() }
+                    .burnFrom(sender, prism_count * 1000000000000000000);
+            }
+
+            self.level.write(token_id, max_level - 1);
+            self.atk.write(token_id, atk_final);
+
+            self
+                .emit(
+                    Upgrade {
+                        sender: get_caller_address(),
+                        token_id: token_id,
+                        new_level: max_level.into(),
+                        neko_coin_count: nko_count,
+                        prism_count: prism_count,
                     }
                 )
         }
@@ -359,16 +415,16 @@ pub mod Nekomoto {
 
     // internal impl
 
-    fn check_max_level(level: u8, seed: u256, is_starter: bool) -> bool {
+    fn cal_max_level(seed: u256, is_starter: bool) -> u8 {
         let rarity = generate_rarity(seed, is_starter);
         match rarity {
-            0 => false,
-            1 => level < 3,
-            2 => level < 6,
-            3 => level < 9,
-            4 => level < 12,
-            5 => level < 15,
-            _ => false,
+            0 => 0,
+            1 => 3,
+            2 => 6,
+            3 => 9,
+            4 => 12,
+            5 => 15,
+            _ => 0,
         }
     }
 

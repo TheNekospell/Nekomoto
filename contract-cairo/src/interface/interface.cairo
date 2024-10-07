@@ -33,6 +33,7 @@ pub trait NekomotoTrait<ContractState> {
     fn check_starter_pack(self: @ContractState, address: ContractAddress) -> bool;
     fn burn(ref self: ContractState, token_id: u256);
     fn upgrade(ref self: ContractState, token_id: u256);
+    fn upgrade_to_max(ref self: ContractState, token_id: u256);
     fn generate(self: @ContractState, token_id: u256, origin: bool) -> Info;
     fn buy_coin(ref self: ContractState, count: u256);
     fn check_coin(self: @ContractState, address: ContractAddress) -> u256;

@@ -52,5 +52,4 @@ pub mod NekoCoin {
         self.erc20._spend_allowance(account, get_caller_address(), amount);
         self.erc20.burn(account, amount);
     }
-
 }
