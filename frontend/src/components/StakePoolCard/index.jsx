@@ -7,8 +7,30 @@ import luck from "@assets/luck.png";
 import lineV from "@assets/line-ver.png";
 import lineH from "@assets/line-hor.png";
 import Button from "@components/Button/index";
+import { useAccount } from "@starknet-react/core";
 
-export default function StakePoolCard() {
+export default function StakePoolCard({
+	setWaiting,
+	setSuccess,
+	staticStakePool,
+	estStakePoolReward,
+	stakePoolToClaim,
+	staticEpoch,
+}) {
+	const { address } = useAccount();
+
+	const claim = async () => {
+		setWaiting(true);
+		const { typedMessage, signature } = await BACKEND.sign(account);
+		const result = await BACKEND.claimRewardOfMint(
+			address,
+			typedMessage,
+			signature
+		);
+		console.log("result: ", result);
+		setSuccess(true);
+	};
+
 	return (
 		<>
 			<div className="pool-card">
@@ -42,7 +64,7 @@ export default function StakePoolCard() {
 						</div>
 						<div>
 							<div className="grey-text" style={{ fontSize: "15px" }}>
-								{"Epoch #1782"}
+								{"Epoch #" + staticEpoch}
 							</div>
 						</div>
 					</div>
@@ -57,7 +79,7 @@ export default function StakePoolCard() {
 							{"Current Pool"}
 						</div>
 						<div style={{ display: "flex", alignItems: "center" }}>
-							<div style={{ fontSize: "40px" }}>{"11110.00"}</div>
+							<div style={{ fontSize: "40px" }}>{staticStakePool}</div>
 							<img src={blue} style={{ height: "30px", marginLeft: "10px" }} />
 						</div>
 						<div
@@ -100,7 +122,7 @@ export default function StakePoolCard() {
 											alignItems: "center",
 										}}
 									>
-										<div style={{ fontSize: "20px" }}>{"25,587"}</div>
+										<div style={{ fontSize: "20px" }}>{staticStakePool}</div>
 										<img
 											src={blue}
 											style={{ height: "20px", marginLeft: "15px" }}
@@ -134,7 +156,7 @@ export default function StakePoolCard() {
 											alignItems: "center",
 										}}
 									>
-										<div style={{ fontSize: "20px" }}>{"25,587"}</div>
+										<div style={{ fontSize: "20px" }}>{staticStakePool}</div>
 										<img
 											src={blue}
 											style={{ height: "20px", marginLeft: "15px" }}
@@ -175,7 +197,7 @@ export default function StakePoolCard() {
 						</div>
 						<div style={{ display: "flex", alignItems: "center" }}>
 							<img src={blue} style={{ height: "30px", marginRight: "10px" }} />
-							<div style={{ fontSize: "35px" }}>{"87.79"}</div>
+							<div style={{ fontSize: "35px" }}>{estStakePoolReward}</div>
 						</div>
 						<div>
 							<div className="grey-text" style={{ fontSize: "15px" }}>
@@ -205,7 +227,7 @@ export default function StakePoolCard() {
 							}}
 						>
 							<div style={{ fontSize: "20px", color: "#E9D78E" }}>
-								{"25,587"}
+								{stakePoolToClaim}
 							</div>
 							<img src={blue} style={{ height: "20px", marginLeft: "10px" }} />
 						</div>
@@ -221,6 +243,7 @@ export default function StakePoolCard() {
 										height: "100%",
 										fontSize: "12px",
 									}}
+									onClick={claim}
 								>
 									{"Claim"}
 								</div>

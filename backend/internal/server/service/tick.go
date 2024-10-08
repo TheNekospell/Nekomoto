@@ -29,6 +29,11 @@ func CalLuckAndPower(nekoList []database.ServerNekoSpiritInfo, epoch uint64) (de
 
 func AllocateProfit() {
 
+	isFirst := AddEpoch()
+	if isFirst {
+		return
+	}
+
 	now := time.Now()
 	fmt.Println("")
 	fmt.Println("Wow, it's time to start a big allocate profit:", now)

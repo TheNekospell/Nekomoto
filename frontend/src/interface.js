@@ -186,8 +186,8 @@ export const BACKEND = {
         return await result.json()
     },
 
-    claimRewardOfInvitation: async (address, typedData, signature) => {
-        const result = await fetch(`${BASE_URL}/reward/claimInv`, {
+    claimRewardOfMint: async (address, typedData, signature) => {
+        const result = await fetch(`${BASE_URL}/reward/claimMint`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

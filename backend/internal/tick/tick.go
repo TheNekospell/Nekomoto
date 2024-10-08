@@ -33,10 +33,6 @@ func StartTicker() {
 
 			allocateTimer.Reset(waitTime)
 
-			isFirst := service.AddEpoch()
-			if isFirst {
-				return
-			}
 			service.AllocateProfit()
 
 		case <-burnTimer.C:

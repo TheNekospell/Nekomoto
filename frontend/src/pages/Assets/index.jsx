@@ -1,27 +1,28 @@
 import "./index.css";
-import InputCard from "@components/InputCard/index";
-import BoxCard from "@components/BoxCard/index";
-import InfoCard from "@components/InfoCard/index";
-import Table from "@components/Table/index";
+import InputCard from "../../components/InputCard/index";
+import BoxCard from "../../components/BoxCard/index";
+import InfoCard from "../../components/InfoCard/index";
+import Table from "../../components/Table/index";
 
-
-import PCHeader from "@components/PCHeader/index";
-import logoText from "@assets/text-logo.png";
-import play from "@assets/play.png";
+import PCHeader from "../../components/PCHeader/index";
+import logoText from "../../assets/text-logo.png";
+import play from "../../assets/play.png";
 import { Col, Flex, Row } from "antd";
 import { useEffect, useState } from "react";
 import { BACKEND, NEKOMOTO_ADDRESS } from "@/interface.js";
 import { useAccount } from "@starknet-react/core";
-import NekoModal from "@components/Modal/index.jsx";
-import CardCorner from "@components/CardCorner/index.jsx";
-import card3 from "@assets/card3.png";
-import Button from "@components/Button/index.jsx";
+import NekoModal from "../../components/Modal/index.jsx";
+import CardCorner from "../../components/CardCorner/index.jsx";
+import card3 from "../../assets/card3.png";
+import Button from "../../components/Button/index.jsx";
 import { CallData } from "starknet";
 import { useNavigate } from "react-router-dom";
-import CardDetail from "@components/CardDetail/index.jsx";
+import CardDetail from "../../components/CardDetail/index.jsx";
 import LuckCard from "../../components/LuckCard";
 import CheckCard from "../../components/CheckCard";
 import MintPoolCard from "../../components/MintPoolCard";
+import { useServer } from "../../components/Server";
+import WaitCard from "../../components/WaitCard/index.jsx";
 
 const style = { background: "#0092ff", padding: "8px 0" };
 
@@ -30,46 +31,24 @@ export default function Assets() {
 	const { account, address, status, chainId, isConnected } = useAccount();
 	const [isModalOpen1, setIsModalOpen1] = useState(false);
 	const navigate = useNavigate();
-	const [addressInfo, setAddressInfo] = useState({});
 	const [hhh, setHhh] = useState("");
+	const { serverData: addressInfo, getServerData } = useServer();
+
+	const [waiting, setWaiting] = useState(false);
+	const [success, setSuccess] = useState("");
 
 	useEffect(() => {
-		BACKEND.staticInfo().then((result) => {
-			console.log("static info: ", result.data);
-			setInfo(result.data);
-		});
-		if (address) {
-			BACKEND.addressInfo(address).then((result) => {
-				console.log("address info: ", result.data);
-				setAddressInfo(result.data);
-			});
-		}
-	}, [address, hhh]);
-
-	useEffect(() => {
-		const interval = setInterval(() => {
-			setHhh(new Date().getTime().toString());
-		}, 5000);
-
-		return () => clearInterval(interval);
-	}, []);
-
-	const openChest = async () => {
-		const multiCall = await account.execute([
-			{
-				contractAddress: NEKOMOTO_ADDRESS,
-				entrypoint: "starter_pack",
-				calldata: CallData.compile({}),
-			},
-		]);
-		// console.log("multiCall: ", multiCall)
-		const result = await account.waitForTransaction(multiCall.transaction_hash);
-		console.log("result: ", result);
-		setIsModalOpen1(true);
-	};
+		getServerData();
+	}, [hhh]);
 
 	return (
 		<div>
+			<WaitCard
+				waiting={waiting}
+				setWaiting={setWaiting}
+				success={success}
+				setSuccess={setSuccess}
+			/>
 			<NekoModal
 				title="Starter Pack"
 				open={isModalOpen1}
@@ -79,7 +58,6 @@ export default function Assets() {
 					<div className="modal-card">
 						<div className="modal-card-inner">
 							<CardCorner />
-							{/* <img src={card3} width={192} alt=""/> */}
 							<CardDetail
 								item={{
 									Level: 1,
@@ -113,15 +91,27 @@ export default function Assets() {
 						<InputCard />
 					</Col>
 					<Col style={{ width: "45%", height: "100%" }}>
-						<MintPoolCard />
+						<MintPoolCard
+							epoch={addressInfo?.StaticEpoch}
+							staticMintPool={addressInfo?.StaticMintPool}
+							staticTotalLuck={addressInfo?.StaticTotalLuck}
+							estMintPoolReward={addressInfo?.EstMintPoolReward}
+							mintPoolToClaim={addressInfo?.MintPoolToClaim}
+							setWaiting={setWaiting}
+							setSuccess={setSuccess}
+						/>
 					</Col>
 				</Row>
 				<Row style={{ marginTop: "16px", marginBottom: "16px" }} gutter={16}>
 					<Col style={{ width: "55%", height: "100%" }}>
-						<LuckCard />
+						<LuckCard
+							myLuck={addressInfo?.MyLuck}
+							mySSR={addressInfo?.MySSR}
+							myUR={addressInfo?.MyUR}
+						/>
 					</Col>
 					<Col style={{ width: "45%", height: "100%" }}>
-						<CheckCard />
+						<CheckCard setWaiting={setWaiting} setSuccess={setSuccess} />
 					</Col>
 				</Row>
 

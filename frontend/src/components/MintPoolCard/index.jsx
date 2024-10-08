@@ -7,8 +7,29 @@ import luck from "@assets/luck.png";
 import lineV from "@assets/line-ver.png";
 import lineH from "@assets/line-hor.png";
 import Button from "@components/Button/index";
+import { addCommaInNumber, BACKEND } from "../../interface";
+import { useAccount } from "@starknet-react/core";
 
-export default function MintPoolCard() {
+export default function MintPoolCard({
+	epoch,
+	staticMintPool,
+	staticTotalLuck,
+	estMintPoolReward,
+	mintPoolToClaim,
+	setWaiting,
+	setSuccess,
+}) {
+
+	const {address} = useAccount();
+
+	const claim = async ()=>{
+		setWaiting(true);
+		const { typedMessage, signature } = await BACKEND.sign(account);
+		const result = await BACKEND.claimReward(address, typedMessage, signature);
+		console.log("result: ", result);
+		setSuccess(true);
+	}
+
 	return (
 		<>
 			<div className="pool-card">
@@ -42,7 +63,7 @@ export default function MintPoolCard() {
 						</div>
 						<div>
 							<div className="grey-text" style={{ fontSize: "15px" }}>
-								{"Epoch #1782"}
+								{"Epoch #" + epoch}
 							</div>
 						</div>
 					</div>
@@ -57,7 +78,7 @@ export default function MintPoolCard() {
 							{"Current Pool"}
 						</div>
 						<div style={{ display: "flex", alignItems: "center" }}>
-							<div style={{ fontSize: "40px" }}>{"11110.00"}</div>
+							<div style={{ fontSize: "40px" }}>{staticMintPool}</div>
 							<img src={blue} style={{ height: "30px", marginLeft: "10px" }} />
 						</div>
 						<div
@@ -93,7 +114,7 @@ export default function MintPoolCard() {
 								>
 									<img src={luck} style={{ height: "30px" }} />
 									<div style={{ fontSize: "20px", color: "white" }}>
-										{"25,587"}
+										{staticTotalLuck}
 									</div>
 								</div>
 								<img
@@ -104,7 +125,9 @@ export default function MintPoolCard() {
 									className="grey-text"
 									style={{ display: "flex", flexDirection: "column" }}
 								>
-									<div style={{ fontSize: "15px" }}>{"3.75"}</div>
+									<div style={{ fontSize: "15px" }}>
+										{addCommaInNumber(staticMintPool / staticTotalLuck)}
+									</div>
 									<div style={{ fontSize: "10px" }}>{"NKO per Luck"}</div>
 								</div>
 							</div>
@@ -141,7 +164,7 @@ export default function MintPoolCard() {
 						</div>
 						<div style={{ display: "flex", alignItems: "center" }}>
 							<img src={blue} style={{ height: "30px", marginRight: "10px" }} />
-							<div style={{ fontSize: "35px" }}>{"87.79"}</div>
+							<div style={{ fontSize: "35px" }}>{estMintPoolReward}</div>
 						</div>
 						<div>
 							<div className="grey-text" style={{ fontSize: "15px" }}>
@@ -163,31 +186,38 @@ export default function MintPoolCard() {
 						}}
 					>
 						<div style={{ fontSize: "15px" }}>{"Unclaimed Prize"}</div>
-						<div style={{ display: "flex", alignItems: "center",marginTop:"5px" }}>
+						<div
+							style={{
+								display: "flex",
+								alignItems: "center",
+								marginTop: "5px",
+							}}
+						>
 							<div style={{ fontSize: "20px", color: "#E9D78E" }}>
-								{"25,587"}
+								{mintPoolToClaim}
 							</div>
 							<img src={blue} style={{ height: "20px", marginLeft: "10px" }} />
 						</div>
 						<Button
 							text={
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        textAlign: "center",
-                                        width: "100%",
-                                        height: "100%",
-                                        fontSize: "12px",
-                                    }}
-                                >
-                                    {"Claim"}
-                                </div>
-                            }
+								<div
+									style={{
+										display: "flex",
+										alignItems: "center",
+										justifyContent: "center",
+										textAlign: "center",
+										width: "100%",
+										height: "100%",
+										fontSize: "12px",
+									}}
+									onClick={claim}
+								>
+									{"Claim"}
+								</div>
+							}
 							color={"yellow"}
 							longness={"long"}
-							style={{ width: "100%",marginTop:"5px",height:"25px" }}
+							style={{ width: "100%", marginTop: "5px", height: "25px" }}
 						/>
 					</div>
 				</div>

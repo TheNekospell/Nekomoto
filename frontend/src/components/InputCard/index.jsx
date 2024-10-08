@@ -28,7 +28,6 @@ import blue from "@assets/blue.png";
 import exclamation from "@assets/exclamation.png";
 
 export default function InputCard() {
-	const { device } = useAppStore();
 
 	const { account, address, status, chainId, isConnected } = useAccount();
 	const [inputValue, setInputValue] = useState("Enter your amount");

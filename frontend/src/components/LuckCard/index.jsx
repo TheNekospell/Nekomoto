@@ -3,7 +3,7 @@ import BoxBorder from "../BoxBorder";
 import luck from "@assets/luck.png";
 import exclamation from "@assets/exclamation.png";
 
-export default function LuckCard() {
+export default function LuckCard({myLuck,mySSR,myUR}) {
 	return (
 		<>
 			<div
@@ -54,7 +54,7 @@ export default function LuckCard() {
 						<div style={{ display: "flex", flexDirection: "row" }}>
 							<img src={luck} style={{ height: "10px" }} />
 							<div>{"1 x ("}</div>
-							<div style={{ color: "white" }}>{"5"}</div>
+							<div style={{ color: "white" }}>{mySSR}</div>
 							<div>{" )"}</div>
 						</div>
 					</div>
@@ -77,7 +77,7 @@ export default function LuckCard() {
 							width: "30%",
 						}}
 					>
-						<div style={{ fontSize: "25px" }}>{"SSR"}</div>
+						<div style={{ fontSize: "25px" }}>{"UR"}</div>
 						<div style={{ height: "100%" }}>
 							<img
 								src={luckLogo}
@@ -90,8 +90,8 @@ export default function LuckCard() {
 						</div>
 						<div style={{ display: "flex", flexDirection: "row" }}>
 							<img src={luck} style={{ height: "10px" }} />
-							<div>{"1 x ("}</div>
-							<div style={{ color: "white" }}>{"5"}</div>
+							<div>{"3 x ("}</div>
+							<div style={{ color: "white" }}>{myUR}</div>
 							<div>{" )"}</div>
 						</div>
 					</div>
@@ -158,7 +158,7 @@ export default function LuckCard() {
 										marginLeft: "10px",
 									}}
 								>
-									{"5"}
+									{myLuck}
 								</div>
 							</div>
 							<div>{"Reset in Every Epoch"}</div>

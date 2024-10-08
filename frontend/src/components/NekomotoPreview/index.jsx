@@ -3,16 +3,23 @@ import BoxBorder from "../BoxBorder";
 import CardDetail from "../CardDetail";
 import RadioButton from "../RadioButton";
 
+import m1 from "@assets/modal-icon1.png";
+import m2 from "@assets/modal-icon2.png";
+import m3 from "@assets/modal-icon3.png";
+import m4 from "@assets/modal-icon4.png";
+import m5 from "@assets/modal-icon5.png";
+
 export default function NekomotoPreview({
 	addressInfo,
 	nekoButton,
 	setNekoButton,
-	setIsModalOpen3,
 	setFocus,
+	unstake,
+	stake,
 }) {
 	return (
 		<>
-			<div className="cards-wrapper margin-top-16">
+			<div className="pool-card" style={{ height: "100%" }}>
 				<BoxBorder />
 				<div className="card-title">
 					{"My Neko (" +
@@ -121,21 +128,21 @@ export default function NekomotoPreview({
 						return (
 							<Col xs={12} sm={12} lg={4} key={index}>
 								<Flex className="card-item" justify="center" vertical="column">
-									<CardDetail item={item} />
+									<CardDetail item={item} onClick={() => setFocus(item)} />
 									<Button
 										style={{ marginTop: "10px" }}
 										onClick={
 											item.IsStaked
 												? () => {
-														setIsModalOpen3(true);
 														setFocus(item);
+														unstake(item.TokenId);
 												  }
 												: () => {
-														setIsModalOpen2(true);
 														setFocus(item);
+														stake(item.TokenId);
 												  }
 										}
-										text={item.IsStaked ? "level up" : "staking"}
+										text={item.IsStaked ? "UNSTAKE" : "STAKE"}
 										color={item.IsStaked ? "orange" : "yellow"}
 										longness="short"
 									/>

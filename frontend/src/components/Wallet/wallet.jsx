@@ -25,6 +25,7 @@ import { typedData, shortString, uint256, hash } from "starknet";
 import Button from "@components/Button/index.jsx";
 import NekoModal from "@components/Modal/index.jsx";
 import { ArgentMobileConnector } from "starknetkit/argentMobile";
+import { useServer } from "../Server";
 
 const SN_MAIN = "0x534e5f4d41494e"; // encodeShortString('SN_MAIN'),
 const SN_SEPOLIA = "0x534e5f5345504f4c4941"; // encodeShortString('SN_SEPOLIA')
@@ -43,7 +44,6 @@ export default function Wallet({ isMobile = false }) {
 	const [text, setText] = useState("");
 
 	const [testCode, setTestCode] = useState("");
-	const [addressInfo, setAddressInfo] = useState({ Active: false });
 
 	const [faucetInterval, setFaucetInterval] = useState(false);
 	const [faucetResult, setFaucetResult] = useState(
@@ -56,9 +56,7 @@ export default function Wallet({ isMobile = false }) {
 	const [prismBalance, setPrismBalance] = useState(0);
 	const [nkoBalance, setNkoBalance] = useState(0);
 
-	// useEffect(() => {
-	// 	connect({connector});
-	// }, []);
+	const { serverData: addressInfo, getServerData } = useServer();
 
 	useEffect(() => {
 		const target = SN_SEPOLIA;
@@ -71,33 +69,6 @@ export default function Wallet({ isMobile = false }) {
 		// 		},
 		// 	});
 		// }
-
-		BACKEND.addressInfo(address).then((result) => {
-			const addressInfo = result.data;
-			setAddressInfo(addressInfo);
-			if (addressInfo.Active) {
-				if (inputValue !== "" && address) {
-					console.log("accept invitation: ", inputValue, account);
-					sign(account).then(({ typedMessage, signature }) => {
-						BACKEND.acceptInvitation(
-							address,
-							inputValue,
-							typedMessage,
-							signature
-						).then((result) => {
-							console.log("accept result: ", result);
-							setAccept(true);
-							if (result.success) {
-								setText(result.data);
-							} else {
-								setText(result.message);
-							}
-						});
-					});
-				}
-				setInputValue("");
-			}
-		});
 	}, [address, chainId]);
 
 	const establishConnection = async (connector) => {
@@ -133,9 +104,7 @@ export default function Wallet({ isMobile = false }) {
 			// }, 10000);
 		}
 		setTestCode("");
-		BACKEND.addressInfo(address).then((result) => {
-			setAddressInfo(result.data);
-		});
+
 	};
 
 	return (

@@ -35,6 +35,13 @@ type AddressInfo struct {
 	MintPoolCurrentReward  decimal.Decimal
 	StakePoolToClaim       decimal.Decimal
 	StakePoolCurrentReward decimal.Decimal
+	EstMintPoolReward      decimal.Decimal
+	EstStakePoolReward     decimal.Decimal
+	MyPower                decimal.Decimal
+	MyLuck                 uint64
+	MySSR                  uint64
+	MyUR                   uint64
+	StaticEpoch            uint64
 	StaticMintPool         decimal.Decimal
 	StaticTotalLuck        decimal.Decimal
 	StaticStakePool        decimal.Decimal
@@ -56,27 +63,47 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 	stakePoolToClaim := decimal.Zero
 	mintPoolToClaim := decimal.Zero
 	var idList []uint64
+	var myLuck, mySSR, myUR uint64
+	var myPower decimal.Decimal
 	for _, spirit := range NekoSpiritList {
 		stakePoolToClaim = stakePoolToClaim.Add(spirit.Rewards)
 		mintPoolToClaim = mintPoolToClaim.Add(spirit.MintRewards)
 		idList = append(idList, spirit.TokenId)
+		if spirit.Rarity == "SSR" {
+			mySSR++
+			myLuck += 1
+		}
+		if spirit.Rarity == "UR" {
+			myUR++
+			myLuck += 3
+		}
+		if spirit.IsStaked {
+			myPower = myPower.Add(spirit.ATK)
+		}
 	}
 
-	mintPool, stakePool, totalLuck, totalPower := GetStatic()
+	epoch, mintPool, stakePool, totalLuck, totalPower := GetStatic()
 
 	result := AddressInfo{
-		Uid:              uid,
-		Address:          serverAddress.Address,
-		IsStarter:        serverAddress.IsStarter,
-		Active:           serverAddress.Active,
-		NekoSpiritIdList: idList,
-		NekoSpiritList:   NekoSpiritList,
-		StaticTotalPower: totalPower,
-		StaticStakePool:  stakePool,
-		StaticTotalLuck:  totalLuck,
-		StaticMintPool:   mintPool,
-		StakePoolToClaim: stakePoolToClaim,
-		MintPoolToClaim:  mintPoolToClaim,
+		Uid:                uid,
+		Address:            serverAddress.Address,
+		IsStarter:          serverAddress.IsStarter,
+		Active:             serverAddress.Active,
+		NekoSpiritIdList:   idList,
+		NekoSpiritList:     NekoSpiritList,
+		StaticTotalPower:   totalPower,
+		StaticStakePool:    stakePool,
+		StaticTotalLuck:    totalLuck,
+		StaticMintPool:     mintPool,
+		StakePoolToClaim:   stakePoolToClaim,
+		MintPoolToClaim:    mintPoolToClaim,
+		StaticEpoch:        epoch,
+		MyPower:            myPower,
+		MyLuck:             myLuck,
+		MySSR:              mySSR,
+		MyUR:               myUR,
+		EstMintPoolReward:  mintPool.Mul(decimal.NewFromUint64(myLuck).Div(totalLuck)),
+		EstStakePoolReward: stakePool.Mul(myPower.Div(totalPower)),
 	}
 
 	//Cache.Set(CacheTagUid+strconv.FormatUint(uid, 10), result, -1)
@@ -84,7 +111,7 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 	return result
 }
 
-func GetStatic() (decimal.Decimal, decimal.Decimal, decimal.Decimal, decimal.Decimal) {
+func GetStatic() (uint64, decimal.Decimal, decimal.Decimal, decimal.Decimal, decimal.Decimal) {
 
 	// !! cache !!
 
@@ -97,7 +124,7 @@ func GetStatic() (decimal.Decimal, decimal.Decimal, decimal.Decimal, decimal.Dec
 	totalPower := decimal.Zero
 	DB.Model(&ServerNekoSpiritInfo{}).Where("is_staked = ?", true).Select("sum(atk) as total_power").Scan(&totalPower)
 
-	return rewardPool.MintPool, rewardPool.StakePool, totalLuck, totalPower
+	return epoch, rewardPool.MintPool, rewardPool.StakePool, totalLuck, totalPower
 }
 
 func GetAddressDetailByAddress(address string) AddressInfo {

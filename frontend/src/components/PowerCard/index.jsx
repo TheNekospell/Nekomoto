@@ -2,7 +2,7 @@ import BoxBorder from "../BoxBorder";
 import exclamation from "@assets/exclamation.png";
 import lineV from "@assets/line-ver.png";
 
-export default function PowerCard({}) {
+export default function PowerCard({ staticTotalPower, myPower }) {
 	return (
 		<>
 			<div
@@ -61,7 +61,7 @@ export default function PowerCard({}) {
 							}}
 						>
 							<div style={{ fontSize: "30px", color: "white" }}>
-								{"250,391"}
+								{staticTotalPower}
 							</div>
 						</div>
 					</div>
@@ -93,8 +93,8 @@ export default function PowerCard({}) {
 									marginTop: "10px",
 								}}
 							>
-								<div style={{ fontSize: "30px", color: "white" }}>
-									{"250,391"}
+								<div style={{ fontSize: "30px", color: "#DA3914" }}>
+									{myPower}
 								</div>
 							</div>
 						</div>
@@ -120,7 +120,7 @@ export default function PowerCard({}) {
 								}}
 							>
 								<div style={{ fontSize: "30px", color: "white" }}>
-									{"250,391"}
+									{(myPower / staticTotalPower).toFixed(2) * 100 + "%"}
 								</div>
 							</div>
 						</div>
