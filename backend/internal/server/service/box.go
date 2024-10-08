@@ -5,7 +5,6 @@ import (
 	"backend/internal/database"
 	"backend/internal/invoker_sn"
 	"math/big"
-	"strconv"
 	"strings"
 	"time"
 
@@ -110,8 +109,6 @@ func UpdateNekoSpiritByUpgrade(tokenId uint64, nekocoin uint64) {
 
 	// add 30% of upgrade cost into MINT reward pool
 	database.AddRewardsPool(decimal.NewFromUint64(nekocoin).Mul(decimal.New(3, -1)), decimal.NewFromInt(0))
-
-	database.Cache.Delete(database.CacheTagNekoSpirit + strconv.Itoa(int(tokenId)))
 
 }
 

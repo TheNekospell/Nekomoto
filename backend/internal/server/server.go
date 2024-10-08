@@ -50,9 +50,9 @@ func StartServer() {
 	// addressGroup.POST("/valid", ValidSignature)
 	addressGroup.POST("/active", ActiveAddress)
 
-	// rewardGroup := apiGroup.Group("/reward")
-	// rewardGroup.POST("/claim", ClaimReward)
-	// rewardGroup.POST("/claimInv", ClaimRewardOfInvitation)
+	rewardGroup := apiGroup.Group("/reward")
+	rewardGroup.POST("/claim", ClaimReward)
+	rewardGroup.POST("/claimMint", ClaimRewardOfMint)
 
 	testGroup := apiGroup.Group("/nike")
 	testGroup.GET("/allocate", func(ctx *gin.Context) {
@@ -89,7 +89,6 @@ func StartServer() {
 
 }
 
-
 func SuccessResponse(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, model.ResponseData{
 		Code:    model.Success,
@@ -106,6 +105,42 @@ func ErrorResponse(c *gin.Context, code model.ResponseCode, message string) {
 		Message: message,
 		Data:    nil,
 	})
+}
+
+func ClaimReward(c *gin.Context) {
+	var req model.AddressAndSignature
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ErrorResponse(c, model.WrongParam, err.Error())
+		return
+	}
+	// if !common.IsHexAddress(req.Address) {
+	// 	ErrorResponse(c, model.WrongParam, "invalid address")
+	// 	return
+	// }
+	code, msg := service.ClaimReward(req)
+	if code != model.Success {
+		ErrorResponse(c, code, msg)
+		return
+	}
+	SuccessResponse(c, msg)
+}
+
+func ClaimRewardOfMint(c *gin.Context) {
+	var req model.AddressAndSignature
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ErrorResponse(c, model.WrongParam, err.Error())
+		return
+	}
+	// if !common.IsHexAddress(req.Address) {
+	// 	ErrorResponse(c, model.WrongParam, "invalid address")
+	// 	return
+	// }
+	code, msg := service.ClaimRewardOfMint(req)
+	if code != model.Success {
+		ErrorResponse(c, code, msg)
+		return
+	}
+	SuccessResponse(c, msg)
 }
 
 func GenerateSignature(c *gin.Context) {
@@ -227,7 +262,6 @@ func AddressInfo(c *gin.Context) {
 	}
 	SuccessResponse(c, data)
 }
-
 
 func ValidSignature(c *gin.Context) {
 	var req model.AddressAndSignature

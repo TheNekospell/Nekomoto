@@ -36,55 +36,33 @@ type AddressInfo struct {
 	StakePoolToClaim       decimal.Decimal
 	StakePoolCurrentReward decimal.Decimal
 	StaticMintPool         decimal.Decimal
-	StaticTotalLuck        uint64
+	StaticTotalLuck        decimal.Decimal
 	StaticStakePool        decimal.Decimal
-	StaticTotalPower       uint64
+	StaticTotalPower       decimal.Decimal
 }
 
-// func calUnlockedAmount(count uint64) decimal.Decimal {
-// 	var result float64
-// 	if count <= 10 {
-// 		result = float64(count) * 3
-// 	} else if count <= 50 {
-// 		result = float64(count-10)*5.5 + 30
-// 	} else if count <= 100 {
-// 		result = float64(count-50)*7 + 250
-// 	} else {
-// 		result = float64(count-100)*8.5 + 600
-// 	}
-// 	return decimal.NewFromFloat(result).Mul(decimal.NewFromInt(2500))
-// }
-
 func GetAddressDetailByUid(uid uint64) AddressInfo {
-	if detail, found := Cache.Get(CacheTagUid + strconv.FormatUint(uid, 10)); found {
-		result := detail.(AddressInfo)
-		result.NekoSpiritList = GetNekoSpiritListByIdList(result.NekoSpiritIdList)
-		return result
-	}
+	// if detail, found := Cache.Get(CacheTagUid + strconv.FormatUint(uid, 10)); found {
+	// 	result := detail.(AddressInfo)
+	// 	result.NekoSpiritList = GetNekoSpiritListByIdList(result.NekoSpiritIdList)
+	// 	return result
+	// }
 
 	var serverAddress ServerAddress
 	DB.Where("id = ?", uid).Find(&serverAddress)
 
-	var TotalClaimed decimal.Decimal
-	if err := DB.Model(&ServerClaimNekoSpiritRecord{}).Where("uid = ?", uid).Select("ifnull(sum(amount),0) as total_claimed").Scan(&TotalClaimed).Error; err != nil {
-		TotalClaimed = decimal.NewFromInt(0)
-	}
-
-	var ToClaim decimal.Decimal
-	if err := DB.Model(&ServerNekoSpiritInfo{}).Where("stake_from_uid = ?", uid).Select("ifnull(sum(rewards),0) as to_claim").Scan(&ToClaim).Error; err != nil {
-		ToClaim = decimal.NewFromInt(0)
-	}
-
 	var NekoSpiritList []ServerNekoSpiritInfo
-	var idList []uint64
 	DB.Model(&ServerNekoSpiritInfo{}).Where("stake_from_uid = ?", uid).Find(&NekoSpiritList)
-	for index := range NekoSpiritList {
-		idList = append(idList, NekoSpiritList[index].TokenId)
-		//Cache.Set(CacheTagNekoSpirit+strconv.FormatUint(NekoSpirit.TokenId, 10), NekoSpirit, -1)
-		// if NekoSpiritList[index].Fade.LessThanOrEqual(decimal.NewFromInt(0)) {
-		// 	NekoSpiritList[index].Mana = decimal.NewFromInt(0)
-		// }
+	stakePoolToClaim := decimal.Zero
+	mintPoolToClaim := decimal.Zero
+	var idList []uint64
+	for _, spirit := range NekoSpiritList {
+		stakePoolToClaim = stakePoolToClaim.Add(spirit.Rewards)
+		mintPoolToClaim = mintPoolToClaim.Add(spirit.MintRewards)
+		idList = append(idList, spirit.TokenId)
 	}
+
+	mintPool, stakePool, totalLuck, totalPower := GetStatic()
 
 	result := AddressInfo{
 		Uid:              uid,
@@ -93,11 +71,33 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		Active:           serverAddress.Active,
 		NekoSpiritIdList: idList,
 		NekoSpiritList:   NekoSpiritList,
+		StaticTotalPower: totalPower,
+		StaticStakePool:  stakePool,
+		StaticTotalLuck:  totalLuck,
+		StaticMintPool:   mintPool,
+		StakePoolToClaim: stakePoolToClaim,
+		MintPoolToClaim:  mintPoolToClaim,
 	}
 
 	//Cache.Set(CacheTagUid+strconv.FormatUint(uid, 10), result, -1)
 	// fmt.Println("Rebuild cache for uid:", uid, "Result:", result)
 	return result
+}
+
+func GetStatic() (decimal.Decimal, decimal.Decimal, decimal.Decimal, decimal.Decimal) {
+
+	// !! cache !!
+
+	rewardPool := GetRewardPool()
+	epoch := GetEpoch()
+
+	totalLuck := decimal.Zero
+	DB.Model(&ServerNekoSpiritInfo{}).Where("epoch = ?", epoch).Select("sum(case when rarity = 'SSR' then 1 when rarity = 'UR' then 3 else 0 end) as total_luck").Scan(&totalLuck)
+
+	totalPower := decimal.Zero
+	DB.Model(&ServerNekoSpiritInfo{}).Where("is_staked = ?", true).Select("sum(atk) as total_power").Scan(&totalPower)
+
+	return rewardPool.MintPool, rewardPool.StakePool, totalLuck, totalPower
 }
 
 func GetAddressDetailByAddress(address string) AddressInfo {

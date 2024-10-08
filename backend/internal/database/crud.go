@@ -311,6 +311,19 @@ func UpdateNekoSpiritListWithMap(toUpdate []ServerNekoSpiritInfo) {
 	fmt.Println("[Database] UpdateNekoSpiritList time: ", time.Since(now).Abs().Milliseconds(), "ms")
 }
 
+func UpdateNekoSpiritListWithMapOfMint(toUpdate []ServerNekoSpiritInfo) {
+	fmt.Println("[Database] UpdateNekoSpiritList size: ", len(toUpdate))
+	now := time.Now()
+	for _, info := range toUpdate {
+		data := map[string]interface{}{"mint_rewards": info.MintRewards, "claimed_mint_rewards": info.ClaimedMintRewards}
+		if err := DB.Model(&info).Updates(data).Error; err != nil {
+			fmt.Println("UpdateNekoSpiritList error: ", err)
+		}
+		Cache.Delete(CacheTagNekoSpirit + strconv.FormatUint(info.TokenId, 10))
+	}
+	fmt.Println("[Database] UpdateNekoSpiritList time: ", time.Since(now).Abs().Milliseconds(), "ms")
+}
+
 func CreateInvitationRewardRecords(records []ServerInvitationRewardRecord) error {
 	return DB.Create(&records).Error
 }

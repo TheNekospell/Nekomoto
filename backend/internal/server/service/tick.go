@@ -82,6 +82,7 @@ func AllocateProfit() {
 			update = true
 		}
 
+		// append toUpdate or not
 		if update {
 			toUpdate = append(toUpdate, temp)
 			fmt.Println("update token ID: ", process.TokenId, temp)
