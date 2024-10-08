@@ -446,3 +446,17 @@ func GetEpoch() uint64 {
 func AddEpoch() {
 	DB.Model(&ServerEpoch{}).Where("id = 1").Update("epoch", gorm.Expr("epoch + ?", 1))
 }
+
+func GetNekoSpiritList() []ServerNekoSpiritInfo {
+	var nekoSpirit []ServerNekoSpiritInfo
+	DB.Find(&nekoSpirit)
+	return nekoSpirit
+}
+
+func ResetRewardPool(mint decimal.Decimal, stake decimal.Decimal) {
+	amountOfEveryEpoch := decimal.New(2000000000, 18).Div(decimal.New(180, 0))
+
+	DB.Model(&ServerRewardPool{}).Where("id = 1").
+		Update("mint_pool", amountOfEveryEpoch.Mul(decimal.New(30, -2)).Add(mint)).
+		Update("stake_pool", amountOfEveryEpoch.Mul(decimal.New(70, -2)).Add(stake))
+}

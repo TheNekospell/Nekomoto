@@ -178,22 +178,22 @@ pub mod Nekomoto {
                         to_mint_prism = to_mint_prism + 5;
                         continue;
                     },
-                    1 => self.atk.write(token_id, generate_random(seed, 5, 15) * 100),
+                    1 => self.atk.write(token_id, generate_random(seed, 5, 15)),
                     2 => {
                         to_mint_prism = to_mint_prism + 1;
-                        self.atk.write(token_id, generate_random(seed, 11, 21) * 100);
+                        self.atk.write(token_id, generate_random(seed, 11, 21));
                     },
                     3 => {
                         to_mint_prism = to_mint_prism + 1;
-                        self.atk.write(token_id, generate_random(seed, 17, 27) * 100);
+                        self.atk.write(token_id, generate_random(seed, 17, 27));
                     },
                     4 => {
                         to_mint_prism = to_mint_prism + 2;
-                        self.atk.write(token_id, generate_random(seed, 26, 36) * 100);
+                        self.atk.write(token_id, generate_random(seed, 26, 36));
                     },
                     5 => {
                         to_mint_prism = to_mint_prism + 3;
-                        self.atk.write(token_id, generate_random(seed, 40, 50) * 100);
+                        self.atk.write(token_id, generate_random(seed, 40, 50));
                     },
                     _ => (),
                 }
@@ -273,7 +273,7 @@ pub mod Nekomoto {
             self.erc721.mint(sender, token_id);
             self.starter.write(token_id, 1);
             self.token_id.write(token_id);
-            self.atk.write(token_id, 500);
+            self.atk.write(token_id, 5);
             self.emit(Summon { to: sender, token_id: token_id });
         }
 

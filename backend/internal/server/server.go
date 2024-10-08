@@ -58,9 +58,9 @@ func StartServer() {
 	testGroup.GET("/allocate", func(ctx *gin.Context) {
 		service.AllocateProfit()
 	})
-	testGroup.GET("/chest", func(ctx *gin.Context) {
-		service.GiveChest()
-	})
+	// testGroup.GET("/chest", func(ctx *gin.Context) {
+	// 	service.GiveChest()
+	// })
 	// testGroup.POST("/summon", func(ctx *gin.Context) {
 	// 	_ = invoker_sn.SendCoinAndNFT("", big.NewInt(100000), big.NewInt(10000), big.NewInt(10))
 	// })

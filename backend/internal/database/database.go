@@ -142,17 +142,19 @@ type ServerClaimRecord struct {
 
 type ServerNekoSpiritInfo struct {
 	Model
-	Epoch          uint64          `gorm:"not null index"`
-	TokenId        uint64          `gorm:"uniqueIndex"`
-	Rarity         string          `gorm:"not null"`
-	Element        string          `gorm:"not null"`
-	ATK            decimal.Decimal `gorm:"not null type:decimal(36,18)"`
-	Level          uint64          `gorm:"not null default:1 index"`
-	StakeFromUid   uint64          `gorm:"index"`
-	IsStaked       bool            `gorm:"not null default:false"`
-	StakeTime      time.Time       `gorm:""`
-	Rewards        decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
-	ClaimedRewards decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
+	Epoch              uint64          `gorm:"not null index"`
+	TokenId            uint64          `gorm:"uniqueIndex"`
+	Rarity             string          `gorm:"not null"`
+	Element            string          `gorm:"not null"`
+	ATK                decimal.Decimal `gorm:"not null type:decimal(36,18)"`
+	Level              uint64          `gorm:"not null default:1 index"`
+	StakeFromUid       uint64          `gorm:"index"`
+	IsStaked           bool            `gorm:"not null default:false"`
+	StakeTime          time.Time       `gorm:""`
+	Rewards            decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
+	ClaimedRewards     decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
+	MintRewards        decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
+	ClaimedMintRewards decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
 }
 
 type ServerBuffRecord struct {

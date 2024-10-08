@@ -2,141 +2,119 @@ package service
 
 import (
 	"backend/internal/database"
-	"backend/internal/invoker_sn"
 	"fmt"
 	"time"
 
 	"github.com/shopspring/decimal"
 )
 
+func CalLuckAndPower(nekoList []database.ServerNekoSpiritInfo, epoch uint64) (decimal.Decimal, decimal.Decimal) {
+	TotalLuck := decimal.Zero
+	TotalPower := decimal.Zero
+	for _, neko := range nekoList {
+		if neko.Epoch == epoch {
+			if neko.Rarity == "SSR" {
+				TotalLuck = TotalLuck.Add(decimal.New(1, 0))
+			} else if neko.Rarity == "UR" {
+				TotalLuck = TotalLuck.Add(decimal.New(3, 0))
+			}
+		}
+		if neko.IsStaked {
+			TotalPower = TotalPower.Add(neko.ATK)
+		}
+	}
+
+	return TotalLuck, TotalPower
+}
+
 func AllocateProfit() {
 
-	// 1. Linear regression of last epoch
-	// 2. Allocate profit of last epoch
-	// 3. Two pools
-
-	// database.Cache.Set(database.CacheAllocate, true, -1)
-
 	now := time.Now()
-	var totalMana decimal.Decimal
-	rewardPool := database.GetRewardPool()
 	fmt.Println("")
 	fmt.Println("Wow, it's time to start a big allocate profit:", now)
 
-	processList := database.QueryStakedSpiritList()
-	if len(processList) == 0 {
-		fmt.Println("There is no staked spirit")
+	lastEpoch := database.GetEpoch() - 1
+
+	rewardPool := database.GetRewardPool()
+	currentMintPoolReward, currentStakePoolReward := rewardPool.MintPool, rewardPool.StakePool
+
+	nekoList := database.GetNekoSpiritList()
+	if len(nekoList) == 0 {
+		// mark here
+		fmt.Println("There is no neko spirit")
+		database.ResetRewardPool(currentMintPoolReward, currentStakePoolReward)
 		return
 	}
+
 	var toUpdate []database.ServerNekoSpiritInfo
 
-	// white list bounty wave
-	// whiteList, boost, open := database.GetBountyWaveList()
+	TotalLuck, TotalPower := CalLuckAndPower(nekoList, lastEpoch)
+	currentStakePoolRewardReleased, currentStakePoolRewardNotReleased := calTheReleaseReward(currentStakePoolReward, TotalPower)
+	fmt.Println("TotalLuck: ", TotalLuck, " TotalPower: ", TotalPower, " currentStakePoolRewardReleased: ", currentStakePoolRewardReleased, " currentStakePoolRewardNotReleased: ", currentStakePoolRewardNotReleased)
 
-	// basic calculation
-	// manaMap := make(map[uint64]decimal.Decimal)
-	for _, process := range processList {
+	for _, process := range nekoList {
 
 		temp := database.ServerNekoSpiritInfo{
-			Model:          database.Model{ID: process.ID},
-			TokenId:        process.TokenId,
-			Rewards:        process.Rewards,
-			ClaimedRewards: process.ClaimedRewards,
+			Model:       database.Model{ID: process.ID},
+			TokenId:     process.TokenId,
+			Rewards:     process.Rewards,
+			MintRewards: process.MintRewards,
 		}
 
-		// calculate the fade, and add mana into the map
-		fmt.Println("process spirit ID: ", process.ID, temp)
+		fmt.Println("process token ID: ", process.ID, temp)
 
-		// TODO epoch profit
-		// detail := database.GetAddressDetailByUid(process.StakeFromUid)
+		update := false
 
-		// if process.Fade.GreaterThan(decimal.New(0, 0)) {
-		// 	// Mana=0.065*（0.4*SPI+0.3*ATK+0.2*DEF+0.1*SPD
-		// manaOfSpirit := process.Mana
-		// 	if detail.Buff.Level > 0 {
-		// 		manaOfSpirit = manaOfSpirit.Mul(getBoostOfAscend(detail.Buff.Level))
-		// 	}
-		// 	// Bounty wave
-		// 	if open && inList(process.StakeFromUid, whiteList) {
-		// 		manaOfSpirit = manaOfSpirit.Mul(boost.Add(decimal.New(1, 0)))
-		// 	}
-		// 	// update mana
-		// 	totalMana = totalMana.Add(manaOfSpirit)
-		// 	// record them
+		// mint pool
+		if process.Epoch == lastEpoch {
+			if process.Rarity == "SSR" {
+				temp.MintRewards = temp.MintRewards.Add(currentMintPoolReward.Mul(decimal.New(1, 0).Div(TotalLuck)))
+				update = true
+			} else if process.Rarity == "UR" {
+				temp.MintRewards = temp.MintRewards.Add(currentMintPoolReward.Mul(decimal.New(3, 0).Div(TotalLuck)))
+				update = true
+			}
+		}
 
-		// toUpdate = append(toUpdate, temp)
-		// manaMap[process.ID] = manaOfSpirit
-		// }
+		// stake pool
+		if process.IsStaked {
+			temp.Rewards = temp.Rewards.Add(currentStakePoolRewardReleased.Mul(process.ATK.Div(TotalPower)))
+			update = true
+		}
+
+		if update {
+			toUpdate = append(toUpdate, temp)
+			fmt.Println("update token ID: ", process.TokenId, temp)
+		}
+
 	}
 
-	// Reward calculation
-	toAllocate := rewardPool.StakePool.Mul(calTheRewardCoefficient(totalMana))
-	fmt.Println("rewardPool: ", rewardPool, "toAllocate: ", toAllocate)
-	// for i := range toUpdate {
-	// coefficient := manaMap[toUpdate[i].ID].Div(totalMana)
-	// toUpdate[i].Rewards = toUpdate[i].Rewards.Add(toAllocate.Mul(coefficient))
-	// }
-	// fmt.Println("toUpdate: ", toUpdate)
+	database.ResetRewardPool(decimal.Zero, currentStakePoolRewardNotReleased)
+
 	database.UpdateNekoSpiritList(toUpdate)
 
-	// sub the reward pool
-	database.SubRewardPool(decimal.Zero, toAllocate)
 }
 
-func calTheRewardCoefficient(mana decimal.Decimal) decimal.Decimal {
-	if mana.Cmp(decimal.New(100, 0)) < 0 {
-		return decimal.New(615, -9)
-	} else if mana.Cmp(decimal.New(1000, 0)) < 0 {
-		return decimal.New(5800, -9)
-	} else if mana.Cmp(decimal.New(5000, 0)) < 0 {
-		return decimal.New(30000, -9)
-	} else if mana.Cmp(decimal.New(10000, 0)) < 0 {
-		return decimal.New(60000, -9)
-	} else if mana.Cmp(decimal.New(50000, 0)) < 0 {
-		return decimal.New(300000, -9)
-	} else if mana.Cmp(decimal.New(100000, 0)) < 0 {
-		return decimal.New(600000, -9)
-	}
-	return decimal.New(620000, -9)
-}
+func calTheReleaseReward(reward decimal.Decimal, power decimal.Decimal) (decimal.Decimal, decimal.Decimal) {
+	// 50%	0
+	// 60%	200000
+	// 70%	300000
+	// 80%	400000
+	// 90%	500000
+	// 100%	600000
 
-
-
-func GiveChest() {
-
-	uidList := database.QueryUidThatStakeGreatNeko()
-	fmt.Println("We should give chest to: ", uidList)
-	var toSave []database.ServerChest
-	for _, uid := range uidList {
-		toSave = append(toSave, database.ServerChest{
-			Uid: uid,
-		})
-	}
-	if len(toSave) > 0 {
-		database.DB.CreateInBatches(toSave, 100)
-	}
-
-}
-
-func BurnCoin() {
-	list := database.GetTempBurn()
-	fmt.Println("to burn list: ", list)
-
-	if list != nil {
-		var toBurn decimal.Decimal
-		for _, v := range list {
-			toBurn = toBurn.Add(v.Count)
-		}
-		if err := invoker_sn.BurnNekoCoin(toBurn); err != nil {
-			fmt.Println("BurnNekoCoin error: ", err)
-			return
-		} else {
-			var id []uint64
-			for _, v := range list {
-				id = append(id, v.ID)
-			}
-			database.UpdateTempBurn(id)
-		}
+	if power.Cmp(decimal.New(200000, 0)) < 0 {
+		return reward.Mul(decimal.New(5, -1)), reward.Mul(decimal.New(5, -1))
+	} else if power.Cmp(decimal.New(300000, 0)) < 0 {
+		return reward.Mul(decimal.New(6, -1)), reward.Mul(decimal.New(4, -1))
+	} else if power.Cmp(decimal.New(400000, 0)) < 0 {
+		return reward.Mul(decimal.New(7, -1)), reward.Mul(decimal.New(3, -1))
+	} else if power.Cmp(decimal.New(500000, 0)) < 0 {
+		return reward.Mul(decimal.New(8, -1)), reward.Mul(decimal.New(2, -1))
+	} else if power.Cmp(decimal.New(600000, 0)) < 0 {
+		return reward.Mul(decimal.New(9, -1)), reward.Mul(decimal.New(1, -1))
+	} else {
+		return reward, decimal.Zero
 	}
 }
 

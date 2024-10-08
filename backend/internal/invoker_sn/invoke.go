@@ -57,11 +57,7 @@ func ReadNekoSpiritInfo(tokenId uint64, origin bool) (database.ServerNekoSpiritI
 	// short string:  0x556e...6f6e
 	// 64:  6155967070890454894
 
-	// SPI := decimal.NewFromUint64(utils.FeltToBigInt(response[3]).Uint64()).Div(decimal.NewFromUint64(100))
-	ATK := decimal.NewFromUint64(utils.FeltToBigInt(response[2]).Uint64()).Div(decimal.NewFromUint64(100))
-	// DEF := decimal.NewFromUint64(utils.FeltToBigInt(response[7]).Uint64()).Div(decimal.NewFromUint64(100))
-	// SPD := decimal.NewFromUint64(utils.FeltToBigInt(response[9]).Uint64()).Div(decimal.NewFromUint64(100))
-	// Mana := SPI.Mul(decimal.New(4, -1)).Add(ATK.Mul(decimal.New(3, -1))).Add(DEF.Mul(decimal.New(2, -1))).Add(SPD.Mul(decimal.New(1, -1))).Mul(decimal.New(65, -3))
+	ATK := decimal.NewFromUint64(utils.FeltToBigInt(response[2]).Uint64())
 
 	return database.ServerNekoSpiritInfo{
 		Rarity:  chain_sn.FeltToString(response[0].String()),
