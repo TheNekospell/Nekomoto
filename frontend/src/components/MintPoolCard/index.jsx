@@ -19,20 +19,19 @@ export default function MintPoolCard({
 	setWaiting,
 	setSuccess,
 }) {
+	const { address } = useAccount();
 
-	const {address} = useAccount();
-
-	const claim = async ()=>{
+	const claim = async () => {
 		setWaiting(true);
 		const { typedMessage, signature } = await BACKEND.sign(account);
 		const result = await BACKEND.claimReward(address, typedMessage, signature);
 		console.log("result: ", result);
 		setSuccess(true);
-	}
+	};
 
 	return (
 		<>
-			<div className="pool-card">
+			<div className="pool-card" style={{ height: "100%" }}>
 				<BoxBorder />
 				<div
 					style={{

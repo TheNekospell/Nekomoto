@@ -9,27 +9,146 @@ import m4 from "@assets/modal-icon4.png";
 import m5 from "@assets/modal-icon5.png";
 import Button from "../Button";
 import BoxBorder from "../BoxBorder";
+import { useMemo } from "react";
 
-export default function NekoDetail({ focus }) {
-	const upgradeCal = [
-		{ level: "Lv2", SPI: 2, ATK: 1, DEF: 1, SPD: 0, Neko: 100 },
-		{ level: "Lv3", SPI: 2, ATK: 1, DEF: 1, SPD: 0, Neko: 120 },
-		{ level: "Lv4", SPI: 2, ATK: 1, DEF: 1, SPD: 0, Neko: 130 },
-		{ level: "Lv5", SPI: 2, ATK: 1, DEF: 1, SPD: 1, Neko: 140 },
-		{ level: "Lv6", SPI: 2, ATK: 1, DEF: 1, SPD: 1, Neko: 155 },
-		{ level: "Lv7", SPI: 2, ATK: 1, DEF: 1, SPD: 1, Neko: 165 },
-		{ level: "Lv8", SPI: 4, ATK: 3, DEF: 2, SPD: 1, Neko: 200, Prism: 1 },
-		{ level: "Lv9", SPI: 4, ATK: 3, DEF: 2, SPD: 1, Neko: 245 },
-		{ level: "Lv10", SPI: 4, ATK: 3, DEF: 3, SPD: 1, Neko: 300 },
-		{ level: "Lv11", SPI: 6, ATK: 5, DEF: 3, SPD: 1, Neko: 370 },
-		{ level: "Lv12", SPI: 6, ATK: 7, DEF: 3, SPD: 2, Neko: 455 },
-		{ level: "Lv13", SPI: 12, ATK: 9, DEF: 5, SPD: 3, Neko: 1000, Prism: 2 },
-		{ level: "Lv", SPI: 0, ATK: 0, DEF: 0, SPD: 0 },
-	];
+import blue from "@assets/blue.png";
+import purple from "@assets/purple.png";
+
+export default function NekoDetail({ focus, prism, nekocoin }) {
+	const Detail = ({ title, value }) => {
+		return (
+			<>
+				<Flex justify="space-between" className="margin-bottom-16">
+					<div className="modal-text2">{title}</div>
+					<div className="modal-text3">{value}</div>
+				</Flex>
+			</>
+		);
+	};
+
+	const calUpgrade = (currentATK, currentLevel) => {
+		let atkGrowth;
+		let nkoCoefficient;
+		let prismConsume;
+		switch (currentLevel) {
+			case 0:
+				atkGrowth = 0;
+				nkoCoefficient = 0;
+				prismConsume = 0;
+				break;
+			case 1:
+				atkGrowth = 0.15;
+				nkoCoefficient = 0.15;
+				prismConsume = 0;
+				break;
+			case 2:
+				atkGrowth = 0.25;
+				nkoCoefficient = 0.2;
+				prismConsume = 1;
+				break;
+			case 3:
+				atkGrowth = 0.18;
+				nkoCoefficient = 0.15;
+				prismConsume = 0;
+				break;
+			case 4:
+				atkGrowth = 0.18;
+				nkoCoefficient = 0.15;
+				prismConsume = 0;
+				break;
+			case 5:
+				atkGrowth = 0.25;
+				nkoCoefficient = 0.2;
+				prismConsume = 3;
+				break;
+			case 6:
+				atkGrowth = 0.2;
+				nkoCoefficient = 0.18;
+				prismConsume = 0;
+				break;
+			case 7:
+				atkGrowth = 0.2;
+				nkoCoefficient = 0.18;
+				prismConsume = 0;
+				break;
+			case 8:
+				atkGrowth = 0.35;
+				nkoCoefficient = 0.2;
+				prismConsume = 6;
+				break;
+			case 9:
+				atkGrowth = 0.22;
+				nkoCoefficient = 0.2;
+				prismConsume = 0;
+				break;
+			case 10:
+				atkGrowth = 0.22;
+				nkoCoefficient = 0.2;
+				prismConsume = 0;
+				break;
+			case 11:
+				atkGrowth = 0.4;
+				nkoCoefficient = 0.3;
+				prismConsume = 9;
+				break;
+			case 12:
+				atkGrowth = 0.25;
+				nkoCoefficient = 0.22;
+				prismConsume = 0;
+				break;
+			case 13:
+				atkGrowth = 0.25;
+				nkoCoefficient = 0.22;
+				prismConsume = 0;
+				break;
+			case 14:
+				atkGrowth = 0.5;
+				nkoCoefficient = 0.35;
+				prismConsume = 12;
+				break;
+			default:
+				atkGrowth = 0;
+				nkoCoefficient = 0;
+				prismConsume = 0;
+		}
+
+		const newATK = currentATK * (1 + atkGrowth);
+		const nkoConsume = newATK / nkoCoefficient;
+
+		return {
+			nkoConsume: nkoConsume,
+			prismConsume: prismConsume,
+			newATK: newATK,
+		};
+	};
+
+	const upgradeConsume = useMemo(
+		() => calUpgrade(focus.ATK, focus.Level),
+		[focus.ATK, focus.Level]
+	);
+
+	const calMaxLevel = (rarity) => {
+		let maxLevel;
+		switch (rarity) {
+			case "N":
+				maxLevel = 3;
+			case "R":
+				maxLevel = 6;
+			case "SR":
+				maxLevel = 9;
+			case "SSR":
+				maxLevel = 12;
+			case "UR":
+				maxLevel = 15;
+		}
+		return maxLevel;
+	};
+
+	const maxLevel = useMemo(() => calMaxLevel(focus.Rarity), [focus.Rarity]);
 
 	return (
 		<>
-			<div className="pool-card">
+			<div className="pool-card" style={{ height: "100%" }}>
 				<BoxBorder />
 				<Flex justify="center" vertical="column">
 					<Row>
@@ -51,35 +170,41 @@ export default function NekoDetail({ focus }) {
 							}}
 						>
 							<Flex className="modal-detail" vertical="column">
-								<div className="modal-text1 margin-top-16">
+								<div
+									className="modal-text1 margin-top-16"
+									style={{
+										justifyContent: "start",
+										display: "flex",
+										marginBottom: "16px",
+									}}
+								>
 									{"# " + focus?.TokenId}
 								</div>
-								<Flex justify="space-between" className="margin-bottom-16">
-									<div className="modal-text2">Earning</div>
-									<div className="modal-text3">
-										{addCommaInNumber(focus?.Rewards)}
-									</div>
-								</Flex>
-								<Flex justify="space-between" className="margin-bottom-16">
-									<div className="modal-text2">Claimed</div>
-									<div className="modal-text3">
-										{addCommaInNumber(focus?.ClaimedRewards)}
-									</div>
-								</Flex>
+
+								<Detail title="Rarity" value={focus?.Rarity} />
+								<Detail title="LV" value={focus?.Level} />
+								<Detail
+									title="Earning"
+									value={addCommaInNumber(focus?.Rewards + focus?.MintRewards)}
+								/>
+								<Detail
+									title="Claimed"
+									value={addCommaInNumber(
+										focus?.ClaimedRewards + focus?.ClaimedMintRewards
+									)}
+								/>
+								<Detail
+									title="Status"
+									value={
+										<div style={{ color: "#c1e8fd" }}>
+											{focus?.IsStaked ? "Staked" : "Available"}
+										</div>
+									}
+								/>
 								{/*<Flex justify="space-between" className="margin-bottom-16">*/}
 								{/*    <div className="modal-text2">APR</div>*/}
 								{/*    <div className="modal-text3">/</div>*/}
 								{/*</Flex>*/}
-								<Flex justify="space-between" className="margin-bottom-16">
-									<div className="modal-text2">Status</div>
-									<div className="modal-text3">
-										{focus?.IsStaked ? "Staked" : "Available"}
-									</div>
-								</Flex>
-								<Flex justify="space-between" className="margin-bottom-16">
-									<div className="modal-text2">LV</div>
-									<div className="modal-text3">{focus?.Level}</div>
-								</Flex>
 							</Flex>
 						</Col>
 					</Row>
@@ -87,56 +212,23 @@ export default function NekoDetail({ focus }) {
 						<Col xs={24} sm={24} lg={18}>
 							<Flex justify="center" style={{ marginBottom: "10px" }}>
 								<div className="modal-text1">{"LV" + focus?.Level}</div>
-								{focus?.Level !== 13 && focus?.Level > 0 && (
+								{maxLevel > focus?.Level && (
 									<div className="modal-text1">{" → "}</div>
 								)}
-								{focus?.Level !== 13 && focus?.Level > 0 && (
+								{maxLevel > focus?.Level && (
 									<div className="modal-text4">
 										&nbsp;
-										{"LV" +
-											(focus?.Level === 13 ? 13 : Number(focus?.Level) + 1)}
+										{"LV" + (Number(focus?.Level) + 1)}
 									</div>
 								)}
 							</Flex>
-							<Flex justify="space-between">
-								<Flex align="center" className="modal-text5">
-									{" "}
-									<img
-										src={m1}
-										width={14}
-										alt=""
-										style={{ marginRight: "10px" }}
-									/>
-									SPI
-								</Flex>
-								<Flex>
-									<div className="modal-text6">
-										{addCommaInNumber(focus?.SPI)}
-									</div>
-									{focus?.Level !== 13 && focus?.Level > 0 && (
-										<div className="modal-text8">&nbsp;{">"}&nbsp;</div>
-									)}
-									{focus?.Level !== 13 && focus?.Level > 0 && (
-										<div
-											className={
-												upgradeCal[focus?.Level - 1].SPI > 0
-													? "modal-text7"
-													: "modal-text8"
-											}
-										>
-											{addCommaInNumber(
-												Number(focus?.SPI) + upgradeCal[focus?.Level - 1].SPI
-											)}
-										</div>
-									)}
-								</Flex>
-							</Flex>
+
 							<Flex justify="space-between">
 								<Flex align="center" className="modal-text5">
 									{" "}
 									<img
 										src={m2}
-										width={14}
+										width={20}
 										alt=""
 										style={{ marginRight: "10px" }}
 									/>
@@ -146,204 +238,100 @@ export default function NekoDetail({ focus }) {
 									<div className="modal-text6">
 										{addCommaInNumber(focus?.ATK)}
 									</div>
-									{focus?.Level !== 13 && focus?.Level > 0 && (
+									{maxLevel > focus?.Level && (
 										<div className="modal-text8">&nbsp;{">"}&nbsp;</div>
 									)}
-									{focus?.Level !== 13 && focus?.Level > 0 && (
+									{maxLevel > focus?.Level && (
 										<div
 											className={
-												upgradeCal[focus?.Level - 1].ATK > 0
+												upgradeConsume.newATK > 0
 													? "modal-text7"
-													: "modal-text8"
+													: "modal-text6"
 											}
 										>
-											{addCommaInNumber(
-												Number(focus?.ATK) + upgradeCal[focus?.Level - 1].ATK
-											)}
+											{addCommaInNumber(upgradeConsume.newATK)}
 										</div>
 									)}
 								</Flex>
 							</Flex>
-							<Flex justify="space-between">
-								<Flex align="center" className="modal-text5">
-									{" "}
-									<img
-										src={m3}
-										width={14}
-										alt=""
-										style={{ marginRight: "10px" }}
-									/>
-									DEF
-								</Flex>
-								<Flex>
-									<div className="modal-text6">
-										{addCommaInNumber(focus?.DEF)}
-									</div>
-									{focus?.Level !== 13 && focus?.Level > 0 && (
-										<div className="modal-text8">&nbsp;{">"}&nbsp;</div>
-									)}
-									{focus?.Level !== 13 && focus?.Level > 0 && (
-										<div
-											className={
-												upgradeCal[focus?.Level - 1].DEF > 0
-													? "modal-text7"
-													: "modal-text8"
-											}
-										>
-											{addCommaInNumber(
-												Number(focus?.DEF) + upgradeCal[focus?.Level - 1].DEF
-											)}
-										</div>
-									)}
-								</Flex>
-							</Flex>
-							<Flex justify="space-between">
-								<Flex align="center" className="modal-text5">
-									{" "}
-									<img
-										src={m4}
-										width={14}
-										alt=""
-										style={{ marginRight: "10px" }}
-									/>
-									SPD
-								</Flex>
-								<Flex>
-									<div className="modal-text6">
-										{addCommaInNumber(focus?.SPD)}
-									</div>
-									{focus?.Level !== 13 && focus?.Level > 0 && (
-										<div className="modal-text8">&nbsp;{">"}&nbsp;</div>
-									)}
-									{focus?.Level !== 13 && focus?.Level > 0 && (
-										<div
-											className={
-												upgradeCal[focus?.Level - 1].SPD > 0
-													? "modal-text7"
-													: "modal-text8"
-											}
-										>
-											{addCommaInNumber(
-												Number(focus?.SPD) + upgradeCal[focus?.Level - 1].SPD
-											)}
-										</div>
-									)}
-								</Flex>
-							</Flex>
-							<Flex justify="space-between">
-								<Flex align="center" className="modal-text5">
-									{" "}
-									<img
-										src={m5}
-										width={14}
-										alt=""
-										style={{ marginRight: "10px" }}
-									/>
-									MANA
-								</Flex>
-								<Flex>
-									<div className="modal-text6">
-										{addCommaInNumber(focus?.Mana)}
-									</div>
-									{focus?.Level !== 13 && focus?.Level > 0 && (
-										<div className="modal-text8">&nbsp;{">"}&nbsp;</div>
-									)}
-									{focus?.Level !== 13 && focus?.Level > 0 && (
-										<div className="modal-text7">
-											{addCommaInNumber(
-												Number(focus?.Mana) +
-													0.065 *
-														(0.4 * Number(upgradeCal[focus?.Level - 1].SPI) +
-															0.3 * Number(upgradeCal[focus?.Level - 1].ATK) +
-															0.2 * Number(upgradeCal[focus?.Level - 1].DEF) +
-															0.1 * Number(upgradeCal[focus?.Level - 1].SPD))
-											)}
-										</div>
-									)}
-								</Flex>
-							</Flex>
-							{upgradeCal[focus?.Level - 1]?.Prism &&
-								upgradeCal[focus?.Level - 1].Prism > 0 && (
-									<Flex
-										className="black-bg2"
-										justify="space-between"
-										align="center"
-										style={{ marginTop: "16px" }}
-									>
-										<Flex align="center">
-											<img
-												src={purple}
-												width={24}
-												style={{ marginRight: "10px" }}
-												alt=""
-											/>
-											<div className="modal-text3">Prism</div>
-										</Flex>
-										<Flex>
-											<div className="modal-text3">
-												{addCommaInNumber(prism)}
-											</div>
-											<div className="modal-text9">
-												{"/" +
-													addCommaInNumber(upgradeCal[focus?.Level - 1].Prism)}
-											</div>
-										</Flex>
+
+							{upgradeConsume.prismConsume > 0 && (
+								<Flex
+									className="black-bg2"
+									justify="space-between"
+									align="center"
+									style={{ marginTop: "16px" }}
+								>
+									<Flex align="center">
+										<img
+											src={purple}
+											width={24}
+											style={{ marginRight: "10px" }}
+											alt=""
+										/>
+										<div className="modal-text3">Prism</div>
 									</Flex>
-								)}
-							{upgradeCal[focus?.Level - 1]?.Neko &&
-								upgradeCal[focus?.Level - 1].Neko > 0 && (
-									<Flex
-										className="black-bg3"
-										justify="space-between"
-										align="center"
-										style={{ marginTop: "16px" }}
-									>
-										<Flex align="center">
-											<img
-												src={blue}
-												width={24}
-												style={{ marginRight: "10px" }}
-												alt=""
-											/>
-											<div className="modal-text3">NPO</div>
-										</Flex>
-										<Flex>
-											<div className="modal-text3">
-												{addCommaInNumber(nekocoin)}
-											</div>
-											<div className="modal-text9">
-												{"/" +
-													addCommaInNumber(upgradeCal[focus?.Level - 1].Neko)}
-											</div>
-										</Flex>
+									<Flex>
+										<div className="modal-text3">{addCommaInNumber(prism)}</div>
+										<div className="modal-text9">
+											{"/" + addCommaInNumber(upgradeConsume.prismConsume)}
+										</div>
 									</Flex>
-								)}
+								</Flex>
+							)}
+							{upgradeConsume.nkoConsume > 0 && (
+								<Flex
+									className="black-bg3"
+									justify="space-between"
+									align="center"
+									style={{ marginTop: "16px" }}
+								>
+									<Flex align="center">
+										<img
+											src={blue}
+											width={24}
+											style={{ marginRight: "10px" }}
+											alt=""
+										/>
+										<div className="modal-text3">NPO</div>
+									</Flex>
+									<Flex>
+										<div className="modal-text3">
+											{addCommaInNumber(nekocoin)}
+										</div>
+										<div className="modal-text9">
+											{"/" + addCommaInNumber(upgradeConsume.nkoConsume)}
+										</div>
+									</Flex>
+								</Flex>
+							)}
 						</Col>
 					</Row>
 					<div
 						style={{
 							display: "flex",
-							justifyContent: "space-between",
+							flexDirection: "column",
+							alignItems: "center",
 							padding: "24px 80px",
 						}}
 					>
 						<Button
-							text={focus?.Level == 13 ? "LV MAX" : "LV UP"}
+							text={focus?.Level == maxLevel ? "LV MAX" : "UPGRADE"}
 							color="orange"
 							longness="short"
 							style={
-								focus?.Level == 13
+								focus?.Level == maxLevel
 									? { filter: "grayscale(1)", marginTop: "24px" }
 									: { marginTop: "24px" }
 							}
 							onClick={
-								focus?.Level == 13 ? null : () => upgrade(focus?.TokenId)
+								focus?.Level == maxLevel ? null : () => upgrade(focus?.TokenId)
 							}
 						/>
 
 						<Button
-							text={"Unstake"}
-							color={"blue"}
+							text={"UPGRADE TO MAX"}
+							color={"orange"}
 							longness={"short"}
 							style={{ marginTop: "24px" }}
 							onClick={() => unstake(focus?.TokenId)}

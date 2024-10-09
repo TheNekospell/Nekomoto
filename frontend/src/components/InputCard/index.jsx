@@ -28,7 +28,6 @@ import blue from "@assets/blue.png";
 import exclamation from "@assets/exclamation.png";
 
 export default function InputCard() {
-
 	const { account, address, status, chainId, isConnected } = useAccount();
 	const [inputValue, setInputValue] = useState("Enter your amount");
 	const [visible, setVisible] = useState(false);
@@ -102,7 +101,7 @@ export default function InputCard() {
 	};
 
 	return (
-		<div>
+		<div style={{ height: "100%" }}>
 			<NekoModal
 				open={visible}
 				centered={true}

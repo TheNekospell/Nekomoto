@@ -2,6 +2,7 @@ import { Button, Col, Flex, Row } from "antd";
 import BoxBorder from "../BoxBorder";
 import CardDetail from "../CardDetail";
 import RadioButton from "../RadioButton";
+import "./index.css";
 
 import m1 from "@assets/modal-icon1.png";
 import m2 from "@assets/modal-icon2.png";
@@ -15,8 +16,40 @@ export default function NekomotoPreview({
 	setNekoButton,
 	setFocus,
 	unstake,
+	unStakeAll,
 	stake,
+	stakeAll,
 }) {
+	const StakeButton = ({ mainTitle, subTitle, func, condition }) => {
+		return (
+			<>
+				<div
+					style={{
+						marginRight: "18px",
+						fontSize: "12px",
+						cursor: condition ? "pointer" : "default",
+						color: "black",
+						backgroundColor: "#ede6c5",
+						borderRadius: "20px",
+						display: "flex",
+						flexDirection: "column",
+						alignItems: "center",
+						padding: "2px 16px",
+						// filter: condition ? "" : "grayscale(0.5)",
+						opacity: condition ? 1 : 0.5,
+					}}
+					className={condition ? "stake-button" : ""}
+					onClick={condition ? func : null}
+				>
+					{mainTitle}
+					{subTitle && (
+						<div style={{ fontSize: "8px", margin: "0" }}>{subTitle}</div>
+					)}
+				</div>
+			</>
+		);
+	};
+
 	return (
 		<>
 			<div className="pool-card" style={{ height: "100%" }}>
@@ -69,53 +102,33 @@ export default function NekomotoPreview({
 				</Flex>
 
 				<Flex style={{ justifyContent: "end" }}>
-					<div
-						className="card-desc-title"
-						style={
+					<StakeButton
+						mainTitle="Stake All"
+						subTitle="Batch"
+						func={stakeAll}
+						condition={
 							addressInfo.NekoSpiritList?.filter((item) => !item.IsStaked)
 								.length > 0
-								? {
-										marginRight: "18px",
-										fontSize: "12px",
-										cursor: "pointer",
-								  }
-								: {
-										marginRight: "18px",
-										fontSize: "12px",
-										cursor: "pointer",
-										filter: "grayscale(1)",
-								  }
 						}
-						onClick={
+					/>
+					<StakeButton
+						mainTitle="Stake All"
+						subTitle="Successive"
+						func={stakeAll}
+						condition={
 							addressInfo.NekoSpiritList?.filter((item) => !item.IsStaked)
 								.length > 0
-								? stakeAll
-								: null
 						}
-					>
-						Stake All
-					</div>
-					<div
-						className="card-desc-title"
-						style={
+					/>
+					<StakeButton
+						mainTitle="Stake All"
+						subTitle="Successive"
+						func={unStakeAll}
+						condition={
 							addressInfo.NekoSpiritList?.filter((item) => item.IsStaked)
 								.length > 0
-								? { fontSize: "12px", cursor: "pointer" }
-								: {
-										fontSize: "12px",
-										cursor: "pointer",
-										filter: "grayscale(1)",
-								  }
 						}
-						onClick={
-							addressInfo.NekoSpiritList?.filter((item) => item.IsStaked)
-								.length > 0
-								? unStakeAll
-								: null
-						}
-					>
-						UnStake All
-					</div>
+					/>
 				</Flex>
 
 				<Row gutter={16}>
@@ -124,7 +137,6 @@ export default function NekomotoPreview({
 							? true
 							: item.Rarity?.toLowerCase() === nekoButton.toLowerCase()
 					).map((item, index) => {
-						// console.log("index: ", item, index)
 						return (
 							<Col xs={12} sm={12} lg={4} key={index}>
 								<Flex className="card-item" justify="center" vertical="column">

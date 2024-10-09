@@ -85,7 +85,7 @@ export default function Assets() {
 			<div className="assets padding-top-80 padding-bottom-80">
 				<Row
 					gutter={16}
-					style={{ paddingTop: "16px", height: "100%", display: "flex" }}
+					style={{ paddingTop: "16px", height: "320px", display: "flex" }}
 				>
 					<Col style={{ width: "55%", height: "100%" }}>
 						<InputCard />
@@ -102,7 +102,7 @@ export default function Assets() {
 						/>
 					</Col>
 				</Row>
-				<Row style={{ marginTop: "16px", marginBottom: "16px" }} gutter={16}>
+				<Row style={{ marginTop: "16px", marginBottom: "16px", height: "150px" }} gutter={16}>
 					<Col style={{ width: "55%", height: "100%" }}>
 						<LuckCard
 							myLuck={addressInfo?.MyLuck}

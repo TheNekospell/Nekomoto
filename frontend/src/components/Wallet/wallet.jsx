@@ -104,7 +104,6 @@ export default function Wallet({ isMobile = false }) {
 			// }, 10000);
 		}
 		setTestCode("");
-
 	};
 
 	return (
@@ -213,7 +212,9 @@ export default function Wallet({ isMobile = false }) {
 							</span>
 						</div>
 					) : (
-						<div style={{ width: "100%" }}>Connect Wallet</div>
+						<div style={{ width: "100%" }} onClick={() => setVisible(true)}>
+							Connect Wallet
+						</div>
 					)}
 				</Col>
 			</Row>
@@ -317,199 +318,196 @@ export default function Wallet({ isMobile = false }) {
 				</NekoModal>
 			)}
 
-			{visible && (
-				<NekoModal
-					open={visible}
-					centered={true}
-					footer={null}
-					maskClosable={true}
-					onCancel={() => {
-						setVisible(false);
-						setActiveResult("");
-					}}
-				>
-					<div>
-						<h2
-							style={{
-								textAlign: "center",
-								color: "#01dce4",
-								fontFamily: "BIG SHOT",
-								fontWeight: "bold",
-							}}
-						>
-							{address && isConnected ? "" : "Connect Wallet"}
-						</h2>
-					</div>
-
-					{/*<button*/}
-					{/*    className={"header-btn"}*/}
-					{/*    style={{marginTop: "20px", textAlign: "center"}}*/}
-					{/*    onClick={sign}*/}
-					{/*>*/}
-					{/*    {"TEST"}*/}
-					{/*</button>*/}
-
-					<div
+			<NekoModal
+				open={visible}
+				centered={true}
+				footer={null}
+				maskClosable={true}
+				onCancel={() => {
+					setVisible(false);
+					setActiveResult("");
+				}}
+			>
+				<div>
+					<h2
 						style={{
-							marginBottom: "15px",
-							marginTop: "20px",
 							textAlign: "center",
+							color: "#01dce4",
+							fontFamily: "BIG SHOT",
+							fontWeight: "bold",
 						}}
 					>
-						{address && isConnected ? (
-							<div>
-								<div
-									style={{
-										fontSize: "16px",
-										textAlign: "center",
-										marginLeft: "10px",
-										fontFamily: "BIG SHOT",
-										color: "#01dce4",
-										fontWeight: "bold",
-									}}
-								>
-									{address.slice(0, 6) + "..." + address.slice(-4)}
-								</div>
-								<div
-									style={{
-										fontSize: "16px",
-										textAlign: "center",
-										marginLeft: "10px",
-										marginTop: "10px",
-										fontFamily: "BIG SHOT",
-										color: addressInfo.Active ? "#539371" : "grey",
-										fontWeight: "bold",
-									}}
-								>
-									{addressInfo.Active ? "Active" : "Not Active"}
-								</div>
-								{!addressInfo.Active && (
-									<div>
+						{address && isConnected ? "" : "Connect Wallet"}
+					</h2>
+				</div>
+
+				{/*<button*/}
+				{/*    className={"header-btn"}*/}
+				{/*    style={{marginTop: "20px", textAlign: "center"}}*/}
+				{/*    onClick={sign}*/}
+				{/*>*/}
+				{/*    {"TEST"}*/}
+				{/*</button>*/}
+
+				<div
+					style={{
+						marginBottom: "15px",
+						marginTop: "20px",
+						textAlign: "center",
+					}}
+				>
+					{address && isConnected ? (
+						<div>
+							<div
+								style={{
+									fontSize: "16px",
+									textAlign: "center",
+									marginLeft: "10px",
+									fontFamily: "BIG SHOT",
+									color: "#01dce4",
+									fontWeight: "bold",
+								}}
+							>
+								{address.slice(0, 6) + "..." + address.slice(-4)}
+							</div>
+							<div
+								style={{
+									fontSize: "16px",
+									textAlign: "center",
+									marginLeft: "10px",
+									marginTop: "10px",
+									fontFamily: "BIG SHOT",
+									color: addressInfo.Active ? "#539371" : "grey",
+									fontWeight: "bold",
+								}}
+							>
+								{addressInfo.Active ? "Active" : "Not Active"}
+							</div>
+							{!addressInfo.Active && (
+								<div>
+									<div
+										style={{
+											display: "flex",
+											justifyContent: "center",
+											alignItems: "center",
+											flexDirection: "row",
+											marginTop: "20px",
+											marginBottom: "10px",
+										}}
+									>
+										<Input
+											placeholder="Enter Game Test Code"
+											// type="number"
+											size="large"
+											style={{ width: "200px", marginRight: "20px" }}
+											// value={inputValue}
+											onChange={(e) => {
+												const v = e.target.value;
+												if (v) {
+													setTestCode(v);
+												}
+											}}
+										/>
+										<Button
+											text="Active"
+											color="yellow"
+											longness="short"
+											onClick={testCode !== "" ? () => active(testCode) : null}
+										/>
+									</div>
+									{activeResult !== "" && (
 										<div
 											style={{
+												fontSize: "16px",
+												textAlign: "center",
+												marginLeft: "10px",
+												marginTop: "15px",
+												fontFamily: "BIG SHOT",
+												color: "white",
+												fontWeight: "bold",
+											}}
+										>
+											{activeResult}
+										</div>
+									)}
+								</div>
+							)}
+
+							{/*<div*/}
+							{/*    style={{*/}
+							{/*        fontSize: "20px",*/}
+							{/*        fontFamily: "BIG SHOT",*/}
+							{/*        color: "#01dce4",*/}
+							{/*        marginTop: "18px",*/}
+							{/*        textAlign: "center",*/}
+							{/*    }}*/}
+							{/*>*/}
+							{/*    {"My Invitor"}*/}
+							{/*</div>*/}
+
+							{/*<div*/}
+							{/*    style={{*/}
+							{/*        fontSize: "14px",*/}
+							{/*        fontFamily: "BIG SHOT",*/}
+							{/*        color: "#01dce4",*/}
+							{/*        marginTop: "18px",*/}
+							{/*        textAlign: "center",*/}
+							{/*    }}*/}
+							{/*>*/}
+							{/*    {"Neko-xxxxxxx"}*/}
+							{/*</div>*/}
+
+							<Button
+								style={{ marginTop: "20px", textAlign: "center" }}
+								onClick={closeConnection}
+								text={"Disconnect"}
+								color={"yellow"}
+								longness="long"
+							/>
+						</div>
+					) : (
+						<div>
+							<ul>
+								{connectors.map((connector) => (
+									<div
+										key={connector.id}
+										style={{
+											display: "flex",
+											justifyContent: "center",
+											marginTop: "20px",
+											flexDirection: "row",
+										}}
+									>
+										<button
+											style={{
+												fontSize: "15px",
+												flexDirection: "row",
 												display: "flex",
 												justifyContent: "center",
 												alignItems: "center",
-												flexDirection: "row",
-												marginTop: "20px",
-												marginBottom: "10px",
+												width: "200px",
 											}}
+											className={"header-btn"}
+											onClick={() => establishConnection(connector)}
 										>
-											<Input
-												placeholder="Enter Game Test Code"
-												// type="number"
-												size="large"
-												style={{ width: "200px", marginRight: "20px" }}
-												// value={inputValue}
-												onChange={(e) => {
-													const v = e.target.value;
-													if (v) {
-														setTestCode(v);
-													}
-												}}
-											/>
-											<Button
-												text="Active"
-												color="yellow"
-												longness="short"
-												onClick={
-													testCode !== "" ? () => active(testCode) : null
-												}
-											/>
-										</div>
-										{activeResult !== "" && (
-											<div
-												style={{
-													fontSize: "16px",
-													textAlign: "center",
-													marginLeft: "10px",
-													marginTop: "15px",
-													fontFamily: "BIG SHOT",
-													color: "white",
-													fontWeight: "bold",
-												}}
-											>
-												{activeResult}
-											</div>
-										)}
+											{connector.icon && (
+												<div
+													style={{
+														marginRight: "20px",
+														display: "flex",
+														justifyContent: "center",
+														alignItems: "center",
+													}}
+												>
+													<img src={connector.icon.dark} width={30} alt="" />
+												</div>
+											)}
+											{connector.name}
+										</button>
 									</div>
-								)}
-
-								{/*<div*/}
-								{/*    style={{*/}
-								{/*        fontSize: "20px",*/}
-								{/*        fontFamily: "BIG SHOT",*/}
-								{/*        color: "#01dce4",*/}
-								{/*        marginTop: "18px",*/}
-								{/*        textAlign: "center",*/}
-								{/*    }}*/}
-								{/*>*/}
-								{/*    {"My Invitor"}*/}
-								{/*</div>*/}
-
-								{/*<div*/}
-								{/*    style={{*/}
-								{/*        fontSize: "14px",*/}
-								{/*        fontFamily: "BIG SHOT",*/}
-								{/*        color: "#01dce4",*/}
-								{/*        marginTop: "18px",*/}
-								{/*        textAlign: "center",*/}
-								{/*    }}*/}
-								{/*>*/}
-								{/*    {"Neko-xxxxxxx"}*/}
-								{/*</div>*/}
-
-								<Button
-									style={{ marginTop: "20px", textAlign: "center" }}
-									onClick={closeConnection}
-									text={"Disconnect"}
-									color={"yellow"}
-									longness="long"
-								/>
-							</div>
-						) : (
-							<div>
-								<ul>
-									{connectors.map((connector) => (
-										<div
-											key={connector.id}
-											style={{
-												display: "flex",
-												justifyContent: "center",
-												marginTop: "20px",
-												flexDirection: "row",
-											}}
-										>
-											<button
-												style={{
-													fontSize: "15px",
-													flexDirection: "row",
-													display: "flex",
-													justifyContent: "center",
-													alignItems: "center",
-													width: "200px",
-												}}
-												className={"header-btn"}
-												onClick={() => establishConnection(connector)}
-											>
-												{connector.icon && (
-													<div
-														style={{
-															marginRight: "20px",
-															display: "flex",
-															justifyContent: "center",
-															alignItems: "center",
-														}}
-													>
-														<img src={connector.icon.dark} width={30} alt="" />
-													</div>
-												)}
-												{connector.name}
-											</button>
-										</div>
-									))}
-								</ul>
-								{/* <div>
+								))}
+							</ul>
+							{/* <div>
 									<Input
 										placeholder="Enter Invite Code"
 										// type="number"
@@ -524,11 +522,10 @@ export default function Wallet({ isMobile = false }) {
 										}}
 									/>
 								</div> */}
-							</div>
-						)}
-					</div>
-				</NekoModal>
-			)}
+						</div>
+					)}
+				</div>
+			</NekoModal>
 		</div>
 	);
 }

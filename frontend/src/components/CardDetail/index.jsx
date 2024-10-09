@@ -16,13 +16,13 @@ import Legendary from "@assets/Legendary.png";
 
 export default function CardDetail({ item }) {
 	const rarity = (item) => {
-		if (item?.Rarity === "Uncommon") {
+		if (item?.Rarity === "R") {
 			return Uncommon;
-		} else if (item?.Rarity === "Rare") {
+		} else if (item?.Rarity === "SR") {
 			return Rare;
-		} else if (item?.Rarity === "Epic") {
+		} else if (item?.Rarity === "SSR") {
 			return Epic;
-		} else if (item?.Rarity === "Legendary") {
+		} else if (item?.Rarity === "UR") {
 			return Legendary;
 		} else {
 			return Common;
@@ -54,7 +54,7 @@ export default function CardDetail({ item }) {
 			>
 				{"Lv " + item?.Level}
 			</div>
-			<div
+			{/* <div
 				style={{
 					textShadow:
 						"2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black, 1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black",
@@ -67,8 +67,8 @@ export default function CardDetail({ item }) {
 				}}
 			>
 				{"Fade=" + item?.Fade}
-			</div>
-			<div
+			</div> */}
+			{/* <div
 				style={{
 					textShadow:
 						"2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black, 1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black",
@@ -82,8 +82,8 @@ export default function CardDetail({ item }) {
 				}}
 			>
 				{item?.Mana}
-			</div>
-			<div
+			</div> */}
+			{/* <div
 				style={{
 					textShadow:
 						"2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black, 1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black",
@@ -128,14 +128,14 @@ export default function CardDetail({ item }) {
 					<img src={DEF} width={18} style={{ marginRight: "4px" }} alt={""} />
 					<span>{item?.DEF}</span>
 				</div>
-			</div>
+			</div> */}
 			<div
 				style={{
 					textShadow:
 						"2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black, 1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black",
 					position: "absolute",
 					top: "170px",
-					left: "100px",
+					left: "30px",
 					fontFamily: "BIG SHOT",
 					color: "white",
 					fontSize: "10px",
@@ -148,11 +148,11 @@ export default function CardDetail({ item }) {
 						alignItems: "center",
 					}}
 				>
-					<img src={ATK} width={18} style={{ marginRight: "4px" }} alt={""} />
+					<img src={ATK} width={30} style={{ marginRight: "4px" }} alt={""} />
 					<span>{item?.ATK}</span>
 				</div>
 			</div>
-			<div
+			{/* <div
 				style={{
 					textShadow:
 						"2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black, 1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black",
@@ -174,7 +174,7 @@ export default function CardDetail({ item }) {
 					<img src={SPD} width={18} style={{ marginRight: "4px" }} alt={""} />
 					<span>{item?.SPD}</span>
 				</div>
-			</div>
+			</div> */}
 		</div>
 	);
 }

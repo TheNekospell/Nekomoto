@@ -520,7 +520,7 @@ pub mod Nekomoto {
     }
 
     fn upgrade_once(current_atk: u256, current_level: u8) -> (u256, u256, u256) {
-        let (atk_growth, nko_coeficcient, prism_consume) = match current_level {
+        let (atk_growth, nko_coefficient, prism_consume) = match current_level {
             0 => (0, 0, 0),
             1 => (15, 15, 0),
             2 => (25, 20, 1),
@@ -540,7 +540,7 @@ pub mod Nekomoto {
         };
 
         let new_atk = current_atk * (100 + atk_growth) / 100;
-        let nko_consume = new_atk / nko_coeficcient;
+        let nko_consume = new_atk / nko_coefficient;
 
         (nko_consume, prism_consume, new_atk)
     }

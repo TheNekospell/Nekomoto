@@ -289,7 +289,7 @@ export default function Detail() {
 			/>
 
 			<div
-				className="detail padding-top-80 padding-bottom-80"
+				className="detail"
 				style={{ width: "100%", height: "100%" }}
 			>
 				<Row gutter={16} style={{ height: "100%" }}>
@@ -324,7 +324,7 @@ export default function Detail() {
 					</Col>
 				</Row>
 
-				<Row gutter={{ md: 0, lg: 16 }}>
+				<Row gutter={16} style={{ height: "600px" }}>
 					<Col
 						style={{ width: "55%", height: "100%" }}
 						className="margin-top-16"
@@ -337,6 +337,8 @@ export default function Detail() {
 							setFocus={setFocus}
 							unstake={unstake}
 							stake={stake}
+							stakeAll={stakeAll}
+							unStakeAll={unStakeAll}
 						/>
 					</Col>
 					<Col
@@ -344,7 +346,7 @@ export default function Detail() {
 						className="margin-top-16"
 						gutter={16}
 					>
-						<NekoDetail focus={focus} />
+						<NekoDetail focus={focus} prism={prism} nekocoin={nekocoin} />
 					</Col>
 				</Row>
 			</div>
