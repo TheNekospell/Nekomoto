@@ -37,5 +37,5 @@ pub trait NekomotoTrait<ContractState> {
     fn generate(self: @ContractState, token_id: u256, origin: bool) -> Info;
     fn buy_coin(ref self: ContractState, count: u256);
     fn check_coin(self: @ContractState, address: ContractAddress) -> u256;
-    fn check_in(ref self: ContractState, address: ContractAddress) -> bool;
+    fn check_in(ref self: ContractState) -> bool;
 }

@@ -2,7 +2,36 @@ import purple1 from "@assets/purple1.png";
 import seven from "@assets/seven.png";
 import BoxBorder from "../BoxBorder";
 
+import {
+	BACKEND,
+	NEKOCOIN_ADDRESS,
+	nekocoinContract,
+	NEKOMOTO_ADDRESS,
+	nekomotoContract,
+	PRISM_ADDRESS,
+	prismContract,
+	SHARD_ADDRESS,
+	shardContract,
+	sign,
+	addCommaInNumber,
+} from "@/interface.js";
+import { useEffect } from "react";
+
 export default function CheckCard() {
+
+	const { address } = useAccount();
+	const [check_status, setCheckStatus] = useState(0);
+
+	useEffect(() => {
+		prismContract.read_check_in().then((result) => {
+			setCheckStatus(result)
+		})
+	}, [address])
+
+	const calCheckStatus = (check_status) => {
+		
+	}
+
 	const CheckItem = () => {
 		return (
 			<>

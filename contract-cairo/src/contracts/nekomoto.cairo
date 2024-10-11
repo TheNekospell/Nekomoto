@@ -144,8 +144,9 @@ pub mod Nekomoto {
             self.coin.write(recipient, count);
         }
 
-        fn check_in(ref self: ContractState, address: ContractAddress) -> bool {
-            ERC20BurnTraitDispatcher { contract_address: self.prism.read() }.check_in(address)
+        fn check_in(ref self: ContractState) -> bool {
+            ERC20BurnTraitDispatcher { contract_address: self.prism.read() }
+                .check_in(get_caller_address())
         }
 
         fn summon(
