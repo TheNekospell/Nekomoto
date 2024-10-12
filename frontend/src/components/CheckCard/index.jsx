@@ -61,10 +61,8 @@ export default function CheckCard({ setWaiting, setSuccess }) {
 
 	const checkStatus = useMemo(() => calCheckStatus(check_status), [check_status])
 
-	const today = () => {
-		const date = new Date();
-		return date.getUTCDay()
-	}
+	const today = new Date().getUTCDay() - 1
+	console.log("today: ", today);
 
 	const CheckItem = ({ checkIn, title, click }) => {
 		return (
@@ -82,6 +80,7 @@ export default function CheckCard({ setWaiting, setSuccess }) {
 						alignItems: "center",
 						margin: "5px 5px",
 						height: "100%",
+						cursor: click ? "pointer" : "default",
 					}}
 					onClick={click ? checkInContract : null}
 				>
