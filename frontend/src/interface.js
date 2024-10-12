@@ -2,16 +2,14 @@ import { Contract, RpcProvider, hash } from "starknet";
 import nekomotoAbi from "./abi/nekomoto.json" assert { type: "json" };
 import nekocoinAbi from "./abi/nekocoin.json" assert { type: "json" };
 import prismAbi from "./abi/prism.json" assert { type: "json" };
-import shardAbi from "./abi/temporalshard.json" assert { type: "json" };
 import { useAccount } from "@starknet-react/core";
 
 const BASE_URL = "https://api.nekomoto.xyz/api"
 // const BASE_URL = "http://localhost:8972/api"
 
-export const NEKOMOTO_ADDRESS = "0x032bf65bdf7fda6c87f738b94203de2e624702cc9373114ac212de2ba89acc6a"
-export const NEKOCOIN_ADDRESS = "0x00bb7546cc8fb47530464e39e8effb8ec17ebd9faef7e5a3537a4e6884f14984"
-export const PRISM_ADDRESS = "0x060f0508a0cfdb8ffa81ee07db964a3de1ce6594cbccfd679b05611b52c6c707"
-export const SHARD_ADDRESS = "0x04a7f4d8e3ebbfcb332b7ec425f0e8e41973a77aae654b5d420ca547fc268ae7"
+export const NEKOMOTO_ADDRESS = "0x030cb3db179dede288ac2f48043a2743e0f077ff846110d2a2d42700201b389a"
+export const NEKOCOIN_ADDRESS = "0x06ab0323c5b13b3d35c0d0f5fb1057923e084b0805c1fabdc349093fa476ad28"
+export const PRISM_ADDRESS = "0x04426f74b7c9920238bc9f2a04188104ce8fd9fb01936b55a0988645e3182da3"
 
 const provider = new RpcProvider({
     nodeUrl: "https://rpc-sepolia.staging.nethermind.dev",
@@ -20,7 +18,6 @@ const provider = new RpcProvider({
 export const nekomotoContract = new Contract(nekomotoAbi, NEKOMOTO_ADDRESS, provider)
 export const nekocoinContract = new Contract(nekocoinAbi, NEKOCOIN_ADDRESS, provider)
 export const prismContract = new Contract(prismAbi, PRISM_ADDRESS, provider)
-export const shardContract = new Contract(shardAbi, SHARD_ADDRESS, provider)
 export const waitTx = async (hash) => {
     return await provider.waitForTransaction(hash)
 }

@@ -38,8 +38,6 @@ import {
 	nekomotoContract,
 	PRISM_ADDRESS,
 	prismContract,
-	SHARD_ADDRESS,
-	shardContract,
 	sign,
 	addCommaInNumber,
 } from "@/interface.js";
@@ -93,12 +91,6 @@ export default function Detail() {
 				// console.log("nekocoin allowance: ", result)
 				setNekocoinAllowance(Number(result / BigInt(10 ** 18)));
 			});
-			shardContract
-				.is_approved_for_all(address, NEKOMOTO_ADDRESS)
-				.then((result) => {
-					// console.log("nekocoin allowance: ", result)
-					setShardApprove(result);
-				});
 			nekomotoContract.lucky(address).then((result) => {
 				// console.log("nekocoin allowance: ", result)
 				setLucky(result);

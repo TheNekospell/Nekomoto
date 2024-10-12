@@ -42,10 +42,6 @@ func init() {
 	if err != nil {
 		panic(err.Error())
 	}
-	ShardContractAddress, err = utils.HexToFelt(env.GetEnvValue("SHARD_CONTRACT_SN"))
-	if err != nil {
-		panic(err.Error())
-	}
 
 	Client, err = rpc.NewProvider(env.GetEnvValue("RPC_URL_SN"))
 	if err != nil {
