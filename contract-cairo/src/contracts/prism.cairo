@@ -68,15 +68,19 @@ pub mod Prism {
     const POW_6: u8 = 0x40; // 2^6
     const POW_7: u8 = 0x80; // 2^7
 
+    const A_WEEK: u64 = 604800;
+    const A_DAY: u64 = 86400;
+    const FOUR_DAYS: u64 = 345600;
+
     #[external(v0)]
     fn check_in(ref self: ContractState, address: ContractAddress) -> bool {
         assert(get_caller_address() == self.nekomoto.read(), 'Only the nekomoto');
 
-        let current = get_block_timestamp();
-        let current_week = current / 604800;
+        let current = get_block_timestamp() - FOUR_DAYS;
+        let current_week = current / A_WEEK;
         let record = self.record.read((address, current_week));
 
-        let current_day = (current % 604800) / 86400;
+        let current_day = (current % A_WEEK) / A_DAY;
         let new_record = match current_day {
             0 => record | POW_7,
             1 => record | POW_6,
@@ -103,8 +107,8 @@ pub mod Prism {
 
     #[external(v0)]
     fn read_check_in(self: @ContractState, address: ContractAddress) -> u8 {
-        let current = get_block_timestamp();
-        let current_week = current / 604800;
+        let current = get_block_timestamp() - FOUR_DAYS;
+        let current_week = current / A_WEEK;
         self.record.read((address, current_week))
     }
 }

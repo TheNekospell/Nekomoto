@@ -4,7 +4,6 @@ import BoxBorder from "../BoxBorder";
 import { useAccount } from "@starknet-react/core";
 import { useMemo, useState } from "react";
 import claimedMask from "@assets/claimed-mask.png";
-
 import {
 	BACKEND,
 	NEKOCOIN_ADDRESS,
@@ -17,6 +16,7 @@ import {
 	addCommaInNumber,
 } from "@/interface.js";
 import { useEffect } from "react";
+import { CallData } from "starknet";
 
 export default function CheckCard({ setWaiting, setSuccess }) {
 
@@ -24,8 +24,9 @@ export default function CheckCard({ setWaiting, setSuccess }) {
 	const [check_status, setCheckStatus] = useState(0);
 
 	useEffect(() => {
-		prismContract.read_check_in().then((result) => {
-			setCheckStatus(result)
+		prismContract.read_check_in(address).then((result) => {
+			// console.log("check_in: ", result);
+			setCheckStatus(Number(result))
 		})
 	}, [address])
 
@@ -60,8 +61,9 @@ export default function CheckCard({ setWaiting, setSuccess }) {
 	}
 
 	const checkStatus = useMemo(() => calCheckStatus(check_status), [check_status])
+	console.log("checkStatus: ", checkStatus);
 
-	const today = new Date().getUTCDay() - 1
+	const today = new Date().getUTCDay()
 	console.log("today: ", today);
 
 	const CheckItem = ({ checkIn, title, click }) => {
@@ -82,7 +84,8 @@ export default function CheckCard({ setWaiting, setSuccess }) {
 						height: "100%",
 						cursor: click ? "pointer" : "default",
 					}}
-					onClick={click ? checkInContract : null}
+					// onClick={click ? checkInContract : null}
+					onClick={checkInContract}
 				>
 					<div style={{ opacity: checkIn === 1 ? "0.5" : "1" }}>{title}</div>
 					<img src={purple1} style={{
@@ -152,8 +155,8 @@ export default function CheckCard({ setWaiting, setSuccess }) {
 								width: "100px",
 							}}
 						>
-							<CheckItem title={"MON"} checkIn={checkStatus[0]} click={checkStatus[0] !== 1 && today === 0} />
-							<CheckItem title={"THU"} checkIn={checkStatus[3]} click={checkStatus[3] !== 1 && today === 3} />
+							<CheckItem title={"MON"} checkIn={checkStatus[0]} click={checkStatus[1] !== 1 && today === 1} />
+							<CheckItem title={"THU"} checkIn={checkStatus[3]} click={checkStatus[4] !== 1 && today === 4} />
 						</div>
 						<div
 							style={{
@@ -162,8 +165,8 @@ export default function CheckCard({ setWaiting, setSuccess }) {
 								width: "100px",
 							}}
 						>
-							<CheckItem title={"TUE"} checkIn={checkStatus[1]} click={checkStatus[1] !== 1 && today === 1} />
-							<CheckItem title={"FRI"} checkIn={checkStatus[4]} click={checkStatus[4] !== 1 && today === 4} />
+							<CheckItem title={"TUE"} checkIn={checkStatus[1]} click={checkStatus[2] !== 1 && today === 2} />
+							<CheckItem title={"FRI"} checkIn={checkStatus[4]} click={checkStatus[5] !== 1 && today === 5} />
 						</div>
 						<div
 							style={{
@@ -172,8 +175,8 @@ export default function CheckCard({ setWaiting, setSuccess }) {
 								width: "100px",
 							}}
 						>
-							<CheckItem title={"WED"} checkIn={checkStatus[2]} click={checkStatus[2] !== 1 && today === 2} />
-							<CheckItem title={"SAT"} checkIn={checkStatus[5]} click={checkStatus[5] !== 1 && today === 5} />
+							<CheckItem title={"WED"} checkIn={checkStatus[2]} click={checkStatus[3] !== 1 && today === 3} />
+							<CheckItem title={"SAT"} checkIn={checkStatus[5]} click={checkStatus[6] !== 1 && today === 6} />
 						</div>
 						<div
 							style={{
@@ -183,7 +186,7 @@ export default function CheckCard({ setWaiting, setSuccess }) {
 								height: "100%",
 							}}
 						>
-							<CheckItem style={{ width: "100px" }} title={"SUN"} checkIn={checkStatus[6]} click={checkStatus[6] !== 1 && today === 6} />
+							<CheckItem style={{ width: "100px" }} title={"SUN"} checkIn={checkStatus[0]} click={checkStatus[0] !== 1 && today === 0} />
 						</div>
 					</div>
 				</div>

@@ -6,6 +6,7 @@ pub trait ERC20BurnTrait<ContractState> {
     fn burnFrom(ref self: ContractState, account: ContractAddress, amount: u256);
     fn mint(ref self: ContractState, recipient: ContractAddress, amount: u256);
     fn check_in(ref self: ContractState, address: ContractAddress) -> bool;
+    fn read_check_in(self: @ContractState, address: ContractAddress) -> u8;
 }
 
 #[starknet::interface]
