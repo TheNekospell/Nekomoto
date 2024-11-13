@@ -125,10 +125,10 @@ func GetStatic() (uint64, decimal.Decimal, decimal.Decimal, decimal.Decimal, dec
 	epoch := GetEpoch()
 
 	totalLuck := decimal.Zero
-	DB.Model(&ServerNekoSpiritInfo{}).Where("epoch = ?", epoch).Select("sum(case when rarity = 'SSR' then 1 when rarity = 'UR' then 3 else 0 end) as total_luck").Scan(&totalLuck)
+	DB.Model(&ServerNekoSpiritInfo{}).Where("epoch = ?", epoch).Select("ifnull(sum(case when rarity = 'SSR' then 1 when rarity = 'UR' then 3 else 0 end),0) as total_luck").Scan(&totalLuck)
 
 	totalPower := decimal.Zero
-	DB.Model(&ServerNekoSpiritInfo{}).Where("is_staked = ?", true).Select("sum(ifnull(atk, 0)) as total_power").Scan(&totalPower)
+	DB.Model(&ServerNekoSpiritInfo{}).Where("is_staked = ?", true).Select("ifnull(sum(atk),0) as total_power").Scan(&totalPower)
 
 	return epoch, rewardPool.MintPool.Div(decimal.New(10, 18)), rewardPool.StakePool.Div(decimal.New(10, 18)), totalLuck, totalPower
 }

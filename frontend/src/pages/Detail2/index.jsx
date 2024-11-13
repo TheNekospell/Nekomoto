@@ -253,7 +253,9 @@ export default function Detail() {
                     </Col>
                 </Row>
 
-                <Row gutter={16} style={{height: "600px"}}>
+                <Row gutter={16}
+                    style={{height: "600px"}}
+                >
                     <Col
                         style={{width: "55%", height: "100%"}}
                         className="margin-top-16"
@@ -263,6 +265,7 @@ export default function Detail() {
                             addressInfo={addressInfo}
                             nekoButton={nekoButton}
                             setNekoButton={setNekoButton}
+                            focus={focus}
                             setFocus={setFocus}
                             unstake={unstake}
                             stake={stake}

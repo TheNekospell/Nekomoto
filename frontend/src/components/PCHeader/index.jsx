@@ -26,11 +26,10 @@ export default function PCHeader() {
         <div className="pcHeader flex justify-between align-center">
             <div
                 className="flex justify-between align-center"
-                style={{cursor: "pointer"}}
-                onClick={() => navigate("/")}
             >
-                <img src={logo} width={48} alt=""/>
-                <img src={logoText} width={116} alt="" style={{marginLeft: "12px"}}/>
+                <img src={logo} width={48} alt="" style={{cursor: "pointer"}} onClick={() => navigate("/")}/>
+                <img src={logoText} width={116} alt="" style={{marginLeft: "12px", cursor: "pointer"}}
+                     onClick={() => navigate("/")}/>
                 {!homePage && address && (
                     <div style={{display: "flex", gap: "20px", marginLeft: "12px"}}>
                         <div

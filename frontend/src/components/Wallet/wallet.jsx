@@ -9,7 +9,7 @@ import nekoPic from "@assets/page-nekomoto.png";
 import accountPic from "@assets/account.png";
 import {useNavigate} from "react-router-dom";
 import {useAccount, useConnect, useDisconnect} from "@starknet-react/core";
-import {BACKEND, sign} from "@/interface.js";
+import {addCommaInNumber, BACKEND, sign} from "@/interface.js";
 import {uint256} from "starknet";
 import Button from "@components/Button/index.jsx";
 import NekoModal from "@components/Modal/index.jsx";
@@ -109,7 +109,7 @@ export default function Wallet({isMobile = false}) {
                                 style={{marginRight: "10px", height: "30px"}}
                                 alt=""
                             />
-                            <span style={{color: "white"}}>{prism}</span>
+                            <span style={{color: "white"}}>{addCommaInNumber(prism)}</span>
                         </Flex>
                     </Col>
                 )}
@@ -133,7 +133,7 @@ export default function Wallet({isMobile = false}) {
                                 style={{marginRight: "10px", height: "20px"}}
                                 alt=""
                             />
-                            <span style={{color: "white"}}>{nekocoin}</span>
+                            <span style={{color: "white"}}>{addCommaInNumber(nekocoin)}</span>
                         </Flex>
                         <img src={t6} width={15} style={{marginLeft: "10px"}} alt=""/>
                     </Col>
@@ -157,7 +157,7 @@ export default function Wallet({isMobile = false}) {
                                 style={{marginRight: "10px", height: "25px"}}
                                 alt=""
                             />
-                            <span style={{color: "white"}}>{0}</span>
+                            <span style={{color: "white"}}>{addCommaInNumber(0)}</span>
                         </Flex>
                     </Col>
                 )}
