@@ -1,15 +1,14 @@
-import { Contract, RpcProvider, hash } from "starknet";
-import nekomotoAbi from "./abi/nekomoto.json" assert { type: "json" };
-import nekocoinAbi from "./abi/nekocoin.json" assert { type: "json" };
-import prismAbi from "./abi/prism.json" assert { type: "json" };
-import { useAccount } from "@starknet-react/core";
+import {Contract, RpcProvider} from "starknet";
+import nekomotoAbi from "./abi/nekomoto.json" assert {type: "json"};
+import nekocoinAbi from "./abi/nekocoin.json" assert {type: "json"};
+import prismAbi from "./abi/prism.json" assert {type: "json"};
 
-const BASE_URL = "https://api.nekomoto.xyz/api"
-// const BASE_URL = "http://localhost:8972/api"
+// const BASE_URL = "https://api.nekomoto.xyz/api"
+const BASE_URL = "http://localhost:8972/api"
 
-export const NEKOMOTO_ADDRESS = "0x037dd259cb1fc2921aeb72daa8d13949af235a0f5e9aea25bf9272e550a9d27d"
-export const NEKOCOIN_ADDRESS = "0x02b00d564a78cd40174304a6f33e5494bd6becd1c3ea242c21fef9a3bd6dce39"
-export const PRISM_ADDRESS = "0x0034ef235f39d030eb8678d3d7b6dd26080e4fc8c53c1591764dabfb85a18ed1"
+export const NEKOMOTO_ADDRESS = "0x05ea7084b76cdff79196b6dc560ec5f74e9b7d17ab025505ba48024f8c86bbd6"
+export const NEKOCOIN_ADDRESS = "0x067d637417d957757950802cb280bfb0bed7954960675fee7f683195bf183ee3"
+export const PRISM_ADDRESS = "0x070486bd8b04327e7314a57399bf1058ec8d4063052670df04bb50922b3a0245"
 
 const provider = new RpcProvider({
     nodeUrl: "https://rpc-sepolia.staging.nethermind.dev",
@@ -36,11 +35,11 @@ export const sign = async (account) => {
         },
         types: {
             StarkNetDomain: [
-                { name: "name", type: "felt" },
-                { name: "chainId", type: "felt" },
-                { name: "version", type: "felt" },
+                {name: "name", type: "felt"},
+                {name: "chainId", type: "felt"},
+                {name: "version", type: "felt"},
             ],
-            Message: [{ name: "content", type: "string" }],
+            Message: [{name: "content", type: "string"}],
         },
         primaryType: "Message",
         message: {
@@ -54,7 +53,7 @@ export const sign = async (account) => {
     const messageHash = await account.hashMessage(typedMessage)
     // console.log("messageHash: ", messageHash);
 
-    return { typedMessage, signature }
+    return {typedMessage, signature}
 };
 
 export const BACKEND = {
@@ -142,7 +141,7 @@ export const BACKEND = {
 
     addressInfo: async (address) => {
         const result = await fetch(`${BASE_URL}/address/info?address=${address}`)
-        // console.log("result: ", result)
+        console.log("result: ", result)
         return await result.json()
     },
 

@@ -7,8 +7,8 @@ import (
 	"math/big"
 
 	"backend/internal/model"
-	"strconv"
 	"github.com/shopspring/decimal"
+	"strconv"
 )
 
 func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
@@ -53,7 +53,6 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 	return model.Success, "Claimed " + totalReward.Round(2).String() + "NKO"
 }
 
-
 func ClaimRewardOfMint(req model.AddressAndSignature) (model.ResponseCode, string) {
 
 	addressDetail := database.GetAddressDetailByAddress(req.Address)
@@ -67,8 +66,8 @@ func ClaimRewardOfMint(req model.AddressAndSignature) (model.ResponseCode, strin
 			continue
 		}
 		temp := database.ServerNekoSpiritInfo{
-			Model:          database.Model{ID: spirit.ID},
-			TokenId:        spirit.TokenId,
+			Model:              database.Model{ID: spirit.ID},
+			TokenId:            spirit.TokenId,
 			ClaimedMintRewards: spirit.ClaimedMintRewards,
 		}
 		spiritReward = spiritReward.Add(spirit.MintRewards)

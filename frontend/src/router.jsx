@@ -3,7 +3,7 @@ import Home from "@pages/Home/index";
 import Assets from "@pages/Assets/index";
 import Detail2 from "@pages/Detail2/index";
 
-import { createBrowserRouter } from "react-router-dom";
+import {createBrowserRouter} from "react-router-dom";
 
 const router = createBrowserRouter([
     {

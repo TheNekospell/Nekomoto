@@ -136,7 +136,7 @@ func resolveBoxUpgrade(block uint64) {
 		if checkIndexedTransaction(&event, 4) {
 			continue
 		}
-		service.UpdateNekoSpiritByUpgrade(event.Event.Keys[2].Uint64(),event.Event.Data[2].Uint64())
+		service.UpdateNekoSpiritByUpgrade(event.Event.Keys[2].Uint64(), event.Event.Data[2].Uint64())
 
 	}
 
@@ -182,14 +182,11 @@ func resolveBoxTransfer(block uint64) {
 
 func recordIndexerHeight(height uint64, signal <-chan uint64) {
 
-	for {
-		select {
-		case newHeight := <-signal:
-			// fmt.Println("[Indexer] newHeight", newHeight)
-			if newHeight > height {
-				database.UpdateHeight(height)
-				height = newHeight
-			}
+	for newHeight := range signal {
+		// fmt.Println("[Indexer] newHeight", newHeight)
+		if newHeight > height {
+			database.UpdateHeight(height)
+			height = newHeight
 		}
 	}
 

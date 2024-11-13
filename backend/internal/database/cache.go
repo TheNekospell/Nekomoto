@@ -4,13 +4,13 @@ import (
 	"backend/internal/util"
 	"errors"
 	"fmt"
+	"github.com/patrickmn/go-cache"
 	"strconv"
 
 	"time"
 
 	"gorm.io/gorm"
 
-	"github.com/patrickmn/go-cache"
 	"github.com/shopspring/decimal"
 )
 
@@ -49,11 +49,6 @@ type AddressInfo struct {
 }
 
 func GetAddressDetailByUid(uid uint64) AddressInfo {
-	// if detail, found := Cache.Get(CacheTagUid + strconv.FormatUint(uid, 10)); found {
-	// 	result := detail.(AddressInfo)
-	// 	result.NekoSpiritList = GetNekoSpiritListByIdList(result.NekoSpiritIdList)
-	// 	return result
-	// }
 
 	var serverAddress ServerAddress
 	DB.Where("id = ?", uid).Find(&serverAddress)
@@ -80,9 +75,20 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		if spirit.IsStaked {
 			myPower = myPower.Add(spirit.ATK)
 		}
+
 	}
 
 	epoch, mintPool, stakePool, totalLuck, totalPower := GetStatic()
+
+	estMintPoolReward := decimal.Zero
+	if !totalLuck.Equal(decimal.Zero) {
+		estMintPoolReward = mintPool.Mul(decimal.NewFromUint64(myLuck).Div(totalLuck))
+	}
+
+	estStakePoolReward := decimal.Zero
+	if !totalPower.Equal(decimal.Zero) {
+		estStakePoolReward = stakePool.Mul(myPower.Div(totalPower))
+	}
 
 	result := AddressInfo{
 		Uid:                uid,
@@ -102,8 +108,8 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		MyLuck:             myLuck,
 		MySSR:              mySSR,
 		MyUR:               myUR,
-		EstMintPoolReward:  mintPool.Mul(decimal.NewFromUint64(myLuck).Div(totalLuck)),
-		EstStakePoolReward: stakePool.Mul(myPower.Div(totalPower)),
+		EstMintPoolReward:  estMintPoolReward,
+		EstStakePoolReward: estStakePoolReward,
 	}
 
 	//Cache.Set(CacheTagUid+strconv.FormatUint(uid, 10), result, -1)
@@ -122,9 +128,9 @@ func GetStatic() (uint64, decimal.Decimal, decimal.Decimal, decimal.Decimal, dec
 	DB.Model(&ServerNekoSpiritInfo{}).Where("epoch = ?", epoch).Select("sum(case when rarity = 'SSR' then 1 when rarity = 'UR' then 3 else 0 end) as total_luck").Scan(&totalLuck)
 
 	totalPower := decimal.Zero
-	DB.Model(&ServerNekoSpiritInfo{}).Where("is_staked = ?", true).Select("sum(atk) as total_power").Scan(&totalPower)
+	DB.Model(&ServerNekoSpiritInfo{}).Where("is_staked = ?", true).Select("sum(ifnull(atk, 0)) as total_power").Scan(&totalPower)
 
-	return epoch, rewardPool.MintPool, rewardPool.StakePool, totalLuck, totalPower
+	return epoch, rewardPool.MintPool.Div(decimal.New(10, 18)), rewardPool.StakePool.Div(decimal.New(10, 18)), totalLuck, totalPower
 }
 
 func GetAddressDetailByAddress(address string) AddressInfo {
