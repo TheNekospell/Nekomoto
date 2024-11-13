@@ -6,7 +6,7 @@ import {useEffect, useState} from "react";
 import {Col, Row} from "antd";
 import {useNavigate} from "react-router-dom";
 import {useAccount} from "@starknet-react/core";
-import {addCommaInNumber, NEKOCOIN_ADDRESS, NEKOMOTO_ADDRESS, PRISM_ADDRESS,} from "@/interface.js";
+import {addCommaInNumber, NEKOMOTO_ADDRESS,} from "@/interface.js";
 import {cairo, CallData} from "starknet";
 import UnlockRate from "../../components/UnlockRate";
 import PowerCard from "../../components/PowerCard";
@@ -125,71 +125,55 @@ export default function Detail() {
         setSuccess("Success: " + mCall.transaction_hash);
     };
 
-    const upgradeCal = [
-        {level: "Lv2", SPI: 2, ATK: 1, DEF: 1, SPD: 0, Neko: 100},
-        {level: "Lv3", SPI: 2, ATK: 1, DEF: 1, SPD: 0, Neko: 120},
-        {level: "Lv4", SPI: 2, ATK: 1, DEF: 1, SPD: 0, Neko: 130},
-        {level: "Lv5", SPI: 2, ATK: 1, DEF: 1, SPD: 1, Neko: 140},
-        {level: "Lv6", SPI: 2, ATK: 1, DEF: 1, SPD: 1, Neko: 155},
-        {level: "Lv7", SPI: 2, ATK: 1, DEF: 1, SPD: 1, Neko: 165},
-        {level: "Lv8", SPI: 4, ATK: 3, DEF: 2, SPD: 1, Neko: 200, Prism: 1},
-        {level: "Lv9", SPI: 4, ATK: 3, DEF: 2, SPD: 1, Neko: 245},
-        {level: "Lv10", SPI: 4, ATK: 3, DEF: 3, SPD: 1, Neko: 300},
-        {level: "Lv11", SPI: 6, ATK: 5, DEF: 3, SPD: 1, Neko: 370},
-        {level: "Lv12", SPI: 6, ATK: 7, DEF: 3, SPD: 2, Neko: 455},
-        {level: "Lv13", SPI: 12, ATK: 9, DEF: 5, SPD: 3, Neko: 1000, Prism: 2},
-        {level: "Lv", SPI: 0, ATK: 0, DEF: 0, SPD: 0},
-    ];
-
     const upgrade = async (tokenId) => {
         setWaiting(true);
 
-        let arr = [];
-        if (
-            upgradeCal[focus.Level - 1].Prism &&
-            prismAllowance < upgradeCal[focus.Level - 1].Prism
-        ) {
-            arr.push({
-                contractAddress: PRISM_ADDRESS,
-                entrypoint: "approve",
-                calldata: CallData.compile({
-                    spender: NEKOMOTO_ADDRESS,
-                    amount: cairo.uint256(
-                        BigInt(upgradeCal[focus.Level - 1].Prism) * 10n ** 18n
-                    ),
-                }),
-            });
-        }
-        if (
-            upgradeCal[focus.Level - 1].Neko &&
-            nekocoinAllowance < upgradeCal[focus.Level - 1].Neko
-        ) {
-            arr.push({
-                contractAddress: NEKOCOIN_ADDRESS,
-                entrypoint: "approve",
-                calldata: CallData.compile({
-                    spender: NEKOMOTO_ADDRESS,
-                    amount: cairo.uint256(
-                        BigInt(upgradeCal[focus.Level - 1].Neko) * 10n ** 18n
-                    ),
-                }),
-            });
-        }
-        arr.push({
-            contractAddress: NEKOMOTO_ADDRESS,
-            entrypoint: "upgrade",
-            calldata: CallData.compile({token_id: cairo.uint256(tokenId)}),
-        });
-        const mCall = await account.execute(arr);
-
-        const result = await account.waitForTransaction(mCall.transaction_hash);
-        setHhh(mCall.transaction_hash);
-        console.log("result ", result);
-        // setSuccess("Success: " + mCall.transaction_hash);
-        if (result.execution_status === "SUCCEEDED") {
-            setWaiting(false);
-            // setFocus(addressInfo.NekoSpiritList.find((x) => x.TokenId === tokenId));
-        }
+        // let arr = [];
+        // if (
+        //     upgradeCal[focus.Level - 1].Prism &&
+        //     prismAllowance < upgradeCal[focus.Level - 1].Prism
+        // ) {
+        //     arr.push({
+        //         contractAddress: PRISM_ADDRESS,
+        //         entrypoint: "approve",
+        //         calldata: CallData.compile({
+        //             spender: NEKOMOTO_ADDRESS,
+        //             amount: cairo.uint256(
+        //                 BigInt(upgradeCal[focus.Level - 1].Prism) * 10n ** 18n
+        //             ),
+        //         }),
+        //     });
+        // }
+        // if (
+        //     upgradeCal[focus.Level - 1].Neko &&
+        //     nekocoinAllowance < upgradeCal[focus.Level - 1].Neko
+        // ) {
+        //     arr.push({
+        //         contractAddress: NEKOCOIN_ADDRESS,
+        //         entrypoint: "approve",
+        //         calldata: CallData.compile({
+        //             spender: NEKOMOTO_ADDRESS,
+        //             amount: cairo.uint256(
+        //                 BigInt(upgradeCal[focus.Level - 1].Neko) * 10n ** 18n
+        //             ),
+        //         }),
+        //     });
+        // }
+        // arr.push({
+        //     contractAddress: NEKOMOTO_ADDRESS,
+        //     entrypoint: "upgrade",
+        //     calldata: CallData.compile({token_id: cairo.uint256(tokenId)}),
+        // });
+        // const mCall = await account.execute(arr);
+        //
+        // const result = await account.waitForTransaction(mCall.transaction_hash);
+        // setHhh(mCall.transaction_hash);
+        // console.log("result ", result);
+        // // setSuccess("Success: " + mCall.transaction_hash);
+        // if (result.execution_status === "SUCCEEDED") {
+        //     setWaiting(false);
+        //     // setFocus(addressInfo.NekoSpiritList.find((x) => x.TokenId === tokenId));
+        // }
     };
 
     const calRate = (power) => {
@@ -254,7 +238,7 @@ export default function Detail() {
                 </Row>
 
                 <Row gutter={16}
-                    style={{height: "600px"}}
+                     style={{height: "600px"}}
                 >
                     <Col
                         style={{width: "55%", height: "100%"}}

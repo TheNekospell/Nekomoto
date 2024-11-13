@@ -1,7 +1,7 @@
 import {Col, Flex, Row} from "antd";
 import CardCorner from "../CardCorner";
 import CardDetail from "../CardDetail";
-import {addCommaInNumber} from "../../interface";
+import {addCommaInNumber} from "@/interface.js";
 import m2 from "@assets/modal-icon2.png";
 import Button from "../Button";
 import BoxBorder from "../BoxBorder";
@@ -11,6 +11,10 @@ import blue from "@assets/blue.png";
 import purple from "@assets/purple.png";
 
 export default function NekoDetail({focus, prism, nekocoin}) {
+
+
+
+
     const Detail = ({title, value}) => {
         return (
             <>

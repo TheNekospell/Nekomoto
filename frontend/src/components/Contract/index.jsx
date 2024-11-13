@@ -32,7 +32,7 @@ export const ContractProvider = ({children}) => {
                 setNekocoinAllowance(Number(result / BigInt(10 ** 18)));
             });
             nekomotoContract.check_coin(address).then((result) => {
-                console.log("scroll: ", result)
+                // console.log("scroll: ", result)
                 setScroll(Number(result));
             })
         } else {

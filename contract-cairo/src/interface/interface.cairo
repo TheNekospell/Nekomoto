@@ -39,4 +39,5 @@ pub trait NekomotoTrait<ContractState> {
     fn buy_coin(ref self: ContractState, count: u256);
     fn check_coin(self: @ContractState, address: ContractAddress) -> u256;
     fn check_in(ref self: ContractState) -> bool;
+    fn upgrade_consume(self: @ContractState, token_id: u256, max: bool) -> (u256, u256, u256);
 }

@@ -134,9 +134,7 @@ export default function NekomotoPreview({
                                 ? true
                                 : item.Rarity?.toLowerCase() === nekoButton.toLowerCase()
                         ).map((item, index) => {
-                            if (index === 0 && focus.ID === undefined) {
-                                setFocus(item);
-                            }
+
                             return (
                                 <Col span={8} key={index}>
                                     <Flex className="card-item" justify="center" vertical="column" align="center">

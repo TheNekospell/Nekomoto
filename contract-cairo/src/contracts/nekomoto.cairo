@@ -294,6 +294,40 @@ pub mod Nekomoto {
 
         // BOX
 
+        fn upgrade_consume(self: @ContractState, token_id: u256, max: bool) -> (u256, u256, u256) {
+            assert(self.token_id.read() >= token_id, 'Invalid token_id');
+
+            let mut current_level = self.level.read(token_id) + 1;
+            let is_starter = self.starter.read(token_id) == 1;
+            let mut max_level = cal_max_level(self.seed.read(token_id), is_starter);
+            assert(max_level > current_level, 'Exceed max level');
+
+            let mut nko_count = 0;
+            let mut prism_count = 0;
+            let mut atk_final = 0;
+
+            if !max{
+                max_level = current_level + 1;
+            }
+
+            loop {
+                let (nko_consume, prism_consume, new_atk) = upgrade_once(
+                    self.atk.read(token_id), current_level
+                );
+                assert(nko_consume != 0, 'Wrong level');
+                nko_count = nko_count + nko_consume;
+                prism_count = prism_count + prism_consume;
+                atk_final = atk_final + new_atk;
+
+                current_level = current_level + 1;
+                if current_level == max_level {
+                    break;
+                }
+            };
+
+            (nko_count, prism_count, atk_final)
+        }
+
         fn upgrade(ref self: ContractState, token_id: u256) {
             assert(self.token_id.read() >= token_id, 'Invalid token_id');
             let host_address = self.host.read();
