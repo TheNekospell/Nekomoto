@@ -14,11 +14,14 @@ export default function CheckCard({setWaiting, setSuccess}) {
 
     useEffect(() => {
         if (!address) return;
-        prismContract.read_check_in(address).then((result) => {
-            // console.log("check_in: ", result);
-            setCheckStatus(Number(result))
-        })
+        readCheckIn().then();
     }, [address])
+
+    const readCheckIn = async () => {
+        const result = await prismContract.read_check_in(address);
+        // console.log("check_in: ", result);
+        setCheckStatus(Number(result))
+    }
 
     const checkInContract = async () => {
         setWaiting(true)
@@ -35,6 +38,7 @@ export default function CheckCard({setWaiting, setSuccess}) {
         if (result.execution_status === "SUCCEEDED") {
             setWaiting(false);
         }
+        await readCheckIn();
     };
 
     const calCheckStatus = (check_status) => {

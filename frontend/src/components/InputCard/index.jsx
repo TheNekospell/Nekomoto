@@ -1,7 +1,6 @@
 import "./index.css";
 import Button from "@components/Button/index";
-import BoxBorder from "@components/BoxBorder/index";
-import {Col, Flex, Input, Row} from "antd";
+import {Col, Row} from "antd";
 import {useState} from "react";
 import {useAccount} from "@starknet-react/core";
 import {
@@ -20,26 +19,22 @@ import BigNumber from "bignumber.js";
 
 import mintPagePic from "@assets/mint-page.png";
 import mintPagePic2 from "@assets/mint-page2.png";
-import blue from "@assets/blue.png";
 import exclamation from "@assets/exclamation.png";
 import {useContractData} from "@components/Contract/index.jsx";
+import BoxBorder from "@components/BoxBorder/index.jsx";
 
 export default function InputCard() {
     const {account, address, status, chainId, isConnected} = useAccount();
-    const [inputValue, setInputValue] = useState("Enter your amount");
+    // const [inputValue, setInputValue] = useState("Enter your amount");
     const [visible, setVisible] = useState(false);
+    const [buyScroll, setBuyScroll] = useState(false);
+    const [buyScrollCount, setBuyScrollCount] = useState(0);
     const [text, setText] = useState("");
     const navigate = useNavigate();
 
-    const {scroll, refreshContractData} = useContractData();
+    const {scroll, nekocoin, prism, refreshContractData} = useContractData();
 
-    const mint = async (count) => {
-        console.log("count: ", count);
-        if (!address) {
-            return;
-        }
-
-        setVisible(true);
+    const buyCoin = async (count) => {
 
         const balance = await nekocoinContract.balance_of(address);
         console.log("balance: ", balance);
@@ -51,17 +46,11 @@ export default function InputCard() {
         console.log("allowance: ", allowance);
 
         if (new BigNumber(balance).lt(new BigNumber(count * 25000 * 10 ** 18))) {
-            // console.log(
-            // 	"balance: ",
-            // 	new BigNumber(balance),
-            // 	new BigNumber(count * 25000 * 10 ** 18)
-            // );
             setText("Insufficient balance");
             return;
         }
 
         if (new BigNumber(allowance).lt(new BigNumber(count * 25000 * 10 ** 18))) {
-            // console.log("allowance: ", BigInt(allowance), count * 25000 * ( 10 ** 18 ))
             const approve = await account.execute([
                 {
                     contractAddress: NEKOCOIN_ADDRESS,
@@ -77,21 +66,37 @@ export default function InputCard() {
             console.log("approveResult: ", approveResult);
         }
 
+        const buyScroll = await account.execute([
+            {
+                contractAddress: NEKOMOTO_ADDRESS,
+                entrypoint: "buy_coin",
+                calldata: CallData.compile({
+                    amount: cairo.uint256(BigInt(count)),
+                }),
+            }
+        ]);
+        console.log("buyScroll: ", buyScroll);
+        const buyScrollResult = await waitTx(buyScroll.transaction_hash);
+        console.log("buyScrollResult: ", buyScrollResult);
+        if (buyScrollResult.execution_status === "SUCCEEDED") {
+            setBuyScroll(true);
+        }
+    }
+
+
+    const mint = async (count) => {
+        console.log("count: ", count);
+        if (!address) {
+            return;
+        }
+
         // console.log("scroll: ", scroll, "count: ", count);
         if (Number(scroll) < count) {
-            const buyScroll = await account.execute([
-                {
-                    contractAddress: NEKOMOTO_ADDRESS,
-                    entrypoint: "buy_coin",
-                    calldata: CallData.compile({
-                        amount: cairo.uint256(BigInt(count - Number(scroll))),
-                    }),
-                }
-            ]);
-            console.log("buyScroll: ", buyScroll);
-            const buyScrollResult = await waitTx(buyScroll.transaction_hash);
-            console.log("buyScrollResult: ", buyScrollResult);
+            setBuyScrollCount(count - Number(scroll));
+            return;
         }
+
+        setVisible(true);
 
         const {typedMessage, signature} = await sign(account);
         // console.log("typedMessage: ", typedMessage);
@@ -113,7 +118,49 @@ export default function InputCard() {
         } else {
             setText("Something went wrong: " + result.message);
         }
+        refreshContractData();
     };
+
+    const MintButton = ({count}) => {
+        return (
+            <>
+                <Button
+                    onClick={() => mint(count)}
+                    text={
+                        <div
+                            style={{
+                                display: "flex",
+                                alignContent: "center",
+                                textAlign: "center",
+                                flexDirection: "column",
+                                width: "100%",
+                                height: "15px",
+                                // marginTop: "5px",
+                            }}
+                        >
+                            <div
+                                style={{
+                                    width: "100%",
+                                    height: "70%",
+                                    fontSize: "13px",
+                                    marginTop: "-2px",
+                                    marginBottom: "3px",
+                                }}
+                            >
+                                {"SUMMON X " + count}
+                            </div>
+                            <div style={{height: "30%", color: "#636363", fontSize: "9px"}}>
+                                {"MINT"}
+                            </div>
+                        </div>
+                    }
+                    color="yellow"
+                    longness="long"
+                    style={{width: "100%", height: "100%", marginTop: "10px"}}
+                />
+            </>
+        )
+    }
 
     return (
         <div style={{height: "100%"}}>
@@ -150,23 +197,7 @@ export default function InputCard() {
                         {text !== "" ? text : "Please sign in your wallet and wait..."}
                     </h2>
 
-                    {/* {text && text == "Insufficient balance" && (
-						<Button
-							style={{
-								marginTop: "20px",
-								fontSize: "15px",
-								flexDirection: "row",
-								display: "flex",
-								justifyContent: "center",
-								alignItems: "center",
-							}}
-							text={"Buy NPO"}
-							color={"yellow"}
-							longness="long"
-							onClick={() => {}}
-						/>
-					)} */}
-                    {text && text != "Insufficient balance" && (
+                    {text && text !== "Insufficient balance" && (
                         <Button
                             style={{
                                 marginTop: "20px",
@@ -185,9 +216,203 @@ export default function InputCard() {
                 </div>
             </NekoModal>
 
+            <NekoModal
+                open={buyScrollCount > 0}
+                centered={true}
+                footer={null}
+                maskClosable={true}
+                onCancel={() => {
+                    setBuyScroll(false);
+                    setBuyScrollCount(0);
+                    refreshContractData();
+                }}
+            >
+                <div
+                    style={{
+                        marginTop: "20px",
+                        marginBottom: "20px",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        display: "flex",
+                        flexDirection: "column",
+                    }}
+                >
+                    {buyScroll === false && text !== "" && (
+                        <>
+                            <div
+                                style={{
+                                    backgroundColor: "#172937",
+                                    width: '110%',
+                                    padding: '10px 0',
+                                }}>
+                                <h2
+                                    style={{
+                                        textAlign: "center",
+                                        fontFamily: "BIG SHOT",
+                                        color: "white",
+                                        fontWeight: "bold",
+                                        wordWrap: "break-word",
+                                        wordBreak: "break-all",
+                                    }}>
+                                    Not Enough <span style={{color: "#E9D78E"}}> [Summon Scroll]</span>
+                                </h2>
+                            </div>
+
+                            <h3
+                                style={{
+                                    textAlign: "center",
+                                    fontFamily: "BIG SHOT",
+                                    color: "white",
+                                    fontWeight: "bold",
+                                    wordWrap: "break-word",
+                                    wordBreak: "break-all",
+                                    marginTop: "20px",
+                                }}
+                            >
+                                <span style={{color: "white"}}>Spent </span>
+                                <span style={{color: "#B6EAFF"}}><u>{addCommaInNumber(buyScrollCount * 25000)}</u> $NKO </span>
+                                to purchase
+                                <div></div>
+                                <span style={{color: "#E9D78E"}}> <u>{buyScrollCount}</u> x [Summon Scroll]</span> ?
+                            </h3>
+
+                            <div style={{
+                                textAlign: "center",
+                                fontFamily: "BIG SHOT",
+                                marginTop: "20px",
+                                backgroundColor: "#172937",
+                                padding: '10px 10px',
+                                color: "#90A6AF",
+                                borderRadius: "30px"
+                            }}>
+                               <span><img src={exclamation} style={{
+                                   height: "10px",
+                                   marginRight: "5px"
+                               }}/></span> own: {addCommaInNumber(nekocoin)} $NKO | {scroll} Scroll
+                            </div>
+
+                            <div style={{display: "flex", flexDirection: "row", marginTop: "20px"}}>
+                                <Button
+                                    text={"CANCEL"}
+                                    color={"blue"}
+                                    longness="long"
+                                    style={{filter: "greyscale(100%)"}}
+                                    onClick={() => {
+                                        setBuyScroll(false);
+                                        setBuyScrollCount(0);
+                                    }}/>
+                                <Button
+                                    style={{marginLeft: "30px"}}
+                                    text={"CONFIRM"}
+                                    color={"yellow"}
+                                    longness="long"
+                                    onClick={() =>
+                                        buyCoin(buyScrollCount)
+                                    }/>
+                            </div>
+                        </>
+                    )}
+
+                    {buyScroll === false && text !== "" && (
+                        <>
+                            <div
+                                style={{
+                                    marginTop: "20px",
+                                    marginBottom: "20px",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                }}
+                            >
+                                <h2
+                                    style={{
+                                        textAlign: "center",
+                                        color: "#01dce4",
+                                        fontFamily: "BIG SHOT",
+                                        fontWeight: "bold",
+                                        wordWrap: "break-word",
+                                        wordBreak: "break-all",
+                                    }}
+                                >
+                                    {text !== "" ? text : "Please sign in your wallet and wait..."}
+                                </h2>
+                            </div>
+                        </>
+                    )}
+
+                    {buyScroll === true && (
+                        <>
+                            <div
+                                style={{
+                                    backgroundColor: "#172937",
+                                    width: '110%',
+                                    padding: '10px 0',
+                                }}>
+                                <h2
+                                    style={{
+                                        textAlign: "center",
+                                        fontFamily: "BIG SHOT",
+                                        color: "white",
+                                        fontWeight: "bold",
+                                        wordWrap: "break-word",
+                                        wordBreak: "break-all",
+                                    }}>
+                                    Purchase Success!
+                                </h2>
+                            </div>
+
+                            <h3
+                                style={{
+                                    textAlign: "center",
+                                    fontFamily: "BIG SHOT",
+                                    color: "white",
+                                    fontWeight: "bold",
+                                    wordWrap: "break-word",
+                                    wordBreak: "break-all",
+                                    marginTop: "20px",
+                                }}
+                            >
+                                Receive
+                                <span style={{color: "#E9D78E"}}> <u>{buyScrollCount}</u> x [Summon Scroll]</span> !
+                            </h3>
+
+                            <div style={{
+                                textAlign: "center",
+                                fontFamily: "BIG SHOT",
+                                marginTop: "20px",
+                                backgroundColor: "#172937",
+                                padding: '10px 10px',
+                                color: "#90A6AF",
+                                borderRadius: "30px"
+                            }}>
+                              <span><img src={exclamation} style={{
+                                  height: "10px",
+                                  marginRight: "5px"
+                              }}/></span> own: {addCommaInNumber(nekocoin - buyScrollCount * 25000)} $NKO
+                                | {scroll + buyScrollCount} Scroll
+                            </div>
+
+                            <div style={{display: "flex", flexDirection: "row", marginTop: "20px"}}>
+                                <Button
+                                    style={{marginLeft: "30px"}}
+                                    text={"CONFIRM"}
+                                    color={"yellow"}
+                                    longness="long"
+                                    onClick={() => {
+                                        setBuyScroll(false);
+                                        setBuyScrollCount(0);
+                                        refreshContractData();
+                                    }}/>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </NekoModal>
+
             <div className="input-card">
                 <BoxBorder/>
-                <Row gutter={32}>
+                <Row gutter={32} style={{justifyContent: "space-between"}}>
                     <Col className="text-center" style={{width: "50%"}}>
                         <Row>
                             <div
@@ -210,120 +435,24 @@ export default function InputCard() {
                         </Row>
                         <img src={mintPagePic} width={"100%"}/>
                     </Col>
-                    <Col style={{width: "50%", paddingRight: "16px"}}>
-                        <Flex gap={16} vertical style={{width: "100%"}}>
-                            <Col style={{justifyContent: "flex-end", display: "flex"}}>
-                                <img src={mintPagePic2} width={"70%"}/>
-                            </Col>
-                            <Col style={{width: "100%"}}>
-                                <Row gutter={16}>
-                                    <Col style={{width: "100%", marginTop: "16px"}}>
-                                        <div
-                                            className="flex justify-between"
-                                            style={{marginBottom: "12px"}}
-                                        >
-                                            <div className="input-card-text1 font-14px">Amount</div>
-                                            <div
-                                                className="input-card-text2 font-14px"
-                                                style={{display: "flex", gap: "20px"}}
-                                            >
-                                                <div
-                                                    className={"text6"}
-                                                    style={{cursor: "pointer"}}
-                                                    onClick={() => setInputValue("5")}
-                                                >
-                                                    x5
-                                                </div>
-                                                <div
-                                                    className={"text6"}
-                                                    style={{cursor: "pointer"}}
-                                                    onClick={() => setInputValue("10")}
-                                                >
-                                                    x10
-                                                </div>
-                                                <div
-                                                    className={"text6"}
-                                                    style={{cursor: "pointer"}}
-                                                    onClick={() => setInputValue("20")}
-                                                >
-                                                    x20
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <Input
-                                            placeholder="Enter Amount (x20 max)"
-                                            // type="number"
-                                            size="large"
-                                            className="input-card-input"
-                                            style={{}}
-                                            value={inputValue}
-                                            onChange={(e) => {
-                                                const v = Math.ceil(Number(e.target.value));
-                                                if (isNaN(v)) {
-                                                    setInputValue("Enter your amount");
-                                                } else {
-                                                    setInputValue(v > 20 ? "20" : v.toString());
-                                                }
-                                            }}
-                                        />
-                                    </Col>
-                                </Row>
-                                <Col
-                                    className="text-center"
-                                    style={{marginTop: "16px", width: "100%"}}
-                                >
-                                    <Button
-                                        text={
-                                            <div
-                                                style={{
-                                                    display: "flex",
-                                                    alignContent: "center",
-                                                    textAlign: "center",
-                                                    flexDirection: "column",
-                                                    width: "100%",
-                                                    height: "20px",
-                                                }}
-                                            >
-                                                <div
-                                                    style={{
-                                                        width: "100%",
-                                                        height: "70%",
-                                                        fontSize: "16px",
-                                                        marginTop: "-5px",
-                                                        marginBottom: "3px",
-                                                    }}
-                                                >
-                                                    {"Mint"}
-                                                </div>
-                                                <div style={{height: "30%"}}>
-                                                    <img
-                                                        src={blue}
-                                                        style={{
-                                                            height: "200%",
-                                                            marginRight: "12px",
-                                                            transform: "translateY(15%)",
-                                                        }}
-                                                    />
-                                                    <span style={{color: "#636363", fontSize: "12px"}}>
-														{!isNaN(inputValue) && inputValue > 0
-                                                            ? addCommaInNumber(inputValue * 25000, true)
-                                                            : 0}
-													</span>
-                                                </div>
-                                            </div>
-                                        }
-                                        color="yellow"
-                                        longness="long"
-                                        style={{width: "100%", height: "100%"}}
-                                        onClick={
-                                            !isNaN(inputValue) && inputValue > 0
-                                                ? () => mint(Number(inputValue))
-                                                : null
-                                        }
-                                    />
-                                </Col>
-                            </Col>
-                        </Flex>
+                    <Col style={{width: "50%", paddingRight: "16px", justifyItems: "flex-end"}}>
+                        <Col style={{justifyContent: "flex-end", display: "flex"}}>
+                            <img src={mintPagePic2} width={"70%"}/>
+                        </Col>
+                        <Col
+                            className="text-center"
+                            style={{
+                                justifyContent: "flex-end",
+                                display: "flex",
+                                flexDirection: "column",
+                                marginTop: "16px",
+                                width: "80%"
+                            }}
+                        >
+                            <MintButton count={1}/>
+                            <MintButton count={10}/>
+                            <MintButton count={20}/>
+                        </Col>
                     </Col>
                 </Row>
             </div>

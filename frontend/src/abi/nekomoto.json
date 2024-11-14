@@ -243,6 +243,26 @@
           }
         ],
         "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "upgrade_consume",
+        "inputs": [
+          {
+            "name": "token_id",
+            "type": "core::integer::u256"
+          },
+          {
+            "name": "max",
+            "type": "core::bool"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "(core::integer::u256, core::integer::u256, core::integer::u256)"
+          }
+        ],
+        "state_mutability": "view"
       }
     ]
   },

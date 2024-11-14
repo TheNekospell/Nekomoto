@@ -141,7 +141,7 @@ pub mod Nekomoto {
                 .transfer_from(recipient, self.host.read(), amount * 30 / 100);
             ERC20BurnTraitDispatcher { contract_address: nekocoin }
                 .burnFrom(recipient, amount * 70 / 100);
-            self.coin.write(recipient, count);
+            self.coin.write(recipient, self.coin.read(recipient) + count);
         }
 
         fn check_in(ref self: ContractState) -> bool {
@@ -157,6 +157,7 @@ pub mod Nekomoto {
 
             let hold_coin = self.coin.read(recipient);
             assert(hold_coin >= count, 'Not enough coin');
+            self.coin.write(recipient, hold_coin - count);
 
             let block_time = starknet::get_block_timestamp();
             let mut i = 0;
@@ -304,20 +305,20 @@ pub mod Nekomoto {
 
             let mut nko_count = 0;
             let mut prism_count = 0;
-            let mut atk_final = 0;
+            let mut current_atk = self.atk.read(token_id);
 
-            if !max{
+            if !max {
                 max_level = current_level + 1;
             }
 
             loop {
                 let (nko_consume, prism_consume, new_atk) = upgrade_once(
-                    self.atk.read(token_id), current_level
+                    current_atk, current_level
                 );
                 assert(nko_consume != 0, 'Wrong level');
                 nko_count = nko_count + nko_consume;
                 prism_count = prism_count + prism_consume;
-                atk_final = atk_final + new_atk;
+                current_atk = current_atk + new_atk;
 
                 current_level = current_level + 1;
                 if current_level == max_level {
@@ -325,7 +326,7 @@ pub mod Nekomoto {
                 }
             };
 
-            (nko_count, prism_count, atk_final)
+            (nko_count, prism_count, current_atk)
         }
 
         fn upgrade(ref self: ContractState, token_id: u256) {
@@ -385,16 +386,17 @@ pub mod Nekomoto {
 
             let mut nko_count = 0;
             let mut prism_count = 0;
-            let mut atk_final = 0;
+
+            let mut current_atk = self.atk.read(token_id);
 
             loop {
                 let (nko_consume, prism_consume, new_atk) = upgrade_once(
-                    self.atk.read(token_id), current_level
+                    current_atk, current_level
                 );
                 assert(nko_consume != 0, 'Wrong level');
                 nko_count = nko_count + nko_consume;
                 prism_count = prism_count + prism_consume;
-                atk_final = atk_final + new_atk;
+                current_atk = current_atk + new_atk;
 
                 self
                     .emit(
@@ -424,7 +426,7 @@ pub mod Nekomoto {
             }
 
             self.level.write(token_id, max_level - 1);
-            self.atk.write(token_id, atk_final);
+            self.atk.write(token_id, current_atk);
         }
 
         fn generate(self: @ContractState, token_id: u256, origin: bool) -> Info {
@@ -575,7 +577,7 @@ pub mod Nekomoto {
         };
 
         let new_atk = current_atk * (100 + atk_growth) / 100;
-        let nko_consume = new_atk / nko_coefficient;
+        let nko_consume = new_atk * 100 / nko_coefficient;
 
         (nko_consume, prism_consume, new_atk)
     }

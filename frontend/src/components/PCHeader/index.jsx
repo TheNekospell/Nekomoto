@@ -12,6 +12,10 @@ import pageExtra from "@assets/page-extra.png";
 import {useLocation, useNavigate} from "react-router-dom";
 import Wallet from "@components/Wallet/wallet.jsx";
 import {useAccount} from "@starknet-react/core";
+import {NEKOMOTO_ADDRESS} from "@/interface.js";
+import WaitCard from "@components/WaitCard/index.jsx";
+import {useState} from "react";
+import {useContractData} from "@components/Contract/index.jsx";
 
 export default function PCHeader() {
     const navigate = useNavigate();
@@ -20,169 +24,203 @@ export default function PCHeader() {
     const inMintPage = pathname === "/assets";
     const inNekoPage = pathname.includes("detail");
 
+    const [waiting, setWaiting] = useState(false);
+    const [success, setSuccess] = useState("");
+
     const {account, address, status, chainId, isConnected} = useAccount();
+    const {refreshContractData} = useContractData();
+
+    const getFaucet = async () => {
+        if (!account) return;
+
+        setWaiting(true);
+        const f = await account.execute([
+            {
+                contractAddress: NEKOMOTO_ADDRESS,
+                entrypoint: "faucet",
+                calldata: []
+            }]);
+        console.log(f)
+        const result = await account.waitForTransaction(f.transaction_hash);
+        console.log("result: ", result);
+        if (result.execution_status === "SUCCEEDED") {
+            setSuccess("success:" + result.transaction_hash);
+        } else {
+            setSuccess("failed");
+        }
+        refreshContractData();
+    }
 
     return (
-        <div className="pcHeader flex justify-between align-center">
-            <div
-                className="flex justify-between align-center"
-            >
-                <img src={logo} width={48} alt="" style={{cursor: "pointer"}} onClick={() => navigate("/")}/>
-                <img src={logoText} width={116} alt="" style={{marginLeft: "12px", cursor: "pointer"}}
-                     onClick={() => navigate("/")}/>
-                {!homePage && address && (
-                    <div style={{display: "flex", gap: "20px", marginLeft: "12px"}}>
-                        <div
-                            className={"header-btn2"}
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                color: "rgba(255, 255, 255, 1)",
-                            }}
-                        >
-                            <img src={faucet} style={{height: "30px"}}/>
-                            <div style={{marginLeft: "8px"}}>Claim NPO</div>
-                        </div>
-
-                        <div
-                            className={"header-btn2"}
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                color: "black",
-                                backgroundColor: "rgba(233, 215, 142, 1)",
-                            }}
-                        >
-                            <img src={starterPack} style={{height: "30px"}}/>
+        <>
+            <WaitCard
+                waiting={waiting}
+                setWaiting={setWaiting}
+                success={success}
+                setSuccess={setSuccess}
+            />
+            <div className="pcHeader flex justify-between align-center">
+                <div
+                    className="flex justify-between align-center"
+                >
+                    <img src={logo} width={48} alt="" style={{cursor: "pointer"}} onClick={() => navigate("/")}/>
+                    <img src={logoText} width={116} alt="" style={{marginLeft: "12px", cursor: "pointer"}}
+                         onClick={() => navigate("/")}/>
+                    {!homePage && address && (
+                        <div style={{display: "flex", gap: "20px", marginLeft: "12px"}}>
                             <div
+                                className={"header-btn2"}
                                 style={{
-                                    marginLeft: "8px",
-                                    fontSize: "14px",
-                                    position: "relative",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "rgba(255, 255, 255, 1)",
+                                }}
+                                onClick={() => getFaucet()}
+                            >
+                                <img src={faucet} style={{height: "30px"}}/>
+                                <div style={{marginLeft: "8px"}}>Claim NPO</div>
+                            </div>
+
+                            <div
+                                className={"header-btn2"}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "black",
+                                    backgroundColor: "rgba(233, 215, 142, 1)",
                                 }}
                             >
-                                <div>Starter Pack!</div>
+                                <img src={starterPack} style={{height: "30px"}}/>
                                 <div
                                     style={{
-                                        color: "#01dce4",
-                                        fontSize: "9px",
-                                        marginTop: "4px",
-                                        left: "50%",
-                                        transform: "translateX(-50%)",
-                                        position: "absolute",
+                                        marginLeft: "8px",
+                                        fontSize: "14px",
+                                        position: "relative",
                                     }}
                                 >
-                                    Free
+                                    <div>Starter Pack!</div>
+                                    <div
+                                        style={{
+                                            color: "#01dce4",
+                                            fontSize: "9px",
+                                            marginTop: "4px",
+                                            left: "50%",
+                                            transform: "translateX(-50%)",
+                                            position: "absolute",
+                                        }}
+                                    >
+                                        Free
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    )}
+                </div>
+                {homePage && (
+                    <div>
+                        <a href={"https://x.com/TheNekomoto"} target="_blank">
+                            <img src={x} width={48} alt=""/>
+                        </a>
                     </div>
                 )}
-            </div>
-            {homePage && (
-                <div>
-                    <a href={"https://x.com/TheNekomoto"} target="_blank">
-                        <img src={x} width={48} alt=""/>
-                    </a>
-                </div>
-            )}
-            {/* {isMobile ? (
+                {/* {isMobile ? (
 				<Wallet isMobile={isMobile} />
 			) : ( */}
-            {!homePage && (
-                <>
-                    <div
-                        style={{
-                            position: "absolute",
-                            left: "50%",
-                            transform: "translateX(-50%)",
-                            display: "flex",
-                            flexDirection: "row",
-                            gap: "20px",
-                        }}
-                    >
+                {!homePage && (
+                    <>
                         <div
-                            className={
-                                inMintPage ? "header-btn-radius2" : "header-btn-radius"
-                            }
                             style={{
+                                position: "absolute",
+                                left: "50%",
+                                transform: "translateX(-50%)",
                                 display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
+                                flexDirection: "row",
+                                gap: "20px",
                             }}
-                            onClick={() => navigate("/assets")}
                         >
-                            <img
-                                src={inMintPage ? pageMintSelected : pageMint}
-                                style={{height: "30px", marginRight: "2px"}}
-                            />
                             <div
+                                className={
+                                    inMintPage ? "header-btn-radius2" : "header-btn-radius"
+                                }
                                 style={{
-                                    marginLeft: "8px",
-                                    fontSize: "14px",
-                                    position: "relative",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                 }}
+                                onClick={() => navigate("/assets")}
                             >
-                                <div>Mint</div>
+                                <img
+                                    src={inMintPage ? pageMintSelected : pageMint}
+                                    style={{height: "30px", marginRight: "2px"}}
+                                />
+                                <div
+                                    style={{
+                                        marginLeft: "8px",
+                                        fontSize: "14px",
+                                        position: "relative",
+                                    }}
+                                >
+                                    <div>Mint</div>
+                                </div>
                             </div>
-                        </div>
 
-                        <div
-                            className={inNekoPage ? "header-btn-radius2" : "header-btn-radius"}
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                            onClick={() => navigate("/detail2")}
-                        >
-                            <img
-                                src={inNekoPage ? pageNekoSelected : pageNeko}
-                                style={{height: "30px", marginRight: "2px"}}
-                            />
                             <div
+                                className={inNekoPage ? "header-btn-radius2" : "header-btn-radius"}
                                 style={{
-                                    marginLeft: "8px",
-                                    fontSize: "14px",
-                                    position: "relative",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                 }}
+                                onClick={() => navigate("/detail2")}
                             >
-                                <div>Yield</div>
+                                <img
+                                    src={inNekoPage ? pageNekoSelected : pageNeko}
+                                    style={{height: "30px", marginRight: "2px"}}
+                                />
+                                <div
+                                    style={{
+                                        marginLeft: "8px",
+                                        fontSize: "14px",
+                                        position: "relative",
+                                    }}
+                                >
+                                    <div>Yield</div>
+                                </div>
                             </div>
-                        </div>
 
-                        <div
-                            className={"header-btn-radius"}
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <img
-                                src={pageExtra}
-                                style={{height: "30px", marginRight: "2px"}}
-                            />
                             <div
+                                className={"header-btn-radius"}
                                 style={{
-                                    marginLeft: "8px",
-                                    fontSize: "14px",
-                                    position: "relative",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                 }}
                             >
-                                <div>Buff</div>
+                                <img
+                                    src={pageExtra}
+                                    style={{height: "30px", marginRight: "2px"}}
+                                />
+                                <div
+                                    style={{
+                                        marginLeft: "8px",
+                                        fontSize: "14px",
+                                        position: "relative",
+                                    }}
+                                >
+                                    <div>Buff</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    {/*{detailPage && (<div></div>)}*/}
-                    {/*{assetsPage && (<div></div>)}*/}
-                    <div>
-                        <Wallet/>
-                    </div>
-                </>
-            )}
-        </div>
+                        {/*{detailPage && (<div></div>)}*/}
+                        {/*{assetsPage && (<div></div>)}*/}
+                        <div>
+                            <Wallet/>
+                        </div>
+                    </>
+                )}
+            </div>
+        </>
     );
 }

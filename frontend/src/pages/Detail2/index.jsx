@@ -27,13 +27,16 @@ export default function Detail() {
     const [waiting, setWaiting] = useState(false);
     const [success, setSuccess] = useState("");
 
-    const [copySuccess1, setCopySuccess1] = useState(false);
     const [nekoButton, setNekoButton] = useState("all");
     const [focus, setFocus] = useState({});
-    const [chestDetail, setChestDetail] = useState({});
 
     const {serverData: addressInfo, refreshServerData} = useServer();
     const {prism, nekocoin, prismAllowance, nekocoinAllowance, refreshContractData} = useContractData();
+
+    useEffect(() => {
+        if (focus || !address || !addressInfo) return;
+        setFocus(addressInfo.NekoSpiritList?.at(0) || {});
+    }, [addressInfo]);
 
     useEffect(() => {
         refreshServerData();
@@ -125,57 +128,6 @@ export default function Detail() {
         setSuccess("Success: " + mCall.transaction_hash);
     };
 
-    const upgrade = async (tokenId) => {
-        setWaiting(true);
-
-        // let arr = [];
-        // if (
-        //     upgradeCal[focus.Level - 1].Prism &&
-        //     prismAllowance < upgradeCal[focus.Level - 1].Prism
-        // ) {
-        //     arr.push({
-        //         contractAddress: PRISM_ADDRESS,
-        //         entrypoint: "approve",
-        //         calldata: CallData.compile({
-        //             spender: NEKOMOTO_ADDRESS,
-        //             amount: cairo.uint256(
-        //                 BigInt(upgradeCal[focus.Level - 1].Prism) * 10n ** 18n
-        //             ),
-        //         }),
-        //     });
-        // }
-        // if (
-        //     upgradeCal[focus.Level - 1].Neko &&
-        //     nekocoinAllowance < upgradeCal[focus.Level - 1].Neko
-        // ) {
-        //     arr.push({
-        //         contractAddress: NEKOCOIN_ADDRESS,
-        //         entrypoint: "approve",
-        //         calldata: CallData.compile({
-        //             spender: NEKOMOTO_ADDRESS,
-        //             amount: cairo.uint256(
-        //                 BigInt(upgradeCal[focus.Level - 1].Neko) * 10n ** 18n
-        //             ),
-        //         }),
-        //     });
-        // }
-        // arr.push({
-        //     contractAddress: NEKOMOTO_ADDRESS,
-        //     entrypoint: "upgrade",
-        //     calldata: CallData.compile({token_id: cairo.uint256(tokenId)}),
-        // });
-        // const mCall = await account.execute(arr);
-        //
-        // const result = await account.waitForTransaction(mCall.transaction_hash);
-        // setHhh(mCall.transaction_hash);
-        // console.log("result ", result);
-        // // setSuccess("Success: " + mCall.transaction_hash);
-        // if (result.execution_status === "SUCCEEDED") {
-        //     setWaiting(false);
-        //     // setFocus(addressInfo.NekoSpiritList.find((x) => x.TokenId === tokenId));
-        // }
-    };
-
     const calRate = (power) => {
         if (power < 200000) {
             return (power / 200000).toFixed(2) * 10 + 50;
@@ -262,7 +214,8 @@ export default function Detail() {
                         className="margin-top-16"
                         gutter={16}
                     >
-                        <NekoDetail focus={focus} prism={prism} nekocoin={nekocoin}/>
+                        <NekoDetail focus={focus}  waiting={waiting}
+                                    setWaiting={setWaiting} success={success} setSuccess={setSuccess}/>
                     </Col>
                 </Row>
             </div>

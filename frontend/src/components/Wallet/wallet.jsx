@@ -5,8 +5,8 @@ import t6 from "@assets/ti6.png";
 
 import prismPic from "@assets/purple.png";
 import nkoPic from "@assets/blue.png";
-import nekoPic from "@assets/page-nekomoto.png";
 import accountPic from "@assets/account.png";
+import scrollPic from "@assets/scroll.png";
 import {useNavigate} from "react-router-dom";
 import {useAccount, useConnect, useDisconnect} from "@starknet-react/core";
 import {addCommaInNumber, BACKEND, sign} from "@/interface.js";
@@ -39,7 +39,7 @@ export default function Wallet({isMobile = false}) {
     );
     const [activeResult, setActiveResult] = useState("");
     const {serverData: addressInfo, getServerData} = useServer();
-    const {prism, nekocoin} = useContractData();
+    const {scroll, prism, nekocoin} = useContractData();
 
 
     useEffect(() => {
@@ -153,11 +153,11 @@ export default function Wallet({isMobile = false}) {
                             style={{width: "100px"}}
                         >
                             <img
-                                src={nekoPic}
+                                src={scrollPic}
                                 style={{marginRight: "10px", height: "25px"}}
                                 alt=""
                             />
-                            <span style={{color: "white"}}>{addCommaInNumber(0)}</span>
+                            <span style={{color: "white"}}>{addCommaInNumber(scroll)}</span>
                         </Flex>
                     </Col>
                 )}

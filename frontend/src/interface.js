@@ -6,9 +6,9 @@ import prismAbi from "./abi/prism.json" assert {type: "json"};
 // const BASE_URL = "https://api.nekomoto.xyz/api"
 const BASE_URL = "http://localhost:8972/api"
 
-export const NEKOMOTO_ADDRESS = "0x05ea7084b76cdff79196b6dc560ec5f74e9b7d17ab025505ba48024f8c86bbd6"
-export const NEKOCOIN_ADDRESS = "0x067d637417d957757950802cb280bfb0bed7954960675fee7f683195bf183ee3"
-export const PRISM_ADDRESS = "0x070486bd8b04327e7314a57399bf1058ec8d4063052670df04bb50922b3a0245"
+export const NEKOMOTO_ADDRESS = "0x0668578983cb2d5041528e41be40a5defbcd5d381a67bdb33e3f3941f381523c"
+export const NEKOCOIN_ADDRESS = "0x0560a02d5ea2638a2840174f1bf99a3ca6cb8e4f9d1b625b8ec413cdc5a61cac"
+export const PRISM_ADDRESS = "0x070a021d6fcc126b30f8a62e5345d016f0945e14ee99a1e5477c7c9c9838fae1"
 
 const provider = new RpcProvider({
     nodeUrl: "https://rpc-sepolia.staging.nethermind.dev",
@@ -141,7 +141,7 @@ export const BACKEND = {
 
     addressInfo: async (address) => {
         const result = await fetch(`${BASE_URL}/address/info?address=${address}`)
-        console.log("result: ", result)
+        // console.log("result: ", result)
         return await result.json()
     },
 

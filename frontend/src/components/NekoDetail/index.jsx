@@ -1,19 +1,51 @@
 import {Col, Flex, Row} from "antd";
 import CardCorner from "../CardCorner";
 import CardDetail from "../CardDetail";
-import {addCommaInNumber} from "@/interface.js";
+import {addCommaInNumber, NEKOCOIN_ADDRESS, NEKOMOTO_ADDRESS, nekomotoContract, PRISM_ADDRESS} from "@/interface.js";
 import m2 from "@assets/modal-icon2.png";
 import Button from "../Button";
 import BoxBorder from "../BoxBorder";
-import {useMemo} from "react";
+import {useEffect, useMemo, useState} from "react";
 
 import blue from "@assets/blue.png";
 import purple from "@assets/purple.png";
+import {useContractData} from "@components/Contract/index.jsx";
+import {cairo, CallData} from "starknet";
+import {useAccount} from "@starknet-react/core";
 
-export default function NekoDetail({focus, prism, nekocoin}) {
+export default function NekoDetail({focus, waiting, setWaiting, success, setSuccess}) {
 
+    const [upgradeCostOnce, setUpgradeCostOnce] = useState({
+        nkoConsume: 0,
+        prismConsume: 0,
+        newATK: 0,
+    });
+    const [upgradeCostMax, setUpgradeCostMax] = useState({
+        nkoConsume: 0,
+        prismConsume: 0,
+        newATK: 0,
+    });
 
+    const {account} = useAccount();
+    const {nekocoin, prism, nekocoinAllowance, prismAllowance} = useContractData();
 
+    useEffect(() => {
+        if (!focus || !focus.ID) return
+        nekomotoContract.upgrade_consume(focus.ID, false).then((res) => {
+            setUpgradeCostOnce({
+                nkoConsume: Number(res[0]),
+                prismConsume: Number(res[1]),
+                newATK: Number(res[2]),
+            })
+        });
+        nekomotoContract.upgrade_consume(focus.ID, true).then((res) => {
+            setUpgradeCostMax({
+                nkoConsume: Number(res[0]),
+                prismConsume: Number(res[1]),
+                newATK: Number(res[2]),
+            })
+        })
+    }, [focus])
 
     const Detail = ({title, value}) => {
         return (
@@ -26,118 +58,21 @@ export default function NekoDetail({focus, prism, nekocoin}) {
         );
     };
 
-    const calUpgrade = (currentATK, currentLevel) => {
-        let atkGrowth;
-        let nkoCoefficient;
-        let prismConsume;
-        switch (currentLevel) {
-            case 0:
-                atkGrowth = 0;
-                nkoCoefficient = 0;
-                prismConsume = 0;
-                break;
-            case 1:
-                atkGrowth = 0.15;
-                nkoCoefficient = 0.15;
-                prismConsume = 0;
-                break;
-            case 2:
-                atkGrowth = 0.25;
-                nkoCoefficient = 0.2;
-                prismConsume = 1;
-                break;
-            case 3:
-                atkGrowth = 0.18;
-                nkoCoefficient = 0.15;
-                prismConsume = 0;
-                break;
-            case 4:
-                atkGrowth = 0.18;
-                nkoCoefficient = 0.15;
-                prismConsume = 0;
-                break;
-            case 5:
-                atkGrowth = 0.25;
-                nkoCoefficient = 0.2;
-                prismConsume = 3;
-                break;
-            case 6:
-                atkGrowth = 0.2;
-                nkoCoefficient = 0.18;
-                prismConsume = 0;
-                break;
-            case 7:
-                atkGrowth = 0.2;
-                nkoCoefficient = 0.18;
-                prismConsume = 0;
-                break;
-            case 8:
-                atkGrowth = 0.35;
-                nkoCoefficient = 0.2;
-                prismConsume = 6;
-                break;
-            case 9:
-                atkGrowth = 0.22;
-                nkoCoefficient = 0.2;
-                prismConsume = 0;
-                break;
-            case 10:
-                atkGrowth = 0.22;
-                nkoCoefficient = 0.2;
-                prismConsume = 0;
-                break;
-            case 11:
-                atkGrowth = 0.4;
-                nkoCoefficient = 0.3;
-                prismConsume = 9;
-                break;
-            case 12:
-                atkGrowth = 0.25;
-                nkoCoefficient = 0.22;
-                prismConsume = 0;
-                break;
-            case 13:
-                atkGrowth = 0.25;
-                nkoCoefficient = 0.22;
-                prismConsume = 0;
-                break;
-            case 14:
-                atkGrowth = 0.5;
-                nkoCoefficient = 0.35;
-                prismConsume = 12;
-                break;
-            default:
-                atkGrowth = 0;
-                nkoCoefficient = 0;
-                prismConsume = 0;
-        }
-
-        const newATK = currentATK * (1 + atkGrowth);
-        const nkoConsume = newATK / nkoCoefficient;
-
-        return {
-            nkoConsume: nkoConsume,
-            prismConsume: prismConsume,
-            newATK: newATK,
-        };
-    };
-
-    const upgradeConsume = useMemo(
-        () => calUpgrade(focus.ATK, focus.Level),
-        [focus.ATK, focus.Level]
-    );
-
     const calMaxLevel = (rarity) => {
         let maxLevel;
         switch (rarity) {
             case "N":
                 maxLevel = 3;
+                break;
             case "R":
                 maxLevel = 6;
+                break;
             case "SR":
                 maxLevel = 9;
+                break;
             case "SSR":
                 maxLevel = 12;
+                break;
             case "UR":
                 maxLevel = 15;
         }
@@ -145,6 +80,100 @@ export default function NekoDetail({focus, prism, nekocoin}) {
     };
 
     const maxLevel = useMemo(() => calMaxLevel(focus.Rarity), [focus.Rarity]);
+
+
+    const upgradeOnce = async () => {
+        setWaiting(true);
+
+        if (upgradeCostOnce.prismConsume > prismAllowance || upgradeCostOnce.nkoConsume > nekocoinAllowance) {
+            setSuccess("Insufficient balance");
+            return;
+        }
+
+        let arr = [];
+        if (upgradeCostOnce.nkoConsume > nekocoinAllowance) {
+            arr.push({
+                contractAddress: NEKOCOIN_ADDRESS,
+                entrypoint: "approve",
+                calldata: CallData.compile({
+                    spender: NEKOMOTO_ADDRESS,
+                    amount: cairo.uint256(BigInt(upgradeCostOnce.nkoConsume) * 10n ** 18n)
+                }),
+            })
+        }
+        if (upgradeCostOnce.prismConsume > prismAllowance) {
+            arr.push({
+                contractAddress: PRISM_ADDRESS,
+                entrypoint: "approve",
+                calldata: CallData.compile({
+                    spender: NEKOMOTO_ADDRESS,
+                    amount: cairo.uint256(BigInt(upgradeCostOnce.prismConsume) * 10n ** 18n)
+                }),
+            })
+        }
+        arr.push({
+            contractAddress: NEKOMOTO_ADDRESS,
+            entrypoint: "upgrade",
+            calldata: CallData.compile({tokenId: focus.ID}),
+        });
+
+        const mCall = await account.execute(arr);
+        const result = await account.waitForTransaction(mCall.transaction_hash);
+
+        if (result.execution_status === "SUCCEEDED") {
+            setSuccess("success:" + result.transaction_hash);
+        } else {
+            setSuccess("failed");
+        }
+
+    }
+
+    const upgradeToMax = async () => {
+
+        setWaiting(true);
+
+        if (upgradeCostMax.prismConsume > prismAllowance || upgradeCostMax.nkoConsume > nekocoinAllowance) {
+            setSuccess("Insufficient balance");
+            return;
+        }
+
+        let arr = [];
+        if (upgradeCostMax.nkoConsume > nekocoinAllowance) {
+            arr.push({
+                contractAddress: NEKOCOIN_ADDRESS,
+                entrypoint: "approve",
+                calldata: CallData.compile({
+                    spender: NEKOMOTO_ADDRESS,
+                    amount: cairo.uint256(BigInt(upgradeCostMax.nkoConsume) * 10n ** 18n)
+                }),
+            })
+        }
+        if (upgradeCostMax.prismConsume > prismAllowance) {
+            arr.push({
+                contractAddress: PRISM_ADDRESS,
+                entrypoint: "approve",
+                calldata: CallData.compile({
+                    spender: NEKOMOTO_ADDRESS,
+                    amount: cairo.uint256(BigInt(upgradeCostMax.prismConsume) * 10n ** 18n)
+                }),
+            })
+        }
+        arr.push({
+            contractAddress: NEKOMOTO_ADDRESS,
+            entrypoint: "upgrade_to_max",
+            calldata: CallData.compile({tokenId: focus.ID}),
+        });
+
+        const mCall = await account.execute(arr);
+        const result = await account.waitForTransaction(mCall.transaction_hash);
+
+        if (result.execution_status === "SUCCEEDED") {
+            setSuccess("success:" + result.transaction_hash);
+        } else {
+            setSuccess("failed");
+        }
+
+    }
 
     return (
         <>
@@ -156,7 +185,7 @@ export default function NekoDetail({focus, prism, nekocoin}) {
                             <div className="modal-card-inner">
                                 <CardCorner/>
                                 {/*<img src={card3} width={192} alt=""/>*/}
-                                <CardDetail item={focus}/>
+                                <CardDetail click={false} item={focus}/>
                             </div>
                         </Col>
                         <Col
@@ -244,18 +273,18 @@ export default function NekoDetail({focus, prism, nekocoin}) {
                                     {maxLevel > focus?.Level && (
                                         <div
                                             className={
-                                                upgradeConsume.newATK > 0
+                                                upgradeCostOnce.newATK > 0
                                                     ? "modal-text7"
                                                     : "modal-text6"
                                             }
                                         >
-                                            {addCommaInNumber(upgradeConsume.newATK)}
+                                            {addCommaInNumber(upgradeCostOnce.newATK)}
                                         </div>
                                     )}
                                 </Flex>
                             </Flex>
 
-                            {upgradeConsume.prismConsume > 0 && (
+                            {upgradeCostOnce.prismConsume > 0 && (
                                 <Flex
                                     className="black-bg2"
                                     justify="space-between"
@@ -274,12 +303,12 @@ export default function NekoDetail({focus, prism, nekocoin}) {
                                     <Flex>
                                         <div className="modal-text3">{addCommaInNumber(prism)}</div>
                                         <div className="modal-text9">
-                                            {"/" + addCommaInNumber(upgradeConsume.prismConsume)}
+                                            {"/" + addCommaInNumber(upgradeCostOnce.prismConsume)}
                                         </div>
                                     </Flex>
                                 </Flex>
                             )}
-                            {upgradeConsume.nkoConsume > 0 && (
+                            {upgradeCostOnce.nkoConsume > 0 && (
                                 <Flex
                                     className="black-bg3"
                                     justify="space-between"
@@ -300,7 +329,7 @@ export default function NekoDetail({focus, prism, nekocoin}) {
                                             {addCommaInNumber(nekocoin)}
                                         </div>
                                         <div className="modal-text9">
-                                            {"/" + addCommaInNumber(upgradeConsume.nkoConsume)}
+                                            {"/" + addCommaInNumber(upgradeCostOnce.nkoConsume)}
                                         </div>
                                     </Flex>
                                 </Flex>
@@ -316,16 +345,16 @@ export default function NekoDetail({focus, prism, nekocoin}) {
                         }}
                     >
                         <Button
-                            text={focus?.Level == maxLevel ? "LV MAX" : "UPGRADE"}
+                            text={focus?.Level === maxLevel ? "LV MAX" : "UPGRADE"}
                             color="orange"
                             longness="short"
                             style={
-                                focus?.Level == maxLevel
+                                focus?.Level === maxLevel
                                     ? {filter: "grayscale(1)", marginTop: "24px"}
                                     : {marginTop: "24px"}
                             }
                             onClick={
-                                focus?.Level == maxLevel ? null : () => upgrade(focus?.TokenId)
+                                focus?.Level === maxLevel ? null : () => upgradeOnce()
                             }
                         />
 
@@ -334,7 +363,7 @@ export default function NekoDetail({focus, prism, nekocoin}) {
                             color={"orange"}
                             longness={"short"}
                             style={{marginTop: "24px"}}
-                            onClick={() => unstake(focus?.TokenId)}
+                            onClick={focus?.Level === maxLevel ? null : () => upgradeToMax()}
                         />
                     </div>
                 </Flex>

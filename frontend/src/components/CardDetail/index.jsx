@@ -6,7 +6,7 @@ import Rare from "@assets/Rare.png";
 import Epic from "@assets/Epic.png";
 import Legendary from "@assets/Legendary.png";
 
-export default function CardDetail({item, setFocus}) {
+export default function CardDetail({item, setFocus, click = true}) {
     const rarity = (item) => {
         if (item?.Rarity === "R") {
             return Uncommon;
@@ -23,7 +23,7 @@ export default function CardDetail({item, setFocus}) {
 
     return (
         <div
-            onClick={() => setFocus(item)}
+            onClick={click ? () => setFocus(item) : null}
             style={{
                 backgroundImage: `url(${rarity(item)})`,
                 backgroundSize: "cover",
@@ -31,7 +31,7 @@ export default function CardDetail({item, setFocus}) {
                 width: "185px",
                 height: "230px",
                 position: "relative",
-                cursor: "pointer",
+                cursor: click ? "pointer" : "default",
             }}
         >
             <div

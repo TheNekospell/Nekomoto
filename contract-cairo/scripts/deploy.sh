@@ -22,7 +22,7 @@ starkli invoke --watch $ADDRESS_PRISM init $ADDRESS_MOTO --account ./starkli/acc
 
 # 30% initial liquidity
 # faucet for now
-starkli invoke --watch $ADDRESS_COIN approve $ADDRESS_MOTO u256:300000000000000000000000000 --account ./starkli/account --private-key $PRIVATE_KEY
+starkli invoke --watch $ADDRESS_COIN transfer $ADDRESS_MOTO u256:300000000000000000000000000 --account ./starkli/account --private-key $PRIVATE_KEY
 
 # 10% airdrop
 # starkli invoke --watch $ADDRESS_COIN approve xxx u256:200000000000000000000000000 --account ./starkli/account --private-key $PRIVATE_KEY
