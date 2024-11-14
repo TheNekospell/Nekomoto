@@ -37,18 +37,20 @@ export default function InputCard() {
     const buyCoin = async (count) => {
 
         const balance = await nekocoinContract.balance_of(address);
-        console.log("balance: ", balance);
+        // console.log("balance: ", balance);
 
         const allowance = await nekocoinContract.allowance(
             account.address,
             NEKOMOTO_ADDRESS
         );
-        console.log("allowance: ", allowance);
+        // console.log("allowance: ", allowance);
 
         if (new BigNumber(balance).lt(new BigNumber(count * 25000 * 10 ** 18))) {
             setText("Insufficient balance");
             return;
         }
+
+        setText("Please sign the transactions and wait for seconds...");
 
         if (new BigNumber(allowance).lt(new BigNumber(count * 25000 * 10 ** 18))) {
             const approve = await account.execute([
@@ -62,8 +64,15 @@ export default function InputCard() {
                 },
             ]);
             console.log("approve: ", approve);
-            const approveResult = await waitTx(approve.transaction_hash);
-            console.log("approveResult: ", approveResult);
+            const result = await waitTx(approve.transaction_hash);
+            console.log("approveResult: ", result);
+            if (result.execution_status === "SUCCEEDED") {
+                setText("");
+                setBuyScroll(true);
+            } else {
+                setText("failed");
+            }
+            refreshContractData();
         }
 
         const buyScroll = await account.execute([
@@ -76,16 +85,20 @@ export default function InputCard() {
             }
         ]);
         console.log("buyScroll: ", buyScroll);
-        const buyScrollResult = await waitTx(buyScroll.transaction_hash);
-        console.log("buyScrollResult: ", buyScrollResult);
-        if (buyScrollResult.execution_status === "SUCCEEDED") {
+        const result = await waitTx(buyScroll.transaction_hash);
+        console.log("buyScrollResult: ", result);
+        if (result.execution_status === "SUCCEEDED") {
+            setText("");
             setBuyScroll(true);
+        } else {
+            setText("failed");
         }
+        refreshContractData();
     }
 
 
     const mint = async (count) => {
-        console.log("count: ", count);
+        // console.log("count: ", count);
         if (!address) {
             return;
         }
@@ -224,6 +237,7 @@ export default function InputCard() {
                 onCancel={() => {
                     setBuyScroll(false);
                     setBuyScrollCount(0);
+                    setText("");
                     refreshContractData();
                 }}
             >
@@ -237,7 +251,7 @@ export default function InputCard() {
                         flexDirection: "column",
                     }}
                 >
-                    {buyScroll === false && text !== "" && (
+                    {buyScroll === false && text === "" && (
                         <>
                             <div
                                 style={{
@@ -389,19 +403,19 @@ export default function InputCard() {
                               <span><img src={exclamation} style={{
                                   height: "10px",
                                   marginRight: "5px"
-                              }}/></span> own: {addCommaInNumber(nekocoin - buyScrollCount * 25000)} $NKO
-                                | {scroll + buyScrollCount} Scroll
+                              }}/></span> own: {addCommaInNumber(nekocoin)} $NKO
+                                | {scroll} Scroll
                             </div>
 
                             <div style={{display: "flex", flexDirection: "row", marginTop: "20px"}}>
                                 <Button
-                                    style={{marginLeft: "30px"}}
                                     text={"CONFIRM"}
                                     color={"yellow"}
                                     longness="long"
                                     onClick={() => {
                                         setBuyScroll(false);
                                         setBuyScrollCount(0);
+                                        setText("");
                                         refreshContractData();
                                     }}/>
                             </div>

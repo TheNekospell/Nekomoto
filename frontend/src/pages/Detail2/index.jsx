@@ -65,8 +65,11 @@ export default function Detail() {
         console.log("result: ", result);
         // setSuccess("Success: " + mCall.transaction_hash);
         if (result.execution_status === "SUCCEEDED") {
-            setWaiting(false);
+            setSuccess("success:" + result.transaction_hash);
+        } else {
+            setSuccess("failed");
         }
+        refreshServerData();
     };
 
     const unstake = async (input) => {
@@ -84,8 +87,11 @@ export default function Detail() {
         console.log("result: ", result);
         // setSuccess("Success: " + mCall.transaction_hash);
         if (result.execution_status === "SUCCEEDED") {
-            setWaiting(false);
+            setSuccess("success:" + result.transaction_hash);
+        } else {
+            setSuccess("failed");
         }
+        refreshServerData();
     };
 
     const stakeAll = async () => {
@@ -105,7 +111,12 @@ export default function Detail() {
         setHhh(mCall.transaction_hash);
         const result = await account.waitForTransaction(mCall.transaction_hash);
         console.log("result: ", result);
-        setSuccess("Success: " + mCall.transaction_hash);
+        if (result.execution_status === "SUCCEEDED") {
+            setSuccess("success:" + result.transaction_hash);
+        } else {
+            setSuccess("failed");
+        }
+        refreshServerData();
     };
 
     const unStakeAll = async () => {
@@ -125,7 +136,12 @@ export default function Detail() {
         setHhh(mCall.transaction_hash);
         const result = await account.waitForTransaction(mCall.transaction_hash);
         console.log("result: ", result);
-        setSuccess("Success: " + mCall.transaction_hash);
+        if (result.execution_status === "SUCCEEDED") {
+            setSuccess("success:" + result.transaction_hash);
+        } else {
+            setSuccess("failed");
+        }
+        refreshServerData();
     };
 
     const calRate = (power) => {
@@ -214,7 +230,7 @@ export default function Detail() {
                         className="margin-top-16"
                         gutter={16}
                     >
-                        <NekoDetail focus={focus}  waiting={waiting}
+                        <NekoDetail focus={focus} waiting={waiting}
                                     setWaiting={setWaiting} success={success} setSuccess={setSuccess}/>
                     </Col>
                 </Row>

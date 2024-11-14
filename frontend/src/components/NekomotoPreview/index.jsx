@@ -117,7 +117,7 @@ export default function NekomotoPreview({
                         }
                     />
                     <StakeButton
-                        mainTitle="Stake All"
+                        mainTitle="Unstake All"
                         subTitle="Successive"
                         func={unStakeAll}
                         condition={

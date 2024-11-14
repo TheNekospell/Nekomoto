@@ -16,11 +16,13 @@ import {useAccount} from "@starknet-react/core";
 export default function NekoDetail({focus, waiting, setWaiting, success, setSuccess}) {
 
     const [upgradeCostOnce, setUpgradeCostOnce] = useState({
+        id: 0,
         nkoConsume: 0,
         prismConsume: 0,
         newATK: 0,
     });
     const [upgradeCostMax, setUpgradeCostMax] = useState({
+        id: 0,
         nkoConsume: 0,
         prismConsume: 0,
         newATK: 0,
@@ -83,9 +85,14 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
 
 
     const upgradeOnce = async () => {
+
+        if (upgradeCostOnce.id !== focus?.ID) {
+            return;
+        }
+
         setWaiting(true);
 
-        if (upgradeCostOnce.prismConsume > prismAllowance || upgradeCostOnce.nkoConsume > nekocoinAllowance) {
+        if (upgradeCostOnce.prismConsume > prism || upgradeCostOnce.nkoConsume > nekocoin) {
             setSuccess("Insufficient balance");
             return;
         }
@@ -114,7 +121,7 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
         arr.push({
             contractAddress: NEKOMOTO_ADDRESS,
             entrypoint: "upgrade",
-            calldata: CallData.compile({tokenId: focus.ID}),
+            calldata: CallData.compile({tokenId: cairo.uint256(focus.ID)}),
         });
 
         const mCall = await account.execute(arr);
@@ -130,9 +137,13 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
 
     const upgradeToMax = async () => {
 
+        if (upgradeCostOnce.id !== focus?.ID) {
+            return;
+        }
+
         setWaiting(true);
 
-        if (upgradeCostMax.prismConsume > prismAllowance || upgradeCostMax.nkoConsume > nekocoinAllowance) {
+        if (upgradeCostMax.prismConsume > prism || upgradeCostMax.nkoConsume > nekocoin) {
             setSuccess("Insufficient balance");
             return;
         }
@@ -161,7 +172,7 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
         arr.push({
             contractAddress: NEKOMOTO_ADDRESS,
             entrypoint: "upgrade_to_max",
-            calldata: CallData.compile({tokenId: focus.ID}),
+            calldata: CallData.compile({tokenId: cairo.uint256(focus.ID)}),
         });
 
         const mCall = await account.execute(arr);
@@ -341,7 +352,7 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
-                            padding: "24px 80px",
+                            padding: "12px 80px",
                         }}
                     >
                         <Button
@@ -350,21 +361,23 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
                             longness="short"
                             style={
                                 focus?.Level === maxLevel
-                                    ? {filter: "grayscale(1)", marginTop: "24px"}
-                                    : {marginTop: "24px"}
+                                    ? {filter: "grayscale(1)", marginTop: "60px"}
+                                    : {marginTop: "12px"}
                             }
                             onClick={
                                 focus?.Level === maxLevel ? null : () => upgradeOnce()
                             }
                         />
 
-                        <Button
-                            text={"UPGRADE TO MAX"}
-                            color={"orange"}
-                            longness={"short"}
-                            style={{marginTop: "24px"}}
-                            onClick={focus?.Level === maxLevel ? null : () => upgradeToMax()}
-                        />
+                        {focus?.Level !== maxLevel && (
+                            <Button
+                                text={"UPGRADE TO MAX"}
+                                color={"orange"}
+                                longness={"short"}
+                                style={{marginTop: "12px"}}
+                                onClick={focus?.Level === maxLevel ? null : () => upgradeToMax()}
+                            />
+                        )}
                     </div>
                 </Flex>
             </div>
