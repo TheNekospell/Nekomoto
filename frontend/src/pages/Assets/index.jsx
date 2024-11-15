@@ -85,10 +85,10 @@ export default function Assets() {
                     <Col style={{width: "45%", height: "100%"}}>
                         <MintPoolCard
                             epoch={addressInfo?.StaticEpoch}
-                            staticMintPool={addCommaInNumber(addressInfo?.StaticMintPool)}
+                            staticMintPool={addressInfo?.StaticMintPool}
                             staticTotalLuck={addressInfo?.StaticTotalLuck}
-                            estMintPoolReward={addCommaInNumber(addressInfo?.EstMintPoolReward)}
-                            mintPoolToClaim={addCommaInNumber(addressInfo?.MintPoolToClaim)}
+                            estMintPoolReward={addressInfo?.EstMintPoolReward}
+                            mintPoolToClaim={addressInfo?.MintPoolToClaim}
                             setWaiting={setWaiting}
                             setSuccess={setSuccess}
                         />

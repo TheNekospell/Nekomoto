@@ -34,8 +34,12 @@ export default function Detail() {
     const {prism, nekocoin, prismAllowance, nekocoinAllowance, refreshContractData} = useContractData();
 
     useEffect(() => {
-        if (focus || !address || !addressInfo) return;
-        setFocus(addressInfo.NekoSpiritList?.at(0) || {});
+        if (!address || !addressInfo) return;
+        if (!focus?.TokenId) {
+            setFocus(addressInfo.NekoSpiritList?.at(0) || {});
+        } else {
+            setFocus(addressInfo.NekoSpiritList?.find((x) => x.TokenId === focus.TokenId) || {});
+        }
     }, [addressInfo]);
 
     useEffect(() => {

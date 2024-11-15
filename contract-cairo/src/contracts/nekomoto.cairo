@@ -178,6 +178,7 @@ pub mod Nekomoto {
                     0 => {
                         // empty
                         to_mint_prism = to_mint_prism + 5;
+                        token_id = token_id - 1;
                         continue;
                     },
                     1 => self.atk.write(token_id, generate_random(seed, 5, 15)),
@@ -318,8 +319,7 @@ pub mod Nekomoto {
                 assert(nko_consume != 0, 'Wrong level');
                 nko_count = nko_count + nko_consume;
                 prism_count = prism_count + prism_consume;
-                current_atk = current_atk + new_atk;
-
+                current_atk = new_atk;
                 current_level = current_level + 1;
                 if current_level == max_level {
                     break;
@@ -396,7 +396,8 @@ pub mod Nekomoto {
                 assert(nko_consume != 0, 'Wrong level');
                 nko_count = nko_count + nko_consume;
                 prism_count = prism_count + prism_consume;
-                current_atk = current_atk + new_atk;
+                current_atk = new_atk;
+                current_level = current_level + 1;
 
                 self
                     .emit(
@@ -409,7 +410,6 @@ pub mod Nekomoto {
                         }
                     );
 
-                current_level = current_level + 1;
                 if current_level == max_level {
                     break;
                 }

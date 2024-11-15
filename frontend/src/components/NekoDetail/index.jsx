@@ -12,17 +12,18 @@ import purple from "@assets/purple.png";
 import {useContractData} from "@components/Contract/index.jsx";
 import {cairo, CallData} from "starknet";
 import {useAccount} from "@starknet-react/core";
+import {useServer} from "@components/Server/index.jsx";
 
 export default function NekoDetail({focus, waiting, setWaiting, success, setSuccess}) {
 
     const [upgradeCostOnce, setUpgradeCostOnce] = useState({
-        id: 0,
+        tokenId: 0,
         nkoConsume: 0,
         prismConsume: 0,
         newATK: 0,
     });
     const [upgradeCostMax, setUpgradeCostMax] = useState({
-        id: 0,
+        tokenId: 0,
         nkoConsume: 0,
         prismConsume: 0,
         newATK: 0,
@@ -30,23 +31,44 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
 
     const {account} = useAccount();
     const {nekocoin, prism, nekocoinAllowance, prismAllowance} = useContractData();
+    const {refreshServerData} = useServer();
 
     useEffect(() => {
-        if (!focus || !focus.ID) return
-        nekomotoContract.upgrade_consume(focus.ID, false).then((res) => {
+        if (!focus || !focus.TokenId) return
+        nekomotoContract.upgrade_consume(focus.TokenId, false).then((res) => {
             setUpgradeCostOnce({
                 nkoConsume: Number(res[0]),
                 prismConsume: Number(res[1]),
                 newATK: Number(res[2]),
+                tokenId: focus.TokenId
             })
+        }).catch((err) => {
+            if (err.toString().includes("Exceed max level")) {
+                setUpgradeCostOnce({
+                    nkoConsume: 0,
+                    prismConsume: 0,
+                    newATK: 0,
+                    tokenId: focus.TokenId
+                })
+            }
         });
-        nekomotoContract.upgrade_consume(focus.ID, true).then((res) => {
+        nekomotoContract.upgrade_consume(focus.TokenId, true).then((res) => {
             setUpgradeCostMax({
                 nkoConsume: Number(res[0]),
                 prismConsume: Number(res[1]),
                 newATK: Number(res[2]),
+                tokenId: focus.TokenId
             })
-        })
+        }).catch((err) => {
+            if (err.toString().includes("Exceed max level")) {
+                setUpgradeCostMax({
+                    nkoConsume: 0,
+                    prismConsume: 0,
+                    newATK: 0,
+                    tokenId: focus.TokenId
+                })
+            }
+        });
     }, [focus])
 
     const Detail = ({title, value}) => {
@@ -83,10 +105,9 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
 
     const maxLevel = useMemo(() => calMaxLevel(focus.Rarity), [focus.Rarity]);
 
-
     const upgradeOnce = async () => {
 
-        if (upgradeCostOnce.id !== focus?.ID) {
+        if (upgradeCostOnce.tokenId !== focus?.TokenId) {
             return;
         }
 
@@ -121,7 +142,7 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
         arr.push({
             contractAddress: NEKOMOTO_ADDRESS,
             entrypoint: "upgrade",
-            calldata: CallData.compile({tokenId: cairo.uint256(focus.ID)}),
+            calldata: CallData.compile({tokenId: cairo.uint256(focus.TokenId)}),
         });
 
         const mCall = await account.execute(arr);
@@ -133,11 +154,13 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
             setSuccess("failed");
         }
 
+        refreshServerData();
+
     }
 
     const upgradeToMax = async () => {
 
-        if (upgradeCostOnce.id !== focus?.ID) {
+        if (upgradeCostMax.tokenId !== focus?.TokenId) {
             return;
         }
 
@@ -172,7 +195,7 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
         arr.push({
             contractAddress: NEKOMOTO_ADDRESS,
             entrypoint: "upgrade_to_max",
-            calldata: CallData.compile({tokenId: cairo.uint256(focus.ID)}),
+            calldata: CallData.compile({tokenId: cairo.uint256(focus.TokenId)}),
         });
 
         const mCall = await account.execute(arr);
@@ -183,6 +206,8 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
         } else {
             setSuccess("failed");
         }
+
+        refreshServerData();
 
     }
 

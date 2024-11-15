@@ -6,9 +6,9 @@ import prismAbi from "./abi/prism.json" assert {type: "json"};
 // const BASE_URL = "https://api.nekomoto.xyz/api"
 const BASE_URL = "http://localhost:8972/api"
 
-export const NEKOMOTO_ADDRESS = "0x0668578983cb2d5041528e41be40a5defbcd5d381a67bdb33e3f3941f381523c"
-export const NEKOCOIN_ADDRESS = "0x0560a02d5ea2638a2840174f1bf99a3ca6cb8e4f9d1b625b8ec413cdc5a61cac"
-export const PRISM_ADDRESS = "0x070a021d6fcc126b30f8a62e5345d016f0945e14ee99a1e5477c7c9c9838fae1"
+export const NEKOMOTO_ADDRESS = "0x01878545224d2c514135026db0c0d0b6e11d26dbeecc1cc23ba90cc1b3b6cfdf"
+export const NEKOCOIN_ADDRESS = "0x05a357b97222f7ac8bdae3fab9f0a9fbc2f6b9272d393cb5228beda350098175"
+export const PRISM_ADDRESS = "0x055b02963367fad7b4fe4ae93a99483a8cc256f7324a02fd29f231e7400ce64b"
 
 const provider = new RpcProvider({
     nodeUrl: "https://rpc-sepolia.staging.nethermind.dev",

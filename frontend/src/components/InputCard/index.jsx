@@ -66,10 +66,7 @@ export default function InputCard() {
             console.log("approve: ", approve);
             const result = await waitTx(approve.transaction_hash);
             console.log("approveResult: ", result);
-            if (result.execution_status === "SUCCEEDED") {
-                setText("");
-                setBuyScroll(true);
-            } else {
+            if (result.execution_status !== "SUCCEEDED") {
                 setText("failed");
             }
             refreshContractData();

@@ -15,7 +15,7 @@ export default function Home() {
                 </div>
                 <div className="home-btn" onClick={() => navigate("/assets")}>
                     <img width={12} src={play} alt="" style={{marginRight: "16px"}}/>{" "}
-                    Paly
+                    Play
                 </div>
             </div>
         </div>

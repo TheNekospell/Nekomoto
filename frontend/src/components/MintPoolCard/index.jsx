@@ -75,7 +75,8 @@ export default function MintPoolCard({
             setSuccess("success:" + result.transaction_hash);
         } else {
             setSuccess("failed");
-        }    };
+        }
+    };
 
     return (
         <>
@@ -125,7 +126,7 @@ export default function MintPoolCard({
                             {"Current Pool"}
                         </div>
                         <div style={{display: "flex", alignItems: "center"}}>
-                            <div style={{fontSize: "40px"}}>{staticMintPool}</div>
+                            <div style={{fontSize: "40px"}}>{addCommaInNumber(staticMintPool)}</div>
                             <img src={blue} style={{height: "30px", marginLeft: "10px"}}/>
                         </div>
                         <div
@@ -161,7 +162,7 @@ export default function MintPoolCard({
                                 >
                                     <img src={luck} style={{height: "30px"}}/>
                                     <div style={{fontSize: "20px", color: "white"}}>
-                                        {staticTotalLuck}
+                                        {addCommaInNumber(staticTotalLuck)}
                                     </div>
                                 </div>
                                 <img
@@ -173,7 +174,7 @@ export default function MintPoolCard({
                                     style={{display: "flex", flexDirection: "column"}}
                                 >
                                     <div style={{fontSize: "15px"}}>
-                                        {addCommaInNumber(staticMintPool / staticTotalLuck)}
+                                        {addCommaInNumber(Number(staticMintPool) / Number(staticTotalLuck))}
                                     </div>
                                     <div style={{fontSize: "10px"}}>{"NKO per Luck"}</div>
                                 </div>
@@ -211,7 +212,7 @@ export default function MintPoolCard({
                         </div>
                         <div style={{display: "flex", alignItems: "center"}}>
                             <img src={blue} style={{height: "30px", marginRight: "10px"}}/>
-                            <div style={{fontSize: "35px"}}>{estMintPoolReward}</div>
+                            <div style={{fontSize: "35px"}}>{addCommaInNumber(estMintPoolReward)}</div>
                         </div>
                         <div>
                             <div className="grey-text" style={{fontSize: "15px"}}>
@@ -241,7 +242,7 @@ export default function MintPoolCard({
                             }}
                         >
                             <div style={{fontSize: "20px", color: "#E9D78E"}}>
-                                {mintPoolToClaim}
+                                {addCommaInNumber(mintPoolToClaim)}
                             </div>
                             <img src={blue} style={{height: "20px", marginLeft: "10px"}}/>
                         </div>
