@@ -672,7 +672,7 @@ side-channel@^1.0.6:
   resolved "https://registry.yarnpkg.com/@starknet-io/types-js/-/types-js-0.7.7.tgz#444be5e4e585ec6f599d42d3407280d98b2dfdf8"
   integrity sha512-WLrpK7LIaIb8Ymxu6KF/6JkGW1sso988DweWu7p5QY/3y7waBIiPvzh27D9bX5KIJNRDyOoOVoHVEKYUYWZ/RQ==
 
-"starknet@^6.11.0 ":
+starknet@^6.11.0:
   version "6.11.0"
   resolved "https://registry.yarnpkg.com/starknet/-/starknet-6.11.0.tgz#5d7e868e913777e9bf64323e59ed8be86437f291"
   integrity sha512-u50KrGDi9fbu1Ogu7ynwF/tSeFlp3mzOg1/Y5x50tYFICImo3OfY4lOz9OtYDk404HK4eUujKkhov9tG7GAKlg==

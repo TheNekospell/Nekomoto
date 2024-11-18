@@ -38,7 +38,7 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 		return model.ServerInternalError, "Nothing to claim"
 	}
 
-	if err := invoker_sn.SendCoinAndNFT(addressDetail.Address, totalReward.Mul(decimal.New(1, 18)).BigInt(), big.NewInt(0), big.NewInt(0)); err != nil {
+	if err := invoker_sn.SendCoinAndNFT(addressDetail.Address, totalReward.BigInt(), big.NewInt(0), big.NewInt(0)); err != nil {
 		fmt.Println("SendCoinAndNFT error: ", err)
 		return model.ServerInternalError, err.Error()
 	}
@@ -80,7 +80,7 @@ func ClaimRewardOfMint(req model.AddressAndSignature) (model.ResponseCode, strin
 		return model.ServerInternalError, "Nothing to claim"
 	}
 
-	if err := invoker_sn.SendCoinAndNFT(addressDetail.Address, totalReward.Mul(decimal.New(1, 18)).BigInt(), big.NewInt(0), big.NewInt(0)); err != nil {
+	if err := invoker_sn.SendCoinAndNFT(addressDetail.Address, totalReward.BigInt(), big.NewInt(0), big.NewInt(0)); err != nil {
 		fmt.Println("SendCoinAndNFT error: ", err)
 		return model.ServerInternalError, err.Error()
 	}

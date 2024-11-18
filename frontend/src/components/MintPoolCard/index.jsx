@@ -9,7 +9,8 @@ import lineH from "@assets/line-hor.png";
 import Button from "@components/Button/index";
 import {addCommaInNumber, BACKEND, sign} from "@/interface.js";
 import {useAccount} from "@starknet-react/core";
-import {useEffect, useState} from "react";
+import TimerCard from "@components/TimerCard/index.jsx";
+import LockBlanket from "@components/LockBlanket/index.jsx";
 
 export default function MintPoolCard({
                                          epoch,
@@ -22,54 +23,10 @@ export default function MintPoolCard({
                                      }) {
     const {address, account} = useAccount();
 
-    const [timer, setTimer] = useState({
-        days: 0,
-        hours: 0,
-        minutes: 0,
-        seconds: 0
-    });
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setTimer(calTimeLeft());
-        }, 1000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const calTimeLeft = () => {
-        const now = new Date();
-        let daysToWeekend = 6 - now.getDay();
-        let hoursToWeekend = (daysToWeekend * 24) - now.getHours();
-        let minutesToWeekend = 60 - now.getMinutes();
-        let secondsToWeekend = 60 - now.getSeconds();
-
-        if (secondsToWeekend === 60) {
-            secondsToWeekend = 0;
-            minutesToWeekend += 1;
-        }
-
-        if (minutesToWeekend === 60) {
-            minutesToWeekend = 0;
-            hoursToWeekend += 1;
-        }
-
-        if (hoursToWeekend === 24) {
-            hoursToWeekend = 0;
-            daysToWeekend += 1;
-        }
-
-        return {
-            days: daysToWeekend.toString().padStart(2, "0"),
-            hours: hoursToWeekend.toString().padStart(2, "0"),
-            minutes: minutesToWeekend.toString().padStart(2, "0"),
-            seconds: secondsToWeekend.toString().padStart(2, "0"),
-        };
-    };
-
     const claim = async () => {
         setWaiting(true);
         const {typedMessage, signature} = await sign(account);
-        const result = await BACKEND.claimReward(address, typedMessage, signature);
+        const result = await BACKEND.claimRewardOfMint(address, typedMessage, signature);
         console.log("result: ", result);
         if (result.execution_status === "SUCCEEDED") {
             setSuccess("success:" + result.transaction_hash);
@@ -174,7 +131,7 @@ export default function MintPoolCard({
                                     style={{display: "flex", flexDirection: "column"}}
                                 >
                                     <div style={{fontSize: "15px"}}>
-                                        {addCommaInNumber(Number(staticMintPool) / Number(staticTotalLuck))}
+                                        {staticTotalLuck === "0" ? 0 : addCommaInNumber(Number(staticMintPool) / Number(staticTotalLuck))}
                                     </div>
                                     <div style={{fontSize: "10px"}}>{"NKO per Luck"}</div>
                                 </div>
@@ -183,92 +140,101 @@ export default function MintPoolCard({
                     </div>
                 </div>
                 <img src={lineH} style={{width: "100%", height: "1px"}}/>
-                <div
-                    style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        marginTop: "5px",
-                    }}
-                >
+                {address ? (
                     <div
                         style={{
                             display: "flex",
-                            flexDirection: "column",
+                            flexDirection: "row",
                             justifyContent: "space-between",
+                            marginTop: "5px",
                         }}
                     >
-                        <div>
-                            <div style={{display: "flex", alignItems: "center"}}>
-                                <div style={{fontSize: "25px"}}>{"My Est. Prize"}</div>
-                                <img src={exclamation} style={{height: "12px"}} alt=""/>
-                            </div>
-                            <div
-                                className="grey-text"
-                                style={{fontSize: "11px", marginRight: "6px"}}
-                            >
-                                {"in current epoch"}
-                            </div>
-                        </div>
-                        <div style={{display: "flex", alignItems: "center"}}>
-                            <img src={blue} style={{height: "30px", marginRight: "10px"}}/>
-                            <div style={{fontSize: "35px"}}>{addCommaInNumber(estMintPoolReward)}</div>
-                        </div>
-                        <div>
-                            <div className="grey-text" style={{fontSize: "15px"}}>
-                                {"Ends in " + timer.days + ":" + timer.hours + ":" + timer.minutes + ":" + timer.seconds}
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        className="grey-text"
-                        style={{
-                            borderRadius: "4px",
-                            padding: "10px",
-                            backgroundColor: "rgba(14, 39, 54, 1)",
-                            alignContent: "center",
-                            alignItems: "center",
-                            display: "flex",
-                            flexDirection: "column",
-                            width: "45%",
-                        }}
-                    >
-                        <div style={{fontSize: "15px"}}>{"Unclaimed Prize"}</div>
                         <div
                             style={{
                                 display: "flex",
-                                alignItems: "center",
-                                marginTop: "5px",
+                                flexDirection: "column",
+                                justifyContent: "space-between",
                             }}
                         >
-                            <div style={{fontSize: "20px", color: "#E9D78E"}}>
-                                {addCommaInNumber(mintPoolToClaim)}
-                            </div>
-                            <img src={blue} style={{height: "20px", marginLeft: "10px"}}/>
-                        </div>
-                        <Button
-                            text={
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        textAlign: "center",
-                                        width: "100%",
-                                        height: "100%",
-                                        fontSize: "12px",
-                                    }}
-                                    onClick={claim}
-                                >
-                                    {"Claim"}
+                            <div>
+                                <div style={{display: "flex", alignItems: "center"}}>
+                                    <div style={{fontSize: "25px"}}>{"My Est. Prize"}</div>
+                                    <img src={exclamation} style={{height: "12px"}} alt=""/>
                                 </div>
-                            }
-                            color={"yellow"}
-                            longness={"long"}
-                            style={{width: "100%", marginTop: "5px", height: "25px"}}
-                        />
+                                <div
+                                    className="grey-text"
+                                    style={{fontSize: "11px", marginRight: "6px"}}
+                                >
+                                    {"in current epoch"}
+                                </div>
+                            </div>
+                            <div style={{display: "flex", alignItems: "center"}}>
+                                <img src={blue} style={{height: "30px", marginRight: "10px"}}/>
+                                <div style={{fontSize: "35px"}}>{addCommaInNumber(estMintPoolReward)}</div>
+                            </div>
+                            <TimerCard/>
+                        </div>
+                        <div
+                            className="grey-text"
+                            style={{
+                                borderRadius: "4px",
+                                padding: "10px",
+                                backgroundColor: "rgba(14, 39, 54, 1)",
+                                alignContent: "center",
+                                alignItems: "center",
+                                display: "flex",
+                                flexDirection: "column",
+                                width: "45%",
+                            }}
+                        >
+                            <div style={{fontSize: "15px"}}>{"Unclaimed Prize"}</div>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    marginTop: "5px",
+                                }}
+                            >
+                                <div style={{fontSize: "20px", color: "#E9D78E"}}>
+                                    {addCommaInNumber(mintPoolToClaim)}
+                                </div>
+                                <img src={blue} style={{height: "20px", marginLeft: "10px"}}/>
+                            </div>
+                            <Button
+                                text={
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            textAlign: "center",
+                                            width: "100%",
+                                            height: "100%",
+                                            fontSize: "12px",
+                                        }}
+                                    >
+                                        {"Claim"}
+                                    </div>
+                                }
+                                color={"yellow"}
+                                longness={"long"}
+                                style={{width: "100%", marginTop: "5px", height: "25px"}}
+                                onClick={claim}
+                            />
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            height: "45%",
+                        }}
+                    >
+                        <LockBlanket/>
+                    </div>
+                )}
             </div>
         </>
     );

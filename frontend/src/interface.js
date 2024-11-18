@@ -11,7 +11,7 @@ export const NEKOCOIN_ADDRESS = "0x05a357b97222f7ac8bdae3fab9f0a9fbc2f6b9272d393
 export const PRISM_ADDRESS = "0x055b02963367fad7b4fe4ae93a99483a8cc256f7324a02fd29f231e7400ce64b"
 
 const provider = new RpcProvider({
-    nodeUrl: "https://rpc-sepolia.staging.nethermind.dev",
+    nodeUrl: "https://starknet-sepolia.public.blastapi.io",
 })
 
 export const nekomotoContract = new Contract(nekomotoAbi, NEKOMOTO_ADDRESS, provider)

@@ -29,16 +29,13 @@ func CalLuckAndPower(nekoList []database.ServerNekoSpiritInfo, epoch uint64) (de
 
 func AllocateProfit() {
 
-	isFirst := AddEpoch()
-	if isFirst {
-		return
-	}
+	newEpoch := AddEpoch()
 
 	now := time.Now()
 	fmt.Println("")
 	fmt.Println("Wow, it's time to start a big allocate profit:", now)
 
-	lastEpoch := database.GetEpoch() - 1
+	lastEpoch := newEpoch - 1
 
 	rewardPool := database.GetRewardPool()
 	currentMintPoolReward, currentStakePoolReward := rewardPool.MintPool, rewardPool.StakePool
@@ -55,7 +52,8 @@ func AllocateProfit() {
 
 	TotalLuck, TotalPower := CalLuckAndPower(nekoList, lastEpoch)
 	currentStakePoolRewardReleased, currentStakePoolRewardNotReleased := calTheReleaseReward(currentStakePoolReward, TotalPower)
-	fmt.Println("TotalLuck: ", TotalLuck, " TotalPower: ", TotalPower, " currentStakePoolRewardReleased: ", currentStakePoolRewardReleased, " currentStakePoolRewardNotReleased: ", currentStakePoolRewardNotReleased)
+	fmt.Println("TotalLuck: ", TotalLuck, " TotalPower: ", TotalPower, " currentStakePoolRewardReleased: ",
+		currentStakePoolRewardReleased, " currentStakePoolRewardNotReleased: ", currentStakePoolRewardNotReleased)
 
 	for _, process := range nekoList {
 
@@ -66,7 +64,7 @@ func AllocateProfit() {
 			MintRewards: process.MintRewards,
 		}
 
-		fmt.Println("process token ID: ", process.ID, temp)
+		//fmt.Println("process token ID: ", process.ID, temp)
 
 		update := false
 
@@ -124,12 +122,8 @@ func calTheReleaseReward(reward decimal.Decimal, power decimal.Decimal) (decimal
 	}
 }
 
-func AddEpoch() bool {
+func AddEpoch() uint64 {
 	epochNow := database.GetEpoch()
-	if epochNow == 1 {
-		return true
-	}
 	database.AddEpoch()
-	return false
-
+	return epochNow + 1
 }

@@ -14,8 +14,6 @@ import CheckCard from "../../components/CheckCard";
 import MintPoolCard from "../../components/MintPoolCard";
 import {useServer} from "../../components/Server";
 import WaitCard from "../../components/WaitCard/index.jsx";
-import {addCommaInNumber} from "@/interface.js";
-import {useAccount} from "@starknet-react/core";
 
 export default function Assets() {
     const [info, setInfo] = useState({});
@@ -26,8 +24,6 @@ export default function Assets() {
 
     const [waiting, setWaiting] = useState(false);
     const [success, setSuccess] = useState("");
-
-    const {address} = useAccount();
 
     useEffect(() => {
         refreshServerData();

@@ -53,6 +53,8 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 	var serverAddress ServerAddress
 	DB.Where("id = ?", uid).Find(&serverAddress)
 
+	epoch, mintPool, stakePool, totalLuck, totalPower := GetStatic()
+
 	var NekoSpiritList []ServerNekoSpiritInfo
 	DB.Model(&ServerNekoSpiritInfo{}).Where("stake_from_uid = ?", uid).Find(&NekoSpiritList)
 	stakePoolToClaim := decimal.Zero
@@ -64,21 +66,20 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		stakePoolToClaim = stakePoolToClaim.Add(spirit.Rewards)
 		mintPoolToClaim = mintPoolToClaim.Add(spirit.MintRewards)
 		idList = append(idList, spirit.TokenId)
-		if spirit.Rarity == "SSR" {
-			mySSR++
-			myLuck += 1
-		}
-		if spirit.Rarity == "UR" {
-			myUR++
-			myLuck += 3
+		if spirit.Epoch == epoch {
+			if spirit.Rarity == "SSR" {
+				mySSR++
+				myLuck += 1
+			}
+			if spirit.Rarity == "UR" {
+				myUR++
+				myLuck += 3
+			}
 		}
 		if spirit.IsStaked {
 			myPower = myPower.Add(spirit.ATK)
 		}
-
 	}
-
-	epoch, mintPool, stakePool, totalLuck, totalPower := GetStatic()
 
 	estMintPoolReward := decimal.Zero
 	if !totalLuck.Equal(decimal.Zero) {
@@ -101,8 +102,8 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		StaticStakePool:    stakePool,
 		StaticTotalLuck:    totalLuck,
 		StaticMintPool:     mintPool,
-		StakePoolToClaim:   stakePoolToClaim,
-		MintPoolToClaim:    mintPoolToClaim,
+		StakePoolToClaim:   stakePoolToClaim.Div(decimal.New(10, 18)),
+		MintPoolToClaim:    mintPoolToClaim.Div(decimal.New(10, 18)),
 		StaticEpoch:        epoch,
 		MyPower:            myPower,
 		MyLuck:             myLuck,

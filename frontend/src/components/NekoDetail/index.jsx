@@ -250,12 +250,12 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
                                 <Detail title="LV" value={focus?.Level}/>
                                 <Detail
                                     title="Earning"
-                                    value={addCommaInNumber(Number(focus?.Rewards) + Number(focus?.MintRewards))}
+                                    value={addCommaInNumber(Number(focus?.Rewards) / (10 ** 18) + Number(focus?.MintRewards) / (10 ** 18))}
                                 />
                                 <Detail
                                     title="Claimed"
                                     value={addCommaInNumber(
-                                        Number(focus?.ClaimedRewards) + Number(focus?.ClaimedMintRewards)
+                                        Number(focus?.ClaimedRewards) / (10 ** 18) + Number(focus?.ClaimedMintRewards) / (10 ** 18)
                                     )}
                                 />
                                 <Detail
@@ -266,10 +266,6 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
                                         </div>
                                     }
                                 />
-                                {/*<Flex justify="space-between" className="margin-bottom-16">*/}
-                                {/*    <div className="modal-text2">APR</div>*/}
-                                {/*    <div className="modal-text3">/</div>*/}
-                                {/*</Flex>*/}
                             </Flex>
                         </Col>
                     </Row>

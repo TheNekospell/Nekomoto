@@ -6,6 +6,7 @@ import {useEffect, useMemo, useState} from "react";
 import claimedMask from "@assets/claimed-mask.png";
 import {NEKOMOTO_ADDRESS, prismContract,} from "@/interface.js";
 import {CallData} from "starknet";
+import LockBlanket from "@components/LockBlanket/index.jsx";
 
 export default function CheckCard({setWaiting, setSuccess}) {
 
@@ -99,104 +100,109 @@ export default function CheckCard({setWaiting, setSuccess}) {
 
     return (
         <>
-            <div
-                style={{
-                    backgroundColor: "#1d3344",
-                    position: "relative",
-                    padding: "10px 20px",
-                    height: "100%",
-                    width: "100%",
-                    fontFamily: "BIG SHOT",
-                }}
-            >
-                <BoxBorder/>
+            {address ? (
+
                 <div
                     style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        width: "100%",
+                        backgroundColor: "#1d3344",
+                        position: "relative",
+                        padding: "10px 20px",
                         height: "100%",
-                        justifyContent: "space-between",
-                        textAlign: "center",
+                        width: "100%",
+                        fontFamily: "BIG SHOT",
                     }}
                 >
-                    {/* daily check-in */}
-                    <div
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            alignContent: "center",
-                            width: "25%",
-                            height: "100%",
-                        }}
-                    >
-                        <div style={{color: "white"}}>{"Daily Check-in"}</div>
-                        <img src={seven} style={{height: "60px"}}/>
-                        <div className="grey-text">{"accumulate days"}</div>
-                    </div>
-                    {/* check week */}
+                    <BoxBorder/>
                     <div
                         style={{
                             display: "flex",
                             flexDirection: "row",
-                            width: "75%",
+                            width: "100%",
                             height: "100%",
-                            alignItems: "center",
-                            marginLeft: "15px",
                             justifyContent: "space-between",
+                            textAlign: "center",
                         }}
                     >
+                        {/* daily check-in */}
                         <div
                             style={{
                                 display: "flex",
                                 flexDirection: "column",
-                                width: "100px",
-                            }}
-                        >
-                            <CheckItem title={"MON"} checkIn={checkStatus[0]}
-                                       click={checkStatus[0] !== 1 && today === 0}/>
-                            <CheckItem title={"THU"} checkIn={checkStatus[3]}
-                                       click={checkStatus[3] !== 1 && today === 3}/>
-                        </div>
-                        <div
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                width: "100px",
-                            }}
-                        >
-                            <CheckItem title={"TUE"} checkIn={checkStatus[1]}
-                                       click={checkStatus[1] !== 1 && today === 1}/>
-                            <CheckItem title={"FRI"} checkIn={checkStatus[4]}
-                                       click={checkStatus[4] !== 1 && today === 4}/>
-                        </div>
-                        <div
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                width: "100px",
-                            }}
-                        >
-                            <CheckItem title={"WED"} checkIn={checkStatus[2]}
-                                       click={checkStatus[2] !== 1 && today === 2}/>
-                            <CheckItem title={"SAT"} checkIn={checkStatus[5]}
-                                       click={checkStatus[5] !== 1 && today === 5}/>
-                        </div>
-                        <div
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                width: "100px",
+                                alignItems: "center",
+                                alignContent: "center",
+                                width: "25%",
                                 height: "100%",
                             }}
                         >
-                            <CheckItem style={{width: "100px"}} title={"SUN"} checkIn={checkStatus[0]}
-                                       click={checkStatus[0] !== 1 && today === 0}/>
+                            <div style={{color: "white"}}>{"Daily Check-in"}</div>
+                            <img src={seven} style={{height: "60px"}}/>
+                            <div className="grey-text">{"accumulate days"}</div>
+                        </div>
+                        {/* check week */}
+                        <div
+                            style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                width: "75%",
+                                height: "100%",
+                                alignItems: "center",
+                                marginLeft: "15px",
+                                justifyContent: "space-between",
+                            }}
+                        >
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    width: "100px",
+                                }}
+                            >
+                                <CheckItem title={"MON"} checkIn={checkStatus[0]}
+                                           click={checkStatus[0] !== 1 && today === 0}/>
+                                <CheckItem title={"THU"} checkIn={checkStatus[3]}
+                                           click={checkStatus[3] !== 1 && today === 3}/>
+                            </div>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    width: "100px",
+                                }}
+                            >
+                                <CheckItem title={"TUE"} checkIn={checkStatus[1]}
+                                           click={checkStatus[1] !== 1 && today === 1}/>
+                                <CheckItem title={"FRI"} checkIn={checkStatus[4]}
+                                           click={checkStatus[4] !== 1 && today === 4}/>
+                            </div>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    width: "100px",
+                                }}
+                            >
+                                <CheckItem title={"WED"} checkIn={checkStatus[2]}
+                                           click={checkStatus[2] !== 1 && today === 2}/>
+                                <CheckItem title={"SAT"} checkIn={checkStatus[5]}
+                                           click={checkStatus[5] !== 1 && today === 5}/>
+                            </div>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    width: "100px",
+                                    height: "100%",
+                                }}
+                            >
+                                <CheckItem style={{width: "100px"}} title={"SUN"} checkIn={checkStatus[6]}
+                                           click={checkStatus[6] !== 1 && today === 6}/>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            ) : (
+                <LockBlanket/>
+            )}
         </>
     );
 }

@@ -1,11 +1,11 @@
 const express = require("express");
-const { Account, cairo, CallData, Contract, json, RpcProvider, uint256 } = require('starknet');
+const {Account, cairo, CallData, Contract, json, RpcProvider, uint256} = require('starknet');
 require('dotenv').config()
 
 
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 
 
 const provider = new RpcProvider({
@@ -19,7 +19,7 @@ app.post("/valid", async function (req, res) {
     console.log("-----------------valid ")
 
     try {
-        const { address, typedMessage, signature } = req.body
+        const {address, typedMessage, signature} = req.body
 
         console.log("valid: ", address, typedMessage, signature)
 
@@ -40,7 +40,7 @@ app.post("/send", async function (req, res) {
     try {
         // console.log("req.body: ", req.body)
 
-        const { to, nekocoin, prism, nft } = req.body;
+        const {to, nekocoin, prism, nft} = req.body;
         if (!to) {
             res.status(500).send("to is required");
             return;
@@ -48,9 +48,7 @@ app.post("/send", async function (req, res) {
 
         console.log("send: ", to, nekocoin, prism, nft)
 
-
         let arr = []
-        // console.log("arr: ", arr)
 
         if (nekocoin) {
             arr.push({
@@ -90,21 +88,20 @@ app.post("/send", async function (req, res) {
             return;
         }
 
-        const multicall = await account.execute(arr, {
+        const multiCall = await account.execute(arr, {
             maxFee: 10 ** 16
         })
 
-        const result = await account.waitForTransaction(multicall.transaction_hash)
+        const result = await account.waitForTransaction(multiCall.transaction_hash)
         console.log("result: ", result.execution_status, result.finality_status)
         console.log("result detail: ", result.status, result.transaction_hash, result.revert_reason, result.transaction_failure_reason)
 
-        res.send(multicall.transaction_hash)
+        res.send(multiCall.transaction_hash)
 
     } catch (e) {
 
         console.log("send error: ", e)
         res.status(500).send(e)
-        return
 
     }
 
@@ -114,7 +111,7 @@ app.post("/summon", async function (req, res) {
     console.log("-----------------summon ")
     try {
 
-        const { to, count, random } = req.body;
+        const {to, count, random} = req.body;
         if (!to) {
             res.status(500).send("to is required");
             return;
@@ -140,7 +137,6 @@ app.post("/summon", async function (req, res) {
 
         console.log("summon error: ", e)
         res.status(500).send(e)
-        return
 
     }
 
@@ -150,7 +146,7 @@ app.post("/burn", async function (req, res) {
     console.log("-----------------burn ")
     try {
 
-        const { count } = req.body;
+        const {count} = req.body;
         if (!count) {
             res.status(500).send("count is required");
             return;
@@ -174,7 +170,6 @@ app.post("/burn", async function (req, res) {
     } catch (e) {
         console.log("burn error: ", e)
         res.status(500).send(e)
-        return
     }
 })
 
