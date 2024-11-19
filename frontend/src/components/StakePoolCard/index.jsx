@@ -9,6 +9,7 @@ import Button from "@components/Button/index";
 import {useAccount} from "@starknet-react/core";
 import TimerCard from "@components/TimerCard/index.jsx";
 import {BACKEND, sign} from "@/interface.js";
+import {useServer} from "@components/Server/index.jsx";
 
 export default function StakePoolCard({
                                           setWaiting,
@@ -19,6 +20,7 @@ export default function StakePoolCard({
                                           staticEpoch,
                                       }) {
     const {address, account} = useAccount();
+    const {refreshServerData} = useServer();
 
     const claim = async () => {
         setWaiting(true);
@@ -29,11 +31,12 @@ export default function StakePoolCard({
             signature
         );
         console.log("result: ", result);
-        if (result.execution_status === "SUCCEEDED") {
+        if (result.success) {
             setSuccess("success:" + result.transaction_hash);
         } else {
             setSuccess("failed");
         }
+        refreshServerData();
     };
 
     return (

@@ -11,6 +11,7 @@ import {addCommaInNumber, BACKEND, sign} from "@/interface.js";
 import {useAccount} from "@starknet-react/core";
 import TimerCard from "@components/TimerCard/index.jsx";
 import LockBlanket from "@components/LockBlanket/index.jsx";
+import {useServer} from "@components/Server/index.jsx";
 
 export default function MintPoolCard({
                                          epoch,
@@ -22,17 +23,19 @@ export default function MintPoolCard({
                                          setSuccess,
                                      }) {
     const {address, account} = useAccount();
+    const {refreshServerData} = useServer();
 
     const claim = async () => {
         setWaiting(true);
         const {typedMessage, signature} = await sign(account);
         const result = await BACKEND.claimRewardOfMint(address, typedMessage, signature);
         console.log("result: ", result);
-        if (result.execution_status === "SUCCEEDED") {
+        if (result.success) {
             setSuccess("success:" + result.transaction_hash);
         } else {
             setSuccess("failed");
         }
+        refreshServerData();
     };
 
     return (

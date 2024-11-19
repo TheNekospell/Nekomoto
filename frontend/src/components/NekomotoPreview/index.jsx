@@ -98,15 +98,15 @@ export default function NekomotoPreview({
                 </Flex>
 
                 <Flex style={{justifyContent: "end"}}>
-                    <StakeButton
-                        mainTitle="Stake All"
-                        subTitle="Batch"
-                        func={stakeAll}
-                        condition={
-                            addressInfo.NekoSpiritList?.filter((item) => !item.IsStaked)
-                                .length > 0
-                        }
-                    />
+                    {/*<StakeButton*/}
+                    {/*    mainTitle="Stake All"*/}
+                    {/*    subTitle="Batch"*/}
+                    {/*    func={stakeAll}*/}
+                    {/*    condition={*/}
+                    {/*        addressInfo.NekoSpiritList?.filter((item) => !item.IsStaked)*/}
+                    {/*            .length > 0*/}
+                    {/*    }*/}
+                    {/*/>*/}
                     <StakeButton
                         mainTitle="Stake All"
                         subTitle="Successive"

@@ -13,6 +13,8 @@ import {useContractData} from "@components/Contract/index.jsx";
 import {cairo, CallData} from "starknet";
 import {useAccount} from "@starknet-react/core";
 import {useServer} from "@components/Server/index.jsx";
+import NekoModal from "@components/Modal/index.jsx";
+import exclamation from "@assets/exclamation.png";
 
 export default function NekoDetail({focus, waiting, setWaiting, success, setSuccess}) {
 
@@ -32,6 +34,8 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
     const {account} = useAccount();
     const {nekocoin, prism, nekocoinAllowance, prismAllowance} = useContractData();
     const {refreshServerData} = useServer();
+
+    const [upgradeToMaxModal, setUpgradeToMaxModal] = useState(false);
 
     useEffect(() => {
         if (!focus || !focus.TokenId) return
@@ -213,6 +217,96 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
 
     return (
         <>
+            <NekoModal
+                open={upgradeToMaxModal}
+                centered={true}
+                footer={null}
+                maskClosable={true}
+                onCancel={() => {
+                    setUpgradeToMaxModal(false);
+                    refreshServerData();
+                }}
+            >
+                <div
+                    style={{
+                        marginTop: "20px",
+                        marginBottom: "20px",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        display: "flex",
+                        flexDirection: "column",
+                    }}
+                >
+                    <div
+                        style={{
+                            backgroundColor: "#172937",
+                            width: '110%',
+                            padding: '10px 0',
+                        }}>
+                        <h2
+                            style={{
+                                textAlign: "center",
+                                fontFamily: "BIG SHOT",
+                                color: "white",
+                                fontWeight: "bold",
+                                wordWrap: "break-word",
+                                wordBreak: "break-all",
+                            }}>
+                            Confirm
+                        </h2>
+                    </div>
+
+                    <h3
+                        style={{
+                            textAlign: "center",
+                            fontFamily: "BIG SHOT",
+                            color: "white",
+                            fontWeight: "bold",
+                            wordWrap: "break-word",
+                            wordBreak: "break-all",
+                            marginTop: "20px",
+                        }}
+                    >
+                        <span style={{color: "white"}}>Spend </span>
+                        <span style={{color: "#B6EAFF"}}>{addCommaInNumber(upgradeCostMax.nkoConsume)} $NKO </span>
+                        {upgradeCostMax.prismConsume > 0 && <span style={{color: "white"}}>and </span>}
+                        {upgradeCostMax.prismConsume > 0 &&
+                            <span
+                                style={{color: "#B6EAFF"}}>{addCommaInNumber(upgradeCostMax.prismConsume)} Prism </span>}
+                        to purchase
+                        <div></div>
+                        upgrade to <span style={{color: "#E9D78E"}}> LV.{maxLevel}</span> ?
+                    </h3>
+
+                    <div style={{
+                        textAlign: "center",
+                        fontFamily: "BIG SHOT",
+                        marginTop: "20px",
+                        backgroundColor: "#172937",
+                        padding: '10px 10px',
+                        color: "#90A6AF",
+                        borderRadius: "30px"
+                    }}>
+                               <span><img src={exclamation} style={{
+                                   height: "10px",
+                                   marginRight: "5px"
+                               }}/></span> own: {addCommaInNumber(nekocoin)} $NKO | {addCommaInNumber(prism)} Prism
+                    </div>
+
+                    <div style={{display: "flex", flexDirection: "row", marginTop: "20px"}}>
+                        <Button
+                            text={"CONFIRM"}
+                            color={"yellow"}
+                            longness="long"
+                            onClick={() => {
+                                setUpgradeToMaxModal(false);
+                                upgradeToMax();
+                            }}/>
+                    </div>
+                </div>
+            </NekoModal>
+
+
             <div className="pool-card" style={{height: "100%"}}>
                 <BoxBorder/>
                 <Flex justify="center" vertical="column">
@@ -396,7 +490,7 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
                                 color={"orange"}
                                 longness={"short"}
                                 style={{marginTop: "12px"}}
-                                onClick={focus?.Level === maxLevel ? null : () => upgradeToMax()}
+                                onClick={focus?.Level === maxLevel && focus?.TokenId === upgradeCostMax.tokenId ? null : () => setUpgradeToMaxModal(true)}
                             />
                         )}
                     </div>
