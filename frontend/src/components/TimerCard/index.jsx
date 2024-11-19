@@ -3,7 +3,6 @@ import {useEffect, useState} from "react";
 export default function TimerCard({}) {
 
     const [timer, setTimer] = useState({
-        days: 0,
         hours: 0,
         minutes: 0,
         seconds: 0
@@ -18,8 +17,8 @@ export default function TimerCard({}) {
 
     const calTimeLeft = () => {
         const now = new Date();
-        let daysToWeekend = 6 - now.getDay();
-        let hoursToWeekend = 24 - now.getHours();
+        const nowHour = now.getHours();
+        let hoursToWeekend = 24 - (nowHour > 12 ? nowHour : (nowHour + 12));
         let minutesToWeekend = 60 - now.getMinutes();
         let secondsToWeekend = 60 - now.getSeconds();
 
@@ -35,11 +34,9 @@ export default function TimerCard({}) {
 
         if (hoursToWeekend === 24) {
             hoursToWeekend = 0;
-            daysToWeekend += 1;
         }
 
         return {
-            days: daysToWeekend.toString().padStart(2, "0"),
             hours: hoursToWeekend.toString().padStart(2, "0"),
             minutes: minutesToWeekend.toString().padStart(2, "0"),
             seconds: secondsToWeekend.toString().padStart(2, "0"),
@@ -50,7 +47,7 @@ export default function TimerCard({}) {
         <>
             <div>
                 <div className="grey-text" style={{fontSize: "15px"}}>
-                    {"Ends in " + timer.days + ":" + timer.hours + ":" + timer.minutes + ":" + timer.seconds}
+                    {"Ends in " + timer.hours + ":" + timer.minutes + ":" + timer.seconds}
                 </div>
             </div>
         </>
