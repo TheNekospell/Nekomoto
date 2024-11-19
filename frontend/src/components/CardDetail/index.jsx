@@ -1,10 +1,9 @@
-import ATK from "@assets/ATK.png";
 
-import Uncommon from "@assets/Uncommon.png";
-import Common from "@assets/Common.png";
-import Rare from "@assets/Rare.png";
-import Epic from "@assets/Epic.png";
-import Legendary from "@assets/Legendary.png";
+import Uncommon from "@assets/Uncommon_new.png";
+import Common from "@assets/Common_new.png";
+import Rare from "@assets/Rare_new.png";
+import Epic from "@assets/Epic_new.png";
+import Legendary from "@assets/Legendary_new.png";
 
 export default function CardDetail({item, setFocus, click = true}) {
     const rarity = (item) => {
@@ -29,7 +28,7 @@ export default function CardDetail({item, setFocus, click = true}) {
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 width: "185px",
-                height: "230px",
+                height: "210px",
                 position: "relative",
                 cursor: click ? "pointer" : "default",
             }}
@@ -39,100 +38,26 @@ export default function CardDetail({item, setFocus, click = true}) {
                     textShadow:
                         "2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black, 1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black",
                     position: "absolute",
-                    top: "17px",
-                    left: "19px",
+                    top: "10px",
+                    left: "16px",
                     fontFamily: "BIG SHOT",
-                    color: "yellow",
-                    fontSize: "9px",
+                    // color: "yellow",
+                    fontSize: "13px",
                 }}
             >
                 {"Lv " + item?.Level}
             </div>
-            {/* <div
-				style={{
-					textShadow:
-						"2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black, 1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black",
-					position: "absolute",
-					top: "17px",
-					right: "19px",
-					fontFamily: "BIG SHOT",
-					color: "white",
-					fontSize: "9px",
-				}}
-			>
-				{"Fade=" + item?.Fade}
-			</div> */}
-            {/* <div
-				style={{
-					textShadow:
-						"2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black, 1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black",
-					position: "absolute",
-					top: "152px",
-					left: "50%",
-					transform: "translate(-50%, -50%)",
-					fontFamily: "BIG SHOT",
-					color: "white",
-					fontSize: "10px",
-				}}
-			>
-				{item?.Mana}
-			</div> */}
-            {/* <div
-				style={{
-					textShadow:
-						"2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black, 1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black",
-					position: "absolute",
-					top: "170px",
-					left: "21px",
-					fontFamily: "BIG SHOT",
-					color: "white",
-					fontSize: "10px",
-				}}
-			>
-				<div
-					style={{
-						flexDirection: "row",
-						display: "flex",
-						alignItems: "center",
-					}}
-				>
-					<img src={SPI} width={18} style={{ marginRight: "4px" }} alt={""} />
-					<span>{item?.SPI}</span>
-				</div>
-			</div>
-			<div
-				style={{
-					textShadow:
-						"2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black, 1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black",
-					position: "absolute",
-					top: "190px",
-					left: "21px",
-					fontFamily: "BIG SHOT",
-					color: "white",
-					fontSize: "10px",
-				}}
-			>
-				<div
-					style={{
-						flexDirection: "row",
-						display: "flex",
-						alignItems: "center",
-					}}
-				>
-					<img src={DEF} width={18} style={{ marginRight: "4px" }} alt={""} />
-					<span>{item?.DEF}</span>
-				</div>
-			</div> */}
+
             <div
                 style={{
                     textShadow:
                         "2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black, 1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black",
                     position: "absolute",
-                    top: "170px",
-                    left: "30px",
+                    bottom: "10px",
+                    left: "50px",
                     fontFamily: "BIG SHOT",
                     color: "white",
-                    fontSize: "10px",
+                    fontSize: "20px",
                 }}
             >
                 <div
@@ -142,33 +67,10 @@ export default function CardDetail({item, setFocus, click = true}) {
                         alignItems: "center",
                     }}
                 >
-                    <img src={ATK} width={30} style={{marginRight: "4px"}} alt={""}/>
                     <span>{item?.ATK}</span>
                 </div>
             </div>
-            {/* <div
-				style={{
-					textShadow:
-						"2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black, 1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black",
-					position: "absolute",
-					top: "190px",
-					left: "100px",
-					fontFamily: "BIG SHOT",
-					color: "white",
-					fontSize: "10px",
-				}}
-			>
-				<div
-					style={{
-						flexDirection: "row",
-						display: "flex",
-						alignItems: "center",
-					}}
-				>
-					<img src={SPD} width={18} style={{ marginRight: "4px" }} alt={""} />
-					<span>{item?.SPD}</span>
-				</div>
-			</div> */}
+
         </div>
     );
 }
