@@ -16,7 +16,7 @@ func StartTicker() {
 	fmt.Println("Start ticker", time.Now().UTC().Local())
 
 	now := time.Now().UTC()
-	nextEpoch := now.Truncate(time.Hour).Add(time.Hour * 12)
+	nextEpoch := now.Truncate(12 * time.Hour).Add(time.Hour * 12)
 
 	waitTime := nextEpoch.Sub(now)
 	allocateTimer := time.NewTimer(waitTime)

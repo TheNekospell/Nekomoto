@@ -67,6 +67,7 @@ pub mod Nekomoto {
         UpgradeableEvent: UpgradeableComponent::Event,
         Upgrade: Upgrade,
         Summon: Summon,
+        BuyCoin: BuyCoin,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -86,6 +87,14 @@ pub mod Nekomoto {
         to: ContractAddress,
         #[key]
         token_id: u256
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct BuyCoin {
+        #[key]
+        to: ContractAddress,
+        #[key]
+        count: u256
     }
 
     #[constructor]
@@ -142,6 +151,7 @@ pub mod Nekomoto {
             ERC20BurnTraitDispatcher { contract_address: nekocoin }
                 .burnFrom(recipient, amount * 70 / 100);
             self.coin.write(recipient, self.coin.read(recipient) + count);
+            self.emit(BuyCoin { to: recipient, count });
         }
 
         fn check_in(ref self: ContractState) -> bool {
