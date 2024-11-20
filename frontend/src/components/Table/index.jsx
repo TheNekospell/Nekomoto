@@ -17,7 +17,7 @@ export default function NekoTable({records}) {
                 return "Stake";
             case 4:
                 return "Withdraw";
-            default:
+            case 5:
                 return "Upgrade";
         }
     }
