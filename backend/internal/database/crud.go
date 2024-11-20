@@ -473,3 +473,7 @@ func ResetRewardPool(mint decimal.Decimal, stake decimal.Decimal) {
 		Update("mint_pool", amountOfEveryEpoch.Mul(decimal.New(30, -2)).Add(mint)).
 		Update("stake_pool", amountOfEveryEpoch.Mul(decimal.New(70, -2)).Add(stake))
 }
+
+func AddServerTransactionRecord(uid uint64, hash string, recordType RecordType, obj string) {
+	DB.Create(&ServerTransactionRecord{Uid: uid, Hash: hash, RecordType: recordType, Object: obj})
+}

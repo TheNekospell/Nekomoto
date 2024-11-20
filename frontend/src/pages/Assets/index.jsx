@@ -16,7 +16,6 @@ import {useServer} from "../../components/Server";
 import WaitCard from "../../components/WaitCard/index.jsx";
 
 export default function Assets() {
-    const [info, setInfo] = useState({});
     const [isModalOpen1, setIsModalOpen1] = useState(false);
     const navigate = useNavigate();
     const [hhh, setHhh] = useState("");
@@ -104,7 +103,7 @@ export default function Assets() {
                 </Row>
 
                 <Row>
-                    <Table records={info.treasuryRevenue}/>
+                    <Table records={addressInfo.TransactionHistory}/>
                 </Row>
             </div>
         </div>

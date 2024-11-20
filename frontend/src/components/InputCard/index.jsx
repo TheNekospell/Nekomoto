@@ -22,6 +22,7 @@ import mintPagePic2 from "@assets/mint-page2.png";
 import exclamation from "@assets/exclamation.png";
 import {useContractData} from "@components/Contract/index.jsx";
 import BoxBorder from "@components/BoxBorder/index.jsx";
+import {useServer} from "@components/Server/index.jsx";
 
 export default function InputCard() {
     const {account, address, status, chainId, isConnected} = useAccount();
@@ -33,6 +34,7 @@ export default function InputCard() {
     const navigate = useNavigate();
 
     const {scroll, nekocoin, prism, refreshContractData} = useContractData();
+    const {refreshServerData} = useServer();
 
     const buyCoin = async (count) => {
 
@@ -129,6 +131,7 @@ export default function InputCard() {
             setText("Something went wrong: " + result.message);
         }
         refreshContractData();
+        refreshServerData();
     };
 
     const MintButton = ({count}) => {

@@ -5,6 +5,7 @@ import (
 	"backend/internal/database"
 	"backend/starknet/rpc"
 	"backend/starknet/utils"
+	"strconv"
 
 	"backend/internal/server/service"
 	"context"
@@ -39,7 +40,7 @@ func StartIndexer() {
 		}
 		// fmt.Println("[Indexer] currentBlock", currentBlock)
 
-		lastHeight := database.GetIndexerHeight()
+		lastHeight = database.GetIndexerHeight()
 		// fmt.Println("[Indexer] lastHeight", lastHeight)
 
 		for i := lastHeight + 1; i <= currentBlock+1; i++ {
@@ -54,6 +55,8 @@ func StartIndexer() {
 			// now = time.Now()
 			resolveNekoCoinBurn(i)
 			// fmt.Println("------------------resolveNekoCoinBurn cost time: ", time.Since(now)/time.Millisecond)
+
+			resolveScroll(i)
 
 			channel <- i
 
@@ -136,7 +139,11 @@ func resolveBoxUpgrade(block uint64) {
 		if checkIndexedTransaction(&event, 4) {
 			continue
 		}
-		service.UpdateNekoSpiritByUpgrade(event.Event.Keys[2].Uint64(), event.Event.Data[2].Uint64())
+		info, recordType := service.UpdateNekoSpiritByUpgrade(event.Event.Keys[2].Uint64(), event.Event.Data[2].Uint64())
+
+		if recordType != database.None {
+			recordTransactionForDisplay(info.StakeFromUid, event.TransactionHash.String(), info.Rarity+" Neko #"+strconv.FormatUint(info.TokenId, 10), recordType)
+		}
 
 	}
 
@@ -171,12 +178,50 @@ func resolveBoxTransfer(block uint64) {
 		to := event.Event.Keys[2].String()
 		tokenId := event.Event.Keys[3].Uint64()
 
-		service.UpdateNekoSpiritByTransfer(from, to, tokenId)
+		info, recordType := service.UpdateNekoSpiritByTransfer(from, to, tokenId)
+
+		if recordType != database.None {
+			recordTransactionForDisplay(info.StakeFromUid, event.TransactionHash.String(), info.Rarity+" Neko #"+strconv.FormatUint(info.TokenId, 10), recordType)
+		}
 
 	}
 
 	for _, event := range result.Events {
 		recordIndexedTransaction(&event, 5)
+	}
+}
+
+func resolveScroll(block uint64) {
+	result, err := chain_sn.Account.Events(context.Background(), rpc.EventsInput{
+		EventFilter: rpc.EventFilter{
+			FromBlock: rpc.BlockID{Number: &block},
+			ToBlock:   rpc.BlockID{Number: &block},
+			Address:   chain_sn.NekomotoContractAddress,
+			Keys:      [][]*felt.Felt{{utils.GetSelectorFromNameFelt("BuyCoin")}},
+		},
+		ResultPageRequest: rpc.ResultPageRequest{ChunkSize: 1000},
+	})
+	if err != nil {
+		// panic(err)
+		fmt.Println("err : ", err.Error())
+		return
+	}
+	// fmt.Println("result: ", result.ContinuationToken)
+	// panic("stop")
+	for _, event := range result.Events {
+		if checkIndexedTransaction(&event, 6) {
+			// fmt.Println("continue")
+			continue
+		}
+		address := event.Event.Keys[1].String()
+		count := event.Event.Keys[2].Uint64()
+
+		recordTransactionForDisplay(database.GetAddressDetailByAddress(address).Uid, event.TransactionHash.String(), strconv.FormatUint(count, 10), database.BuyScroll)
+
+	}
+
+	for _, event := range result.Events {
+		recordIndexedTransaction(&event, 6)
 	}
 }
 
@@ -189,5 +234,11 @@ func recordIndexerHeight(height uint64, signal <-chan uint64) {
 			height = newHeight
 		}
 	}
+
+}
+
+func recordTransactionForDisplay(uid uint64, hash string, obj string, recordType database.RecordType) {
+
+	database.AddServerTransactionRecord(uid, hash, recordType, obj)
 
 }

@@ -65,13 +65,18 @@ export default function Detail() {
         ]);
 
         setHhh(mCall.transaction_hash);
-        const result = await account.waitForTransaction(mCall.transaction_hash);
-        console.log("result: ", result);
-        // setSuccess("Success: " + mCall.transaction_hash);
-        if (result.execution_status === "SUCCEEDED") {
-            setSuccess("success:" + result.transaction_hash);
-        } else {
-            setSuccess("failed");
+        try {
+            const result = await account.waitForTransaction(mCall.transaction_hash);
+            console.log("result: ", result);
+            // setSuccess("Success: " + mCall.transaction_hash);
+            if (result.execution_status === "SUCCEEDED") {
+                setSuccess("success:" + result.transaction_hash);
+            } else {
+                setSuccess("failed");
+            }
+        } catch (e) {
+            setWaiting(false);
+            console.log(e)
         }
         refreshServerData();
     };
@@ -87,13 +92,18 @@ export default function Detail() {
         ]);
 
         setHhh(mCall.transaction_hash);
-        const result = await account.waitForTransaction(mCall.transaction_hash);
-        console.log("result: ", result);
-        // setSuccess("Success: " + mCall.transaction_hash);
-        if (result.execution_status === "SUCCEEDED") {
-            setSuccess("success:" + result.transaction_hash);
-        } else {
-            setSuccess("failed");
+        try {
+            const result = await account.waitForTransaction(mCall.transaction_hash);
+            console.log("result: ", result);
+            // setSuccess("Success: " + mCall.transaction_hash);
+            if (result.execution_status === "SUCCEEDED") {
+                setSuccess("success:" + result.transaction_hash);
+            } else {
+                setSuccess("failed");
+            }
+        } catch (e) {
+            setWaiting(false);
+            console.log(e)
         }
         refreshServerData();
     };
@@ -113,12 +123,18 @@ export default function Detail() {
         ]);
 
         setHhh(mCall.transaction_hash);
-        const result = await account.waitForTransaction(mCall.transaction_hash);
-        console.log("result: ", result);
-        if (result.execution_status === "SUCCEEDED") {
-            setSuccess("success:" + result.transaction_hash);
-        } else {
-            setSuccess("failed");
+        try {
+            const result = await account.waitForTransaction(mCall.transaction_hash);
+            console.log("result: ", result);
+            // setSuccess("Success: " + mCall.transaction_hash);
+            if (result.execution_status === "SUCCEEDED") {
+                setSuccess("success:" + result.transaction_hash);
+            } else {
+                setSuccess("failed");
+            }
+        } catch (e) {
+            setWaiting(false);
+            console.log(e)
         }
         refreshServerData();
     };
@@ -138,12 +154,18 @@ export default function Detail() {
         ]);
 
         setHhh(mCall.transaction_hash);
-        const result = await account.waitForTransaction(mCall.transaction_hash);
-        console.log("result: ", result);
-        if (result.execution_status === "SUCCEEDED") {
-            setSuccess("success:" + result.transaction_hash);
-        } else {
-            setSuccess("failed");
+        try {
+            const result = await account.waitForTransaction(mCall.transaction_hash);
+            console.log("result: ", result);
+            // setSuccess("Success: " + mCall.transaction_hash);
+            if (result.execution_status === "SUCCEEDED") {
+                setSuccess("success:" + result.transaction_hash);
+            } else {
+                setSuccess("failed");
+            }
+        } catch (e) {
+            setWaiting(false);
+            console.log(e)
         }
         refreshServerData();
     };

@@ -46,6 +46,7 @@ type AddressInfo struct {
 	StaticTotalLuck        decimal.Decimal
 	StaticStakePool        decimal.Decimal
 	StaticTotalPower       decimal.Decimal
+	TransactionHistory     []ServerTransactionRecord
 }
 
 func GetAddressDetailByUid(uid uint64) AddressInfo {
@@ -91,6 +92,9 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		estStakePoolReward = stakePool.Mul(myPower.Div(totalPower))
 	}
 
+	var transactionHistory []ServerTransactionRecord
+	DB.Model(&ServerTransactionRecord{}).Where("uid = ?", uid).Order("created_at desc").Find(&transactionHistory)
+
 	result := AddressInfo{
 		Uid:                uid,
 		Address:            serverAddress.Address,
@@ -111,6 +115,7 @@ func GetAddressDetailByUid(uid uint64) AddressInfo {
 		MyUR:               myUR,
 		EstMintPoolReward:  estMintPoolReward,
 		EstStakePoolReward: estStakePoolReward,
+		TransactionHistory: transactionHistory,
 	}
 
 	//Cache.Set(CacheTagUid+strconv.FormatUint(uid, 10), result, -1)

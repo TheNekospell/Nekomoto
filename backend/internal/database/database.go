@@ -60,6 +60,7 @@ func initTables() {
 		&ServerBurnTemp{},
 		&ServerTestCode{},
 		&ServerEpoch{},
+		ServerTransactionRecord{},
 		&IndexerRecord{},
 		&IndexerTransactionRecord{},
 		&EventNekoCoinTransfer{},
@@ -118,6 +119,17 @@ const (
 	MasterChest
 )
 
+type RecordType uint16
+
+const (
+	None RecordType = iota
+	BuyScroll
+	Summon
+	Stake
+	Withdraw
+	Upgrade
+)
+
 type Model struct {
 	ID        uint64 `gorm:"primaryKey"`
 	CreatedAt time.Time
@@ -130,7 +142,7 @@ type ServerAddress struct {
 	Address    string `gorm:"uniqueIndex type:char(66) not null"`
 	InviteCode string `gorm:"not null index"`
 	IsStarter  bool   `gorm:"not null default:true"`
-	Active     bool   `gorm:"not null default:false"`
+	Active     bool   `gorm:"not null default:true"`
 }
 
 type ServerClaimRecord struct {
@@ -284,6 +296,14 @@ type ServerTestCode struct {
 	Model
 	Code string `gorm:"not null"`
 	Uid  uint64 `gorm:"not null default:0"`
+}
+
+type ServerTransactionRecord struct {
+	Model
+	Uid        uint64     `gorm:"not null index"`
+	Hash       string     `gorm:"not null type:char(66) index"`
+	RecordType RecordType `gorm:"not null"`
+	Object     string     `gorm:"not null"`
 }
 
 type ServerEpoch struct {
