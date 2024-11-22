@@ -171,6 +171,7 @@ export default function Wallet({isMobile = false}) {
                         display: "flex",
                         alignItems: "center",
                     }}
+                    onClick={() => setVisible(true)}
                 >
                     {address && isConnected ? (
                         <div
@@ -184,7 +185,6 @@ export default function Wallet({isMobile = false}) {
                                 // justify: "space-between",
                                 justifyContent: "center",
                             }}
-                            onClick={() => setVisible(true)}
                         >
                             <img
                                 src={accountPic}
@@ -196,7 +196,7 @@ export default function Wallet({isMobile = false}) {
 							</span>
                         </div>
                     ) : (
-                        <div style={{width: "100%"}} onClick={() => setVisible(true)}>
+                        <div style={{width: "100%"}}>
                             Connect Wallet
                         </div>
                     )}

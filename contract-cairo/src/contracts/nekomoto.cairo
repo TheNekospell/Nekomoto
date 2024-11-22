@@ -493,7 +493,6 @@ pub mod Nekomoto {
                 2 => 'Water',
                 3 => 'Wind',
                 4 => 'Earth',
-                5 => 'Thunder',
                 _ => '',
             }
         )
@@ -552,18 +551,7 @@ pub mod Nekomoto {
 
 
     fn generate_element(seed: u256) -> u8 {
-        let element_number = generate_random(seed, 0, 5);
-        if (element_number == 0) {
-            1
-        } else if (element_number == 1) {
-            2
-        } else if (element_number == 2) {
-            3
-        } else if (element_number == 3) {
-            4
-        } else {
-            5
-        }
+        generate_random(seed, 1, 5).try_into().unwrap()
     }
 
     fn upgrade_once(current_atk: u256, current_level: u8) -> (u256, u256, u256) {

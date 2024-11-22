@@ -6,9 +6,9 @@ import prismAbi from "./abi/prism.json" assert {type: "json"};
 // const BASE_URL = "https://api.nekomoto.xyz/api"
 const BASE_URL = "http://localhost:8972/api"
 
-export const NEKOMOTO_ADDRESS = "0x01878545224d2c514135026db0c0d0b6e11d26dbeecc1cc23ba90cc1b3b6cfdf"
-export const NEKOCOIN_ADDRESS = "0x05a357b97222f7ac8bdae3fab9f0a9fbc2f6b9272d393cb5228beda350098175"
-export const PRISM_ADDRESS = "0x055b02963367fad7b4fe4ae93a99483a8cc256f7324a02fd29f231e7400ce64b"
+export const NEKOMOTO_ADDRESS = "0x0615fdb0a687407578263d565f55c6004d4aac2451ff86fffaab703942bf1132"
+export const NEKOCOIN_ADDRESS = "0x05d87ea1f47df9e7547b9799b5a4580d3dfe325c468cb7fc5d3cb1b90a5783b1"
+export const PRISM_ADDRESS = "0x075f95bc1cd1f57d2ef16b530a600937b53d297dd13b85f1ba6081650ea9dd41"
 
 const provider = new RpcProvider({
     nodeUrl: "https://starknet-sepolia.public.blastapi.io/rpc/v0_7",

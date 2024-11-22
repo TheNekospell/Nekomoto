@@ -50,7 +50,12 @@ export default function NekoTable({records}) {
                     title: "TX Hash",
                     dataIndex: "Hash",
                     fixed: "left",
-                    width: 400
+                    width: 400,
+                    render: (text) => {
+                        return <a href={"https://sepolia.voyager.online/tx/" + text}
+                                  style={{textDecoration: "none", color: "inherit"}}
+                                  target="_blank">{text.substring(0, 15) + "......" + text.substring(text.length - 15, text.length)}</a>
+                    }
                 },
                 {
                     title: "Type",
@@ -102,7 +107,7 @@ export default function NekoTable({records}) {
             ]} dataSource={records?.map((item) => {
                 return {
                     key: item.ID,
-                    Hash: item.Hash.substring(0, 15) + "..." + item.Hash.substring(item.Hash.length - 15, item.Hash.length),
+                    Hash: item.Hash,
                     CreatedAt: new Date(item.CreatedAt).toUTCString().toString(),
                     Object: item.Object,
                     Type: getRecordType(item.RecordType),
