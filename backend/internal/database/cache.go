@@ -172,6 +172,7 @@ func CreateAddressInfo(address string) uint64 {
 		Address:    address,
 		InviteCode: "neko-" + strconv.Itoa(time.Now().Nanosecond())[:5] + address[len(address)-3:],
 		IsStarter:  true,
+		Active:     true,
 	})
 	if err != nil {
 		panic(err)
