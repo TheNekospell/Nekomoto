@@ -3,8 +3,8 @@ import nekomotoAbi from "./abi/nekomoto.json" assert {type: "json"};
 import nekocoinAbi from "./abi/nekocoin.json" assert {type: "json"};
 import prismAbi from "./abi/prism.json" assert {type: "json"};
 
-// const BASE_URL = "https://api.nekomoto.xyz/api"
-const BASE_URL = "http://localhost:8972/api"
+const BASE_URL = "https://api.nekomoto.xyz/api"
+// const BASE_URL = "http://localhost:8972/api"
 
 export const NEKOMOTO_ADDRESS = "0x0615fdb0a687407578263d565f55c6004d4aac2451ff86fffaab703942bf1132"
 export const NEKOCOIN_ADDRESS = "0x05d87ea1f47df9e7547b9799b5a4580d3dfe325c468cb7fc5d3cb1b90a5783b1"
