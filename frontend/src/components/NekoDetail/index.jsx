@@ -103,6 +103,9 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
                 break;
             case "UR":
                 maxLevel = 15;
+                break;
+            default:
+                maxLevel = 0;
         }
         return maxLevel;
     };

@@ -69,7 +69,7 @@ export default function CheckCard({setWaiting, setSuccess}) {
                     style={{
                         position: "relative",
                         borderRadius: "4px",
-                        padding: "10px",
+                        padding: title === "SUN" ? "13px" : "10px",
                         backgroundColor: click ? "#E9D78E" : "rgba(14, 39, 54, 1)",
                         display: "flex",
                         flexDirection: "column",
@@ -83,10 +83,26 @@ export default function CheckCard({setWaiting, setSuccess}) {
                     onClick={checkInContract}
                 >
                     <div style={{opacity: checkIn === 1 ? "0.5" : "1"}}>{title}</div>
-                    <img src={purple1} style={{
-                        height: "25px",
-                        opacity: checkIn === 1 ? "0.5" : "1"
-                    }}/>
+                    {title !== "SUN" && (
+                        <img src={purple1} style={{
+                            height: "25px",
+                            opacity: checkIn === 1 ? "0.5" : "1"
+                        }}/>
+                    )}
+                    {title === "SUN" && (
+                        <>
+                            <img src={purple1} style={{
+                                marginTop: "15px",
+                                height: "25px",
+                                opacity: checkIn === 1 ? "0.5" : "1"
+                            }}/>
+                            <img src={purple1} style={{
+                                marginTop: "15px",
+                                height: "25px",
+                                opacity: checkIn === 1 ? "0.5" : "1"
+                            }}/>
+                        </>
+                    )}
                     {checkIn === 1 && (<img src={claimedMask} style={{
                         scale: "50%",
                         position: "absolute",

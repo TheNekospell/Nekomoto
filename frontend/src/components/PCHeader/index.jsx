@@ -12,9 +12,9 @@ import pageExtra from "@assets/page-extra.png";
 import {useLocation, useNavigate} from "react-router-dom";
 import Wallet from "@components/Wallet/wallet.jsx";
 import {useAccount} from "@starknet-react/core";
-import {NEKOMOTO_ADDRESS} from "@/interface.js";
+import {NEKOMOTO_ADDRESS, nekomotoContract} from "@/interface.js";
 import WaitCard from "@components/WaitCard/index.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useContractData} from "@components/Contract/index.jsx";
 
 export default function PCHeader() {
@@ -27,8 +27,18 @@ export default function PCHeader() {
     const [waiting, setWaiting] = useState(false);
     const [success, setSuccess] = useState("");
 
+    const [canOpenStarterPack, setCanOpenStarterPack] = useState();
+
     const {account, address, status, chainId, isConnected} = useAccount();
     const {refreshContractData} = useContractData();
+
+    useEffect(() => {
+        if (!address || canOpenStarterPack === false) return;
+        nekomotoContract.check_starter_pack(address).then((result) => {
+            console.log("can open starter pack: ", result);
+            setCanOpenStarterPack(result);
+        })
+    }, [address]);
 
     const getFaucet = async () => {
         if (!account) return;
@@ -45,6 +55,28 @@ export default function PCHeader() {
         console.log("result: ", result);
         if (result.execution_status === "SUCCEEDED") {
             setSuccess("success:" + result.transaction_hash);
+        } else {
+            setSuccess("failed");
+        }
+        refreshContractData();
+    }
+
+    const getStarterPack = async () => {
+        if (!account) return;
+
+        setWaiting(true);
+        const f = await account.execute([
+            {
+                contractAddress: NEKOMOTO_ADDRESS,
+                entrypoint: "starter_pack",
+                calldata: []
+            }]);
+        console.log(f)
+        const result = await account.waitForTransaction(f.transaction_hash);
+        console.log("result: ", result);
+        if (result.execution_status === "SUCCEEDED") {
+            setSuccess("success:" + result.transaction_hash);
+            setCanOpenStarterPack(false);
         } else {
             setSuccess("failed");
         }
@@ -82,39 +114,42 @@ export default function PCHeader() {
                                 <div style={{marginLeft: "8px"}}>Claim NPO</div>
                             </div>
 
-                            <div
-                                className={"header-btn2"}
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    color: "black",
-                                    backgroundColor: "rgba(233, 215, 142, 1)",
-                                }}
-                            >
-                                <img src={starterPack} style={{height: "30px"}}/>
+                            {canOpenStarterPack === true && (
                                 <div
+                                    className={"header-btn2"}
                                     style={{
-                                        marginLeft: "8px",
-                                        fontSize: "14px",
-                                        position: "relative",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        color: "black",
+                                        backgroundColor: "rgba(233, 215, 142, 1)",
                                     }}
+                                    onClick={getStarterPack}
                                 >
-                                    <div>Starter Pack!</div>
+                                    <img src={starterPack} style={{height: "30px"}}/>
                                     <div
                                         style={{
-                                            color: "#01dce4",
-                                            fontSize: "9px",
-                                            marginTop: "4px",
-                                            left: "50%",
-                                            transform: "translateX(-50%)",
-                                            position: "absolute",
+                                            marginLeft: "8px",
+                                            fontSize: "14px",
+                                            position: "relative",
                                         }}
                                     >
-                                        Free
+                                        <div>Starter Pack!</div>
+                                        <div
+                                            style={{
+                                                color: "#01dce4",
+                                                fontSize: "9px",
+                                                marginTop: "4px",
+                                                left: "50%",
+                                                transform: "translateX(-50%)",
+                                                position: "absolute",
+                                            }}
+                                        >
+                                            Free
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     )}
                 </div>

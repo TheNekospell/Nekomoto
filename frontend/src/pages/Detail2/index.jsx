@@ -36,7 +36,7 @@ export default function Detail() {
     useEffect(() => {
         if (!address || !addressInfo) return;
         if (!focus?.TokenId) {
-            setFocus(addressInfo.NekoSpiritList?.at(0) || {});
+            setFocus(addressInfo.NekoSpiritList?.at(0) || {Level: 0, TokenId: 0});
         } else {
             setFocus(addressInfo.NekoSpiritList?.find((x) => x.TokenId === focus.TokenId) || {});
         }
