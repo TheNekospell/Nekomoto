@@ -35,7 +35,7 @@ export default function PCHeader() {
     useEffect(() => {
         if (!address || canOpenStarterPack === false) return;
         nekomotoContract.check_starter_pack(address).then((result) => {
-            console.log("can open starter pack: ", result);
+            // console.log("can open starter pack: ", result);
             setCanOpenStarterPack(result);
         })
     }, [address]);
@@ -51,7 +51,7 @@ export default function PCHeader() {
                 calldata: []
             }]);
         console.log(f)
-        const result = await account.waitForTransaction(f.transaction_hash);
+        const result = await waitTx(f.transaction_hash);
         console.log("result: ", result);
         if (result.execution_status === "SUCCEEDED") {
             setSuccess("success:" + result.transaction_hash);
@@ -72,7 +72,7 @@ export default function PCHeader() {
                 calldata: []
             }]);
         console.log(f)
-        const result = await account.waitForTransaction(f.transaction_hash);
+        const result = await waitTx(f.transaction_hash);
         console.log("result: ", result);
         if (result.execution_status === "SUCCEEDED") {
             setSuccess("success:" + result.transaction_hash);

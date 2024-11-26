@@ -1,12 +1,12 @@
 import "./index.css";
 import NekoModal from "@components/Modal/index";
 
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 
 import {Col, Row} from "antd";
 import {useNavigate} from "react-router-dom";
 import {useAccount} from "@starknet-react/core";
-import {addCommaInNumber, NEKOMOTO_ADDRESS,} from "@/interface.js";
+import {addCommaInNumber, NEKOMOTO_ADDRESS, waitTx,} from "@/interface.js";
 import {cairo, CallData} from "starknet";
 import UnlockRate from "../../components/UnlockRate";
 import PowerCard from "../../components/PowerCard";
@@ -32,14 +32,19 @@ export default function Detail() {
 
     const {serverData: addressInfo, refreshServerData} = useServer();
     const {prism, nekocoin, prismAllowance, nekocoinAllowance, refreshContractData} = useContractData();
+    const addressInfoRef = useRef(addressInfo);
 
     useEffect(() => {
+
+        addressInfoRef.current = addressInfo;
+
         if (!address || !addressInfo) return;
         if (!focus?.TokenId) {
             setFocus(addressInfo.NekoSpiritList?.at(0) || {Level: 0, TokenId: 0});
         } else {
             setFocus(addressInfo.NekoSpiritList?.find((x) => x.TokenId === focus.TokenId) || {});
         }
+
     }, [addressInfo]);
 
     useEffect(() => {
@@ -56,17 +61,17 @@ export default function Detail() {
 
     const stake = async (input) => {
         setWaiting(true);
-        const mCall = await account.execute([
-            {
-                contractAddress: NEKOMOTO_ADDRESS,
-                entrypoint: "stake",
-                calldata: CallData.compile({token_id: [cairo.uint256(input)]}),
-            },
-        ]);
-
-        setHhh(mCall.transaction_hash);
         try {
-            const result = await account.waitForTransaction(mCall.transaction_hash);
+            const mCall = await account.execute([
+                {
+                    contractAddress: NEKOMOTO_ADDRESS,
+                    entrypoint: "stake",
+                    calldata: CallData.compile({token_id: [cairo.uint256(input)]}),
+                },
+            ]);
+
+            setHhh(mCall.transaction_hash);
+            const result = await waitTx(mCall.transaction_hash);
             console.log("result: ", result);
             // setSuccess("Success: " + mCall.transaction_hash);
             if (result.execution_status === "SUCCEEDED") {
@@ -74,26 +79,33 @@ export default function Detail() {
             } else {
                 setSuccess("failed");
             }
+            const i = setInterval(() => {
+                if (addressInfoRef.current.NekoSpiritList.filter(item => item.TokenId === input).at(0).IsStaked === false) {
+                    refreshServerData();
+                } else {
+                    clearInterval(i);
+                }
+            }, 2000);
+            setTimeout(() => clearInterval(i), 30000)
         } catch (e) {
+            refreshServerData();
             setWaiting(false);
             console.log(e)
         }
-        refreshServerData();
     };
 
     const unstake = async (input) => {
         setWaiting(true);
-        const mCall = await account.execute([
-            {
-                contractAddress: NEKOMOTO_ADDRESS,
-                entrypoint: "withdraw",
-                calldata: CallData.compile({token_id: [cairo.uint256(input)]}),
-            },
-        ]);
-
-        setHhh(mCall.transaction_hash);
         try {
-            const result = await account.waitForTransaction(mCall.transaction_hash);
+            const mCall = await account.execute([
+                {
+                    contractAddress: NEKOMOTO_ADDRESS,
+                    entrypoint: "withdraw",
+                    calldata: CallData.compile({token_id: [cairo.uint256(input)]}),
+                },
+            ]);
+
+            const result = await waitTx(mCall.transaction_hash);
             console.log("result: ", result);
             // setSuccess("Success: " + mCall.transaction_hash);
             if (result.execution_status === "SUCCEEDED") {
@@ -101,79 +113,107 @@ export default function Detail() {
             } else {
                 setSuccess("failed");
             }
+            const i = setInterval(() => {
+                if (addressInfoRef.current.NekoSpiritList.filter(item => item.TokenId === input).at(0).IsStaked === true) {
+                    refreshServerData();
+                } else {
+                    clearInterval(i);
+                }
+            }, 2000);
+            setTimeout(() => clearInterval(i), 30000)
         } catch (e) {
+            refreshServerData();
             setWaiting(false);
             console.log(e)
         }
-        refreshServerData();
     };
 
     const stakeAll = async (rarity) => {
         setWaiting(true);
-        const mCall = await account.execute([
+        const list = addressInfo.NekoSpiritList?.filter((x) => !x.IsStaked)
+            .filter((x) => rarity.toLowerCase() === "ALL".toLowerCase() ? true : x.Rarity.toLowerCase() === rarity.toLowerCase());
+        console.log("list: ", list);
+        account.execute([
             {
                 contractAddress: NEKOMOTO_ADDRESS,
                 entrypoint: "stake",
                 calldata: CallData.compile({
-                    token_id:
-                        addressInfo.NekoSpiritList?.filter((x) => !x.IsStaked)
-                            .filter((x) => rarity.toLowerCase() === "ALL".toLowerCase() ? true : x.Rarity.toLowerCase() === rarity.toLowerCase())
-                            .map((x) => cairo.uint256(x.TokenId)),
+                    token_id: list.map((x) => cairo.uint256(x.TokenId)),
                 }),
             },
-        ]);
-
-        setHhh(mCall.transaction_hash);
-        try {
-            const result = await account.waitForTransaction(mCall.transaction_hash);
-            console.log("result: ", result);
-            // setSuccess("Success: " + mCall.transaction_hash);
-            if (result.execution_status === "SUCCEEDED") {
-                setSuccess("success:" + result.transaction_hash);
-            } else {
-                setSuccess("failed");
-            }
-        } catch (e) {
+        ]).then(mCall => {
+            waitTx(mCall.transaction_hash).then(result => {
+                console.log("result: ", result);
+                // setSuccess("Success: " + mCall.transaction_hash);
+                if (result.execution_status === "SUCCEEDED") {
+                    setSuccess("success:" + result.transaction_hash);
+                } else {
+                    setSuccess("failed");
+                }
+            }).catch(e => {
+                setWaiting(false);
+                console.log(e)
+            }).finally(() => {
+                const i = setInterval(() => {
+                    if (addressInfoRef.current.NekoSpiritList.filter(item => item.TokenId === list[0].TokenId).at(0).IsStaked === false) {
+                        refreshServerData();
+                    } else {
+                        clearInterval(i);
+                    }
+                }, 2000);
+                setTimeout(() => clearInterval(i), 30000)
+            });
+        }).catch(e => {
+            refreshServerData();
             setWaiting(false);
             console.log(e)
-        }
-        refreshServerData();
+        });
     };
 
     const unStakeAll = async (rarity) => {
         setWaiting(true);
-        const mCall = await account.execute([
+        const list = addressInfo.NekoSpiritList?.filter((x) => x.IsStaked)
+            .filter((x) => rarity.toLowerCase() === "ALL".toLowerCase() ? true : x.Rarity.toLowerCase() === rarity.toLowerCase());
+        console.log("list: ", list);
+        account.execute([
             {
                 contractAddress: NEKOMOTO_ADDRESS,
                 entrypoint: "withdraw",
                 calldata: CallData.compile({
-                    token_id:
-                        addressInfo.NekoSpiritList?.filter((x) => x.IsStaked)
-                            .filter((x) => rarity.toLowerCase() === "ALL".toLowerCase() ? true : x.Rarity.toLowerCase() === rarity.toLowerCase())
-                            .map((x) => cairo.uint256(x.TokenId)),
+                    token_id: list.map((x) => cairo.uint256(x.TokenId)),
                 }),
             },
-        ]);
-
-        setHhh(mCall.transaction_hash);
-        try {
-            const result = await account.waitForTransaction(mCall.transaction_hash);
-            console.log("result: ", result);
-            // setSuccess("Success: " + mCall.transaction_hash);
-            if (result.execution_status === "SUCCEEDED") {
-                setSuccess("success:" + result.transaction_hash);
-            } else {
-                setSuccess("failed");
-            }
-        } catch (e) {
+        ]).then(mCall => {
+            waitTx(mCall.transaction_hash).then(result => {
+                console.log("result: ", result);
+                // setSuccess("Success: " + mCall.transaction_hash);
+                if (result.execution_status === "SUCCEEDED") {
+                    setSuccess("success:" + result.transaction_hash);
+                } else {
+                    setSuccess("failed");
+                }
+            }).catch(e => {
+                setWaiting(false);
+                console.log(e)
+            }).finally(() => {
+                const i = setInterval(() => {
+                    if (addressInfoRef.current.NekoSpiritList.filter(item => item.TokenId === list[0].TokenId).at(0).IsStaked === true) {
+                        refreshServerData();
+                    } else {
+                        clearInterval(i);
+                    }
+                }, 2000);
+                setTimeout(() => clearInterval(i), 30000)
+            });
+        }).catch(e => {
+            refreshServerData();
             setWaiting(false);
-            console.log(e)
-        }
-        refreshServerData();
+            console.log(e);
+        })
     };
-
     const calRate = (power) => {
         if (power < 200000) {
+
             return (power / 200000).toFixed(2) * 10 + 50;
         } else if (power < 300000) {
             return ((power - 200000) / 100000).toFixed(2) * 10 + 60;

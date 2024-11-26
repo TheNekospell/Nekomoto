@@ -4,7 +4,7 @@ import BoxBorder from "../BoxBorder";
 import {useAccount} from "@starknet-react/core";
 import {useEffect, useMemo, useState} from "react";
 import claimedMask from "@assets/claimed-mask.png";
-import {NEKOMOTO_ADDRESS, prismContract,} from "@/interface.js";
+import {NEKOMOTO_ADDRESS, prismContract, waitTx,} from "@/interface.js";
 import {CallData} from "starknet";
 import LockBlanket from "@components/LockBlanket/index.jsx";
 
@@ -26,20 +26,24 @@ export default function CheckCard({setWaiting, setSuccess}) {
 
     const checkInContract = async () => {
         setWaiting(true)
-        const mCall = await account.execute([
-            {
-                contractAddress: NEKOMOTO_ADDRESS,
-                entrypoint: "check_in",
-                calldata: CallData.compile({})
+        try {
+            const mCall = await account.execute([
+                {
+                    contractAddress: NEKOMOTO_ADDRESS,
+                    entrypoint: "check_in",
+                    calldata: CallData.compile({})
+                }
+            ])
+            const result = await waitTx(mCall.transaction_hash);
+            console.log("result: ", result);
+            // setSuccess("Success: " + mCall.transaction_hash);
+            if (result.execution_status === "SUCCEEDED") {
+                setWaiting(false);
             }
-        ])
-        const result = await account.waitForTransaction(mCall.transaction_hash);
-        console.log("result: ", result);
-        // setSuccess("Success: " + mCall.transaction_hash);
-        if (result.execution_status === "SUCCEEDED") {
+            await readCheckIn();
+        } catch (e) {
             setWaiting(false);
         }
-        await readCheckIn();
     };
 
     const calCheckStatus = (check_status) => {

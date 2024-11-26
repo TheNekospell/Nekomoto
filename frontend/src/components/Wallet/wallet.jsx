@@ -44,7 +44,7 @@ export default function Wallet({isMobile = false}) {
 
     useEffect(() => {
         const target = SN_SEPOLIA;
-        console.log("chainId: ", chainId, uint256.uint256ToBN(target));
+        // console.log("chainId: ", chainId, uint256.uint256ToBN(target));
         // if (chainId !== uint256.uint256ToBN(target) && !isMobile) {
         // 	window?.starknet?.request({
         // 		type: "wallet_switchStarknetChain",

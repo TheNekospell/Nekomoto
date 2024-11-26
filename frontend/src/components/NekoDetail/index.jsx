@@ -1,7 +1,14 @@
 import {Col, Flex, Row} from "antd";
 import CardCorner from "../CardCorner";
 import CardDetail from "../CardDetail";
-import {addCommaInNumber, NEKOCOIN_ADDRESS, NEKOMOTO_ADDRESS, nekomotoContract, PRISM_ADDRESS} from "@/interface.js";
+import {
+    addCommaInNumber,
+    NEKOCOIN_ADDRESS,
+    NEKOMOTO_ADDRESS,
+    nekomotoContract,
+    PRISM_ADDRESS,
+    waitTx
+} from "@/interface.js";
 import m2 from "@assets/modal-icon2.png";
 import Button from "../Button";
 import BoxBorder from "../BoxBorder";
@@ -33,9 +40,14 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
 
     const {account} = useAccount();
     const {nekocoin, prism, nekocoinAllowance, prismAllowance} = useContractData();
-    const {refreshServerData} = useServer();
+    const {serverData: addressInfo, refreshServerData} = useServer();
+    // const addressInfoRef = useRef(addressInfo);
 
     const [upgradeToMaxModal, setUpgradeToMaxModal] = useState(false);
+
+    // useEffect(() => {
+    //     addressInfoRef.current = addressInfo
+    // }, [addressInfo])
 
     useEffect(() => {
         if (!focus || !focus.TokenId) return
@@ -152,10 +164,10 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
             calldata: CallData.compile({tokenId: cairo.uint256(focus.TokenId)}),
         });
 
-        const mCall = await account.execute(arr);
-
         try {
-            const result = await account.waitForTransaction(mCall.transaction_hash);
+            const mCall = await account.execute(arr);
+
+            const result = await waitTx(mCall.transaction_hash);
             console.log("result: ", result);
             // setSuccess("Success: " + mCall.transaction_hash);
             if (result.execution_status === "SUCCEEDED") {
@@ -163,12 +175,19 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
             } else {
                 setSuccess("failed");
             }
+
+            const i = setInterval(() => {
+                if (addressInfo.NekoSpiritList.filter(item => item.TokenId === focus.TokenId).at(0).Level === focus.Level) {
+                    refreshServerData();
+                } else {
+                    clearInterval(i);
+                }
+            }, 2000);
+            setTimeout(() => clearInterval(i), 30000)
         } catch (e) {
             setWaiting(false);
             console.log(e)
         }
-
-        refreshServerData();
 
     }
 
@@ -212,9 +231,9 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
             calldata: CallData.compile({tokenId: cairo.uint256(focus.TokenId)}),
         });
 
-        const mCall = await account.execute(arr);
         try {
-            const result = await account.waitForTransaction(mCall.transaction_hash);
+            const mCall = await account.execute(arr);
+            const result = await waitTx(mCall.transaction_hash);
             console.log("result: ", result);
             // setSuccess("Success: " + mCall.transaction_hash);
             if (result.execution_status === "SUCCEEDED") {
@@ -222,6 +241,15 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
             } else {
                 setSuccess("failed");
             }
+
+            const i = setInterval(() => {
+                if (addressInfo.NekoSpiritList.filter(item => item.TokenId === focus.TokenId).at(0).Level === focus.Level) {
+                    refreshServerData();
+                } else {
+                    clearInterval(i);
+                }
+            }, 2000);
+            setTimeout(() => clearInterval(i), 30000)
         } catch (e) {
             setWaiting(false);
             console.log(e)

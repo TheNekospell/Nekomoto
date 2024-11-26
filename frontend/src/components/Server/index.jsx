@@ -31,7 +31,7 @@ export const ServerProvider = ({children}) => {
     const refreshServerData = () => {
         if (!address) return;
         BACKEND.addressInfo(address).then((result) => {
-            console.log("address info: ", result.data);
+            // console.log("address info: ", result.data);
             setServerData(result.data);
         });
     };

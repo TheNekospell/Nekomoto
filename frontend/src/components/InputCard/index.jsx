@@ -54,45 +54,50 @@ export default function InputCard() {
 
         setText("Please sign the transactions and wait for seconds...");
 
-        if (new BigNumber(allowance).lt(new BigNumber(count * 25000 * 10 ** 18))) {
-            const approve = await account.execute([
+        try {
+            if (new BigNumber(allowance).lt(new BigNumber(count * 25000 * 10 ** 18))) {
+                const approve = await account.execute([
+                    {
+                        contractAddress: NEKOCOIN_ADDRESS,
+                        entrypoint: "approve",
+                        calldata: CallData.compile({
+                            spender: NEKOMOTO_ADDRESS,
+                            amount: cairo.uint256(BigInt(count) * 25000n * 10n ** 18n),
+                        }),
+                    },
+                ]);
+                console.log("approve: ", approve);
+                const result = await waitTx(approve.transaction_hash);
+                console.log("approveResult: ", result);
+                if (result.execution_status !== "SUCCEEDED") {
+                    setText("failed");
+                }
+                refreshContractData();
+            }
+
+            const buyScroll = await account.execute([
                 {
-                    contractAddress: NEKOCOIN_ADDRESS,
-                    entrypoint: "approve",
+                    contractAddress: NEKOMOTO_ADDRESS,
+                    entrypoint: "buy_coin",
                     calldata: CallData.compile({
-                        spender: NEKOMOTO_ADDRESS,
-                        amount: cairo.uint256(BigInt(count) * 25000n * 10n ** 18n),
+                        amount: cairo.uint256(BigInt(count)),
                     }),
-                },
+                }
             ]);
-            console.log("approve: ", approve);
-            const result = await waitTx(approve.transaction_hash);
-            console.log("approveResult: ", result);
-            if (result.execution_status !== "SUCCEEDED") {
+            console.log("buyScroll: ", buyScroll);
+            const result = await waitTx(buyScroll.transaction_hash);
+            console.log("buyScrollResult: ", result);
+            if (result.execution_status === "SUCCEEDED") {
+                setText("");
+                setBuyScroll(true);
+            } else {
                 setText("failed");
             }
             refreshContractData();
-        }
-
-        const buyScroll = await account.execute([
-            {
-                contractAddress: NEKOMOTO_ADDRESS,
-                entrypoint: "buy_coin",
-                calldata: CallData.compile({
-                    amount: cairo.uint256(BigInt(count)),
-                }),
-            }
-        ]);
-        console.log("buyScroll: ", buyScroll);
-        const result = await waitTx(buyScroll.transaction_hash);
-        console.log("buyScrollResult: ", result);
-        if (result.execution_status === "SUCCEEDED") {
+        } catch (e) {
+            console.log(e);
             setText("");
-            setBuyScroll(true);
-        } else {
-            setText("failed");
         }
-        refreshContractData();
     }
 
 
@@ -110,28 +115,32 @@ export default function InputCard() {
 
         setVisible(true);
 
-        const {typedMessage, signature} = await sign(account);
-        // console.log("typedMessage: ", typedMessage);
-        // console.log("signature: ", signature);
-        // return
+        try {
+            const {typedMessage, signature} = await sign(account);
+            // console.log("typedMessage: ", typedMessage);
+            // console.log("signature: ", signature);
+            // return
 
-        const result = await BACKEND.summonBox(
-            address,
-            count,
-            typedMessage,
-            signature
-        );
-        console.log("result: ", result);
-        setText("Waiting for transaction: " + result.data);
-        if (result.success) {
-            const summonResult = await waitTx(result.data);
-            console.log("summonResult: ", summonResult);
-            setText("Success: " + result.data);
-        } else {
-            setText("Something went wrong: " + result.message);
+            const result = await BACKEND.summonBox(
+                address,
+                count,
+                typedMessage,
+                signature
+            );
+            console.log("result: ", result);
+            setText("Waiting for transaction: " + result.data);
+            if (result.success) {
+                const summonResult = await waitTx(result.data);
+                console.log("summonResult: ", summonResult);
+                setText("Success: " + result.data);
+            } else {
+                setText("Something went wrong: " + result.message);
+            }
+            refreshContractData();
+            refreshServerData();
+        } catch (e) {
+            setText("");
         }
-        refreshContractData();
-        refreshServerData();
     };
 
     const MintButton = ({count}) => {

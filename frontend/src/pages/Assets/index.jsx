@@ -3,7 +3,7 @@ import InputCard from "../../components/InputCard/index";
 import Table from "../../components/Table/index";
 
 import {Col, Flex, Row} from "antd";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import NekoModal from "../../components/Modal/index.jsx";
 import CardCorner from "../../components/CardCorner/index.jsx";
 import Button from "../../components/Button/index.jsx";
@@ -18,15 +18,11 @@ import WaitCard from "../../components/WaitCard/index.jsx";
 export default function Assets() {
     const [isModalOpen1, setIsModalOpen1] = useState(false);
     const navigate = useNavigate();
-    const [hhh, setHhh] = useState("");
-    const {serverData: addressInfo, refreshServerData} = useServer();
+    const {serverData: addressInfo} = useServer();
 
     const [waiting, setWaiting] = useState(false);
     const [success, setSuccess] = useState("");
 
-    useEffect(() => {
-        refreshServerData();
-    }, [hhh]);
 
     return (
         <div>

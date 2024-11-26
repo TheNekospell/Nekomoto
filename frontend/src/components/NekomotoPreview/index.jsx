@@ -113,6 +113,7 @@ export default function NekomotoPreview({
                         func={stakeAll}
                         condition={
                             addressInfo.NekoSpiritList?.filter((item) => !item.IsStaked)
+                                .filter((item) => nekoButton.toLowerCase() === "ALL".toLowerCase() ? true : item.Rarity.toLowerCase() === nekoButton.toLowerCase())
                                 .length > 0
                         }
                     />
@@ -122,6 +123,7 @@ export default function NekomotoPreview({
                         func={unStakeAll}
                         condition={
                             addressInfo.NekoSpiritList?.filter((item) => item.IsStaked)
+                                .filter((item) => nekoButton.toLowerCase() === "ALL".toLowerCase() ? true : item.Rarity.toLowerCase() === nekoButton.toLowerCase())
                                 .length > 0
                         }
                     />

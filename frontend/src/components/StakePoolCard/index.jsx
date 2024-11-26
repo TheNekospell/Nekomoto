@@ -24,19 +24,25 @@ export default function StakePoolCard({
 
     const claim = async () => {
         setWaiting(true);
-        const {typedMessage, signature} = await sign(account);
-        const result = await BACKEND.claimReward(
-            address,
-            typedMessage,
-            signature
-        );
-        console.log("result: ", result);
-        if (result.success) {
-            setSuccess("success:" + result.transaction_hash);
-        } else {
-            setSuccess("failed");
+        try {
+
+            const {typedMessage, signature} = await sign(account);
+            const result = await BACKEND.claimReward(
+                address,
+                typedMessage,
+                signature
+            );
+            console.log("result: ", result);
+            if (result.success) {
+                setSuccess("success:" + result.transaction_hash);
+            } else {
+                setSuccess("failed");
+            }
+            refreshServerData();
+        } catch (e) {
+            setWaiting(false);
+            console.log(e)
         }
-        refreshServerData();
     };
 
     return (
