@@ -12,7 +12,7 @@ import {
 import m2 from "@assets/modal-icon2.png";
 import Button from "../Button";
 import BoxBorder from "../BoxBorder";
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 
 import blue from "@assets/blue.png";
 import purple from "@assets/purple.png";
@@ -41,13 +41,13 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
     const {account} = useAccount();
     const {nekocoin, prism, nekocoinAllowance, prismAllowance} = useContractData();
     const {serverData: addressInfo, refreshServerData} = useServer();
-    // const addressInfoRef = useRef(addressInfo);
+    const addressInfoRef = useRef(addressInfo);
 
     const [upgradeToMaxModal, setUpgradeToMaxModal] = useState(false);
 
-    // useEffect(() => {
-    //     addressInfoRef.current = addressInfo
-    // }, [addressInfo])
+    useEffect(() => {
+        addressInfoRef.current = addressInfo
+    }, [addressInfo])
 
     useEffect(() => {
         if (!focus || !focus.TokenId) return
@@ -177,7 +177,7 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
             }
 
             const i = setInterval(() => {
-                if (addressInfo.NekoSpiritList.filter(item => item.TokenId === focus.TokenId).at(0).Level === focus.Level) {
+                if (addressInfoRef.current.NekoSpiritList.filter(item => item.TokenId === focus.TokenId).at(0).Level === focus.Level) {
                     refreshServerData();
                 } else {
                     clearInterval(i);
@@ -243,7 +243,7 @@ export default function NekoDetail({focus, waiting, setWaiting, success, setSucc
             }
 
             const i = setInterval(() => {
-                if (addressInfo.NekoSpiritList.filter(item => item.TokenId === focus.TokenId).at(0).Level === focus.Level) {
+                if (addressInfoRef.current.NekoSpiritList.filter(item => item.TokenId === focus.TokenId).at(0).Level === focus.Level) {
                     refreshServerData();
                 } else {
                     clearInterval(i);
