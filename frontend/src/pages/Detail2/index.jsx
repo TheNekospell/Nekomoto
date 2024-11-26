@@ -132,7 +132,6 @@ export default function Detail() {
         setWaiting(true);
         const list = addressInfo.NekoSpiritList?.filter((x) => !x.IsStaked)
             .filter((x) => rarity.toLowerCase() === "ALL".toLowerCase() ? true : x.Rarity.toLowerCase() === rarity.toLowerCase());
-        console.log("list: ", list);
         account.execute([
             {
                 contractAddress: NEKOMOTO_ADDRESS,
@@ -174,7 +173,6 @@ export default function Detail() {
         setWaiting(true);
         const list = addressInfo.NekoSpiritList?.filter((x) => x.IsStaked)
             .filter((x) => rarity.toLowerCase() === "ALL".toLowerCase() ? true : x.Rarity.toLowerCase() === rarity.toLowerCase());
-        console.log("list: ", list);
         account.execute([
             {
                 contractAddress: NEKOMOTO_ADDRESS,
