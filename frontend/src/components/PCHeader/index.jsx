@@ -231,6 +231,7 @@ export default function PCHeader() {
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
+                                    cursor:"default"
                                 }}
                             >
                                 <img

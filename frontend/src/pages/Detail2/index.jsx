@@ -108,16 +108,17 @@ export default function Detail() {
         refreshServerData();
     };
 
-    const stakeAll = async () => {
+    const stakeAll = async (rarity) => {
         setWaiting(true);
         const mCall = await account.execute([
             {
                 contractAddress: NEKOMOTO_ADDRESS,
                 entrypoint: "stake",
                 calldata: CallData.compile({
-                    token_id: addressInfo.NekoSpiritList?.filter((x) => !x.IsStaked).map(
-                        (x) => cairo.uint256(x.TokenId)
-                    ),
+                    token_id:
+                        addressInfo.NekoSpiritList?.filter((x) => !x.IsStaked)
+                            .filter((x) => rarity.toLowerCase() === "ALL".toLowerCase() ? true : x.Rarity.toLowerCase() === rarity.toLowerCase())
+                            .map((x) => cairo.uint256(x.TokenId)),
                 }),
             },
         ]);
@@ -139,16 +140,17 @@ export default function Detail() {
         refreshServerData();
     };
 
-    const unStakeAll = async () => {
+    const unStakeAll = async (rarity) => {
         setWaiting(true);
         const mCall = await account.execute([
             {
                 contractAddress: NEKOMOTO_ADDRESS,
                 entrypoint: "withdraw",
                 calldata: CallData.compile({
-                    token_id: addressInfo.NekoSpiritList?.filter((x) => x.IsStaked).map(
-                        (x) => cairo.uint256(x.TokenId)
-                    ),
+                    token_id:
+                        addressInfo.NekoSpiritList?.filter((x) => x.IsStaked)
+                            .filter((x) => rarity.toLowerCase() === "ALL".toLowerCase() ? true : x.Rarity.toLowerCase() === rarity.toLowerCase())
+                            .map((x) => cairo.uint256(x.TokenId)),
                 }),
             },
         ]);

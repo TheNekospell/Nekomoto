@@ -35,7 +35,7 @@ export default function NekomotoPreview({
                         opacity: condition ? 1 : 0.5,
                     }}
                     className={condition ? "stake-button" : ""}
-                    onClick={condition ? func : null}
+                    onClick={condition ? () => func(nekoButton) : null}
                 >
                     {mainTitle}
                     {subTitle && (
