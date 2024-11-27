@@ -12,7 +12,7 @@ import pageExtra from "@assets/page-extra.png";
 import {useLocation, useNavigate} from "react-router-dom";
 import Wallet from "@components/Wallet/wallet.jsx";
 import {useAccount} from "@starknet-react/core";
-import {NEKOMOTO_ADDRESS, nekomotoContract} from "@/interface.js";
+import {NEKOMOTO_ADDRESS, nekomotoContract, waitTx} from "@/interface.js";
 import WaitCard from "@components/WaitCard/index.jsx";
 import {useEffect, useState} from "react";
 import {useContractData} from "@components/Contract/index.jsx";

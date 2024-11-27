@@ -79,7 +79,7 @@ func StartIndexer() {
 
 		}
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(100 * time.Millisecond)
 
 	}
 
@@ -255,17 +255,18 @@ func resolvePrismTransfer(block uint64) {
 		fmt.Println("err : ", err.Error())
 		return
 	}
-	// fmt.Println("result: ", result.ContinuationToken)
+	//fmt.Println("result: ", result.Events)
 	// panic("stop")
 	for _, event := range result.Events {
 		if checkIndexedTransaction(&event, uint8(PrismTransfer)) {
 			// fmt.Println("continue")
 			continue
 		}
+		//fmt.Println("event : ", event.Event.Data)
 		to := event.Event.Keys[2].String()
-		value := event.Event.Keys[3].Uint64()
+		value := event.Event.Data[0].Uint64()
 
-		recordTransactionForDisplay(database.GetAddressDetailByAddress(to).Uid, event.TransactionHash.String(), decimal.NewFromUint64(value).Div(decimal.New(10, 18)).String(), database.Prism)
+		recordTransactionForDisplay(database.GetAddressDetailByAddress(to).Uid, event.TransactionHash.String(), decimal.NewFromUint64(value).Div(decimal.New(1, 18)).String(), database.Prism)
 
 	}
 
