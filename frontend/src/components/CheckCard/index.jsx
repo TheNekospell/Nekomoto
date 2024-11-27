@@ -2,16 +2,23 @@ import purple1 from "@assets/purple1.png";
 import seven from "@assets/seven.png";
 import BoxBorder from "../BoxBorder";
 import {useAccount} from "@starknet-react/core";
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import claimedMask from "@assets/claimed-mask.png";
 import {NEKOMOTO_ADDRESS, prismContract, waitTx,} from "@/interface.js";
 import {CallData} from "starknet";
 import LockBlanket from "@components/LockBlanket/index.jsx";
+import {useContractData} from "@components/Contract/index.jsx";
 
 export default function CheckCard({setWaiting, setSuccess}) {
 
     const {account, address} = useAccount();
     const [check_status, setCheckStatus] = useState(0);
+    const {prism, refreshContractData} = useContractData();
+    const prismRef = useRef(prism);
+
+    useEffect(() => {
+        prismRef.current = prism;
+    }, [prism]);
 
     useEffect(() => {
         if (!address) return;
@@ -40,7 +47,15 @@ export default function CheckCard({setWaiting, setSuccess}) {
             if (result.execution_status === "SUCCEEDED") {
                 setWaiting(false);
             }
-            await readCheckIn();
+            const i = setInterval(() => {
+                if (prismRef.current === prism) {
+                    refreshContractData();
+                } else {
+                    clearInterval(i);
+                    readCheckIn();
+                }
+            }, 2000);
+            setTimeout(() => clearInterval(i), 30000)
         } catch (e) {
             setWaiting(false);
         }

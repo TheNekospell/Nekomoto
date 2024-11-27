@@ -87,6 +87,10 @@ export default function NekoTable({records}) {
                                 text: "Upgrade",
                                 value: "Upgrade",
                             },
+                            {
+                                text: "Prism",
+                                value: "Prism"
+                            },
                         ],
                         onFilter: (value, record) => record.Type === value.toString(),
                     },
