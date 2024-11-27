@@ -178,13 +178,13 @@ func CreateAddressInfo(address string) uint64 {
 		panic(err)
 	}
 	// uid -> buff
-	_ = CreateBuffRecord(&ServerBuffRecord{
-		Uid:   uid,
-		Level: 0,
-		Boost: decimal.NewFromInt(0),
-	})
+	//_ = CreateBuffRecord(&ServerBuffRecord{
+	//	Uid:   uid,
+	//	Level: 0,
+	//	Boost: decimal.NewFromInt(0),
+	//})
 	// uid -> invitation reward static
-	CreateInvitationRewardStatic(uid)
+	//CreateInvitationRewardStatic(uid)
 	fmt.Println("[Server] Create address info for address:", address, "uid:", uid)
 	return uid
 }

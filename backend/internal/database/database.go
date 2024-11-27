@@ -60,7 +60,7 @@ func initTables() {
 		&ServerBurnTemp{},
 		&ServerTestCode{},
 		&ServerEpoch{},
-		ServerTransactionRecord{},
+		&ServerTransactionRecord{},
 		&IndexerRecord{},
 		&IndexerTransactionRecord{},
 		&EventNekoCoinTransfer{},
@@ -170,17 +170,17 @@ type ServerNekoSpiritInfo struct {
 	ClaimedMintRewards decimal.Decimal `gorm:"not null type:decimal(36,18) default:0"`
 }
 
-type ServerBuffRecord struct {
-	Model
-	Uid uint64 `gorm:"not null index"`
-	// ascend
-	Level uint64          `gorm:"not null default:0"`
-	Boost decimal.Decimal `gorm:"not null default:0 type:decimal(4,4)"`
-	// time freeze
-	StartTime time.Time `gorm:"default:'2000-01-01 00:00:00.000'"`
-	// lucky
-	IsLucky bool `gorm:"not null default:false"`
-}
+//type ServerBuffRecord struct {
+//	Model
+//	Uid uint64 `gorm:"not null index"`
+//	// ascend
+//	Level uint64          `gorm:"not null default:0"`
+//	Boost decimal.Decimal `gorm:"not null default:0 type:decimal(4,4)"`
+//	// time freeze
+//	StartTime time.Time `gorm:"default:'2000-01-01 00:00:00.000'"`
+//	// lucky
+//	IsLucky bool `gorm:"not null default:false"`
+//}
 
 type ServerClaimNekoSpiritRecord struct {
 	Model
