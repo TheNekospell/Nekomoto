@@ -19,6 +19,8 @@ export default function NekoTable({records}) {
                 return "Withdraw";
             case 5:
                 return "Upgrade";
+            case 6:
+                return "Prism";
         }
     }
 
