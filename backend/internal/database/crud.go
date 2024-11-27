@@ -68,20 +68,20 @@ func UpdateNekoSpiritInfoWithStakeStatus(box *ServerNekoSpiritInfo, attr map[str
 	return nil
 }
 
-func CreateBuffRecord(record *ServerBuffRecord) error {
-	if err := DB.Create(&record).Error; err != nil {
-		return err
-	}
-	return nil
-}
-
-func UpdateBuffRecord(record *ServerBuffRecord) error {
-	if err := DB.Model(&record).Updates(record).Error; err != nil {
-		return err
-	}
-	Cache.Delete(CacheTagUid + strconv.FormatUint(record.Uid, 10))
-	return nil
-}
+//func CreateBuffRecord(record *ServerBuffRecord) error {
+//	if err := DB.Create(&record).Error; err != nil {
+//		return err
+//	}
+//	return nil
+//}
+//
+//func UpdateBuffRecord(record *ServerBuffRecord) error {
+//	if err := DB.Model(&record).Updates(record).Error; err != nil {
+//		return err
+//	}
+//	Cache.Delete(CacheTagUid + strconv.FormatUint(record.Uid, 10))
+//	return nil
+//}
 
 // func SaveEventNekoSpiritTransfer(event *chain.SpiritTransfer) error {
 // 	toSave := EventNekoSpiritTransfer{
