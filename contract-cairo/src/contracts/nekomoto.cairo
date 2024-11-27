@@ -282,12 +282,17 @@ pub mod Nekomoto {
             assert(self.starter_pack_limit.read() > 0, 'No more starter pack');
             self.open_pack.write(sender, 1);
             self.starter_pack_limit.write(self.starter_pack_limit.read() - 1);
-            let token_id = self.token_id.read() + 1;
-            self.erc721.mint(sender, token_id);
-            self.starter.write(token_id, 1);
-            self.token_id.write(token_id);
-            self.atk.write(token_id, 5);
-            self.emit(Summon { to: sender, token_id: token_id });
+            // let token_id = self.token_id.read() + 1;
+            // self.erc721.mint(sender, token_id);
+            // self.starter.write(token_id, 1);
+            // self.token_id.write(token_id);
+            // self.atk.write(token_id, 5);
+            // self.emit(Summon { to: sender, token_id: token_id });
+            ERC20BurnTraitDispatcher { contract_address: self.prism.read() }
+                .mint(sender, 5000000000000000000);
+            let count = 20;
+            self.coin.write(sender, self.coin.read(sender) + count);
+            self.emit(BuyCoin { to: sender, count });
         }
 
         fn check_starter_pack(self: @ContractState, address: ContractAddress) -> bool {

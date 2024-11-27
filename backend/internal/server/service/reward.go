@@ -50,7 +50,7 @@ func ClaimReward(req model.AddressAndSignature) (model.ResponseCode, string) {
 	// clear cache
 	database.Cache.Delete(database.CacheTagUid + strconv.FormatUint(addressDetail.Uid, 10))
 
-	return model.Success, "Claimed " + totalReward.Round(2).String() + "NKO"
+	return model.Success, "Claimed " + totalReward.Div(decimal.New(10, 18)).Round(2).String() + "NKO"
 }
 
 func ClaimRewardOfMint(req model.AddressAndSignature) (model.ResponseCode, string) {
@@ -92,5 +92,5 @@ func ClaimRewardOfMint(req model.AddressAndSignature) (model.ResponseCode, strin
 	// clear cache
 	database.Cache.Delete(database.CacheTagUid + strconv.FormatUint(addressDetail.Uid, 10))
 
-	return model.Success, "Claimed " + totalReward.Round(2).String() + "NKO"
+	return model.Success, "Claimed " + totalReward.Div(decimal.New(10, 18)).Round(2).String() + "NKO"
 }

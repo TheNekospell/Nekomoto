@@ -12,6 +12,8 @@ import {useAccount} from "@starknet-react/core";
 import TimerCard from "@components/TimerCard/index.jsx";
 import LockBlanket from "@components/LockBlanket/index.jsx";
 import {useServer} from "@components/Server/index.jsx";
+import {useContractData} from "@components/Contract/index.jsx";
+import {useEffect, useRef} from "react";
 
 export default function MintPoolCard({
                                          epoch,
@@ -24,6 +26,12 @@ export default function MintPoolCard({
                                      }) {
     const {address, account} = useAccount();
     const {refreshServerData} = useServer();
+    const {nekocoin, refreshContractData} = useContractData();
+    const nekocoinRef = useRef(nekocoin);
+
+    useEffect(() => {
+        nekocoinRef.current = nekocoin;
+    }, [nekocoin]);
 
     const claim = async () => {
         setWaiting(true);
@@ -32,15 +40,24 @@ export default function MintPoolCard({
             const result = await BACKEND.claimRewardOfMint(address, typedMessage, signature);
             console.log("result: ", result);
             if (result.success) {
-                setSuccess("success:" + result.transaction_hash);
+                setSuccess("success:" + result.data);
             } else {
-                setSuccess("failed");
+                setSuccess("failed:" + result.message);
             }
-            refreshServerData();
         } catch (e) {
             setWaiting(false);
             console.log(e)
+            return;
         }
+        refreshServerData();
+        const i = setInterval(() => {
+            if (nekocoinRef.current === nekocoin) {
+                refreshContractData();
+            } else {
+                clearInterval(i);
+            }
+        }, 2000);
+        setTimeout(() => clearInterval(i), 30000)
     }
 
     return (

@@ -109,6 +109,7 @@ export default function NekoTable({records}) {
                     },
                 ]} dataSource={records?.map((item) => {
                     return {
+                        id: item.ID,
                         key: item.ID,
                         Hash: item.Hash,
                         CreatedAt: new Date(item.CreatedAt).toUTCString().toString(),

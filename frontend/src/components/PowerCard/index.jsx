@@ -85,7 +85,7 @@ export default function PowerCard({staticTotalPower, myPower}) {
                                 flexDirection: "column",
                             }}
                         >
-                            <div style={{fontSize: "12px"}}>{"Global Power"}</div>
+                            <div style={{fontSize: "12px"}}>{"My Power"}</div>
                             <div
                                 style={{
                                     display: "flex",
@@ -111,7 +111,7 @@ export default function PowerCard({staticTotalPower, myPower}) {
                                 flexDirection: "column",
                             }}
                         >
-                            <div style={{fontSize: "12px"}}>{"Global Power"}</div>
+                            <div style={{fontSize: "12px"}}>{"Proportion"}</div>
                             <div
                                 style={{
                                     display: "flex",
@@ -120,7 +120,7 @@ export default function PowerCard({staticTotalPower, myPower}) {
                                 }}
                             >
                                 <div style={{fontSize: "30px", color: "white"}}>
-                                    {staticTotalPower === 0 || staticTotalPower === "0" ? "0%" : Number(BigInt(myPower) / BigInt(staticTotalPower)).toFixed(2) * 100 + "%"}
+                                    {staticTotalPower === 0 || staticTotalPower === "0" ? "0%" : (Number(myPower) / Number(staticTotalPower)).toFixed(4) * 100 + "%"}
                                 </div>
                             </div>
                         </div>

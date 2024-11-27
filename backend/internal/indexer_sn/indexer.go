@@ -16,6 +16,19 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+type RecordType uint8
+
+const (
+	None RecordType = iota
+	NekoCoinBurn
+	ToUse2
+	ToUse3
+	BoxUpgrade
+	BoxTransfer
+	BuyScroll
+	PrismTransfer
+)
+
 func init() {
 
 }
@@ -57,6 +70,8 @@ func StartIndexer() {
 			// fmt.Println("------------------resolveNekoCoinBurn cost time: ", time.Since(now)/time.Millisecond)
 
 			resolveScroll(i)
+
+			resolvePrismTransfer(i)
 
 			channel <- i
 
@@ -104,7 +119,7 @@ func resolveNekoCoinBurn(block uint64) {
 	}
 
 	for _, event := range result.Events {
-		if checkIndexedTransaction(&event, 1) {
+		if checkIndexedTransaction(&event, uint8(NekoCoinBurn)) {
 			continue
 		}
 		// fmt.Println("event : ", event.Event)
@@ -116,7 +131,7 @@ func resolveNekoCoinBurn(block uint64) {
 	}
 
 	for _, event := range result.Events {
-		recordIndexedTransaction(&event, 1)
+		recordIndexedTransaction(&event, uint8(NekoCoinBurn))
 	}
 }
 
@@ -136,7 +151,7 @@ func resolveBoxUpgrade(block uint64) {
 		return
 	}
 	for _, event := range result.Events {
-		if checkIndexedTransaction(&event, 4) {
+		if checkIndexedTransaction(&event, uint8(BoxUpgrade)) {
 			continue
 		}
 		info, recordType := service.UpdateNekoSpiritByUpgrade(event.Event.Keys[2].Uint64(), event.Event.Data[2].Uint64())
@@ -148,7 +163,7 @@ func resolveBoxUpgrade(block uint64) {
 	}
 
 	for _, event := range result.Events {
-		recordIndexedTransaction(&event, 4)
+		recordIndexedTransaction(&event, uint8(BoxUpgrade))
 	}
 }
 
@@ -170,7 +185,7 @@ func resolveBoxTransfer(block uint64) {
 	// fmt.Println("result: ", result.ContinuationToken)
 	// panic("stop")
 	for _, event := range result.Events {
-		if checkIndexedTransaction(&event, 5) {
+		if checkIndexedTransaction(&event, uint8(BoxTransfer)) {
 			// fmt.Println("continue")
 			continue
 		}
@@ -187,7 +202,7 @@ func resolveBoxTransfer(block uint64) {
 	}
 
 	for _, event := range result.Events {
-		recordIndexedTransaction(&event, 5)
+		recordIndexedTransaction(&event, uint8(BoxTransfer))
 	}
 }
 
@@ -209,7 +224,7 @@ func resolveScroll(block uint64) {
 	// fmt.Println("result: ", result.ContinuationToken)
 	// panic("stop")
 	for _, event := range result.Events {
-		if checkIndexedTransaction(&event, 6) {
+		if checkIndexedTransaction(&event, uint8(BuyScroll)) {
 			// fmt.Println("continue")
 			continue
 		}
@@ -221,7 +236,41 @@ func resolveScroll(block uint64) {
 	}
 
 	for _, event := range result.Events {
-		recordIndexedTransaction(&event, 6)
+		recordIndexedTransaction(&event, uint8(BuyScroll))
+	}
+}
+
+func resolvePrismTransfer(block uint64) {
+	result, err := chain_sn.Account.Events(context.Background(), rpc.EventsInput{
+		EventFilter: rpc.EventFilter{
+			FromBlock: rpc.BlockID{Number: &block},
+			ToBlock:   rpc.BlockID{Number: &block},
+			Address:   chain_sn.PrismContractAddress,
+			Keys:      [][]*felt.Felt{{utils.GetSelectorFromNameFelt("Transfer")}},
+		},
+		ResultPageRequest: rpc.ResultPageRequest{ChunkSize: 1000},
+	})
+	if err != nil {
+		// panic(err)
+		fmt.Println("err : ", err.Error())
+		return
+	}
+	// fmt.Println("result: ", result.ContinuationToken)
+	// panic("stop")
+	for _, event := range result.Events {
+		if checkIndexedTransaction(&event, uint8(PrismTransfer)) {
+			// fmt.Println("continue")
+			continue
+		}
+		to := event.Event.Keys[2].String()
+		value := event.Event.Keys[3].Uint64()
+
+		recordTransactionForDisplay(database.GetAddressDetailByAddress(to).Uid, event.TransactionHash.String(), decimal.NewFromUint64(value).Div(decimal.New(10, 18)).String(), database.Prism)
+
+	}
+
+	for _, event := range result.Events {
+		recordIndexedTransaction(&event, uint8(PrismTransfer))
 	}
 }
 

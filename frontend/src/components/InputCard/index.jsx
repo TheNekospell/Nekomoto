@@ -132,7 +132,8 @@ export default function InputCard() {
             if (result.success) {
                 const summonResult = await waitTx(result.data);
                 console.log("summonResult: ", summonResult);
-                setText("Success: " + result.data);
+                const summonCount = summonResult.events.filter(item => item.keys[0] === "0x23806c3414197ff8414c60a5846333b8f48e849bca036faa095917399eb275c").length;
+                setText("Success Summon " + summonCount + " Nekos!");
             } else {
                 setText("Something went wrong: " + result.message);
             }
@@ -418,7 +419,7 @@ export default function InputCard() {
 
                             <div style={{display: "flex", flexDirection: "row", marginTop: "20px"}}>
                                 <Button
-                                    text={"CONFIRM"}
+                                    text={"SUMMON NOW!"}
                                     color={"yellow"}
                                     longness="long"
                                     onClick={() => {
@@ -426,6 +427,8 @@ export default function InputCard() {
                                         setBuyScrollCount(0);
                                         setText("");
                                         refreshContractData();
+                                        // value shouldn't be 0 here
+                                        mint(buyScrollCount);
                                     }}/>
                             </div>
                         </>

@@ -128,6 +128,7 @@ const (
 	Stake
 	Withdraw
 	Upgrade
+	Prism
 )
 
 type Model struct {
