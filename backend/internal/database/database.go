@@ -1,7 +1,9 @@
 package database
 
 import (
+	"backend/internal/chain_sn"
 	"backend/internal/env"
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -83,7 +85,12 @@ func initTables() {
 		blockHeight, err := strconv.ParseUint(env.GetEnvValue("BLOCK_HEIGHT"), 10, 64)
 		if err != nil {
 			fmt.Println("indexer block height is not set, use default value 0", err)
-			blockHeight = 0
+			currentBlock, err := chain_sn.Client.BlockNumber(context.Background())
+			if err != nil {
+				blockHeight = 0
+			} else {
+				blockHeight = currentBlock - 100
+			}
 		}
 		DB.Create(&IndexerRecord{BlockHeight: blockHeight})
 	}
